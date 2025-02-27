@@ -2,6 +2,7 @@ package nl.kmartin.dartsmatcherapiv2.features.x01.x01checkout;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceNotFoundException;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Checkout;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -9,8 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class X01CheckoutServiceImpl implements IX01CheckoutService {
@@ -25,14 +24,21 @@ public class X01CheckoutServiceImpl implements IX01CheckoutService {
      * @throws IOException If there's an issue reading the file.
      */
     @Override
-    public ArrayList<X01Checkout> getCheckouts() throws IOException {
+    public ArrayList<X01Checkout> getCheckouts() throws IOException, RuntimeException {
         ObjectMapper mapper = new ObjectMapper();
 
-        return mapper.readValue(
+        // Read the JSON file to an ArrayList of X01Checkout objects
+        ArrayList<X01Checkout> checkouts = mapper.readValue(
                 checkoutsResourceFile.getInputStream(),
                 new TypeReference<>() {
-                }
-        );
+                });
+
+        // If for some reason the checkouts is empty throw a RuntimeException as this should not happen.
+        if (checkouts == null || checkouts.isEmpty()) {
+            throw new RuntimeException("Checkouts not found");
+        }
+
+        return checkouts;
     }
 
     /**
@@ -41,15 +47,13 @@ public class X01CheckoutServiceImpl implements IX01CheckoutService {
      * @param remaining int The value to search for in the checkouts.
      * @return Optional<X01Checkout> containing the matching checkout. if no checkout available an empty Optional.
      * @throws IOException If there's an issue reading the file.
+     * @throws ResourceNotFoundException If the remaining score doesn't have a checkout.
      */
     @Override
-    public Optional<X01Checkout> getCheckout(int remaining) throws IOException {
-        List<X01Checkout> checkouts = getCheckouts();
-
-        if (checkouts == null || checkouts.isEmpty()) return Optional.empty();
-
+    public X01Checkout getCheckout(int remaining) throws IOException, ResourceNotFoundException {
         return getCheckouts().stream()
                 .filter(x01Checkout -> x01Checkout.getCheckout() == remaining)
-                .findFirst();
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException(X01Checkout.class, remaining));
     }
 }
