@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -37,7 +36,7 @@ public class X01CheckoutServiceImpl implements IX01CheckoutService {
     }
 
     /**
-     * Retrieves the checkout information based on the remaining score in an x01 match.
+     * Retrieves the checkout information based on the remaining score in a x01 match.
      *
      * @param remaining int The value to search for in the checkouts.
      * @return Optional<X01Checkout> containing the matching checkout. if no checkout available an empty Optional.

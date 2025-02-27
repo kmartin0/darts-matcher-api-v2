@@ -9,13 +9,8 @@ import org.bson.types.ObjectId;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MatchPlayer {
-
     private ObjectId playerId;
-
     private String playerName;
-
     private PlayerType playerType;
-
     private ResultType resultType;
-
 }

@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Dart {
     private int section;
-
     private DartboardSectionArea area;
-
     public int getScore() {
         return section * area.getMultiplier();
     }

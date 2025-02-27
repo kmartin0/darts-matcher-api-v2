@@ -6,7 +6,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class PolarCoordinate {
-
     private double r;
     private double theta;
 
@@ -32,5 +31,4 @@ public class PolarCoordinate {
     public static double degreeToRadian(double degree) {
         return degree * (Math.PI / 180);
     }
-
 }

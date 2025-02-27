@@ -9,7 +9,6 @@ import java.util.Arrays;
 @Data
 @AllArgsConstructor
 public class Dartboard {
-
     // Sections starting at 6 counting counterclockwise. Reasoning is that polar planes
     // the convention is to start at 0 degrees on the x-axis and then increases counterclockwise.
     private final ArrayList<Integer> sections = new ArrayList<>(
@@ -124,5 +123,4 @@ public class Dartboard {
                 })
                 .orElse(new PolarCoordinate(0, 0));
     }
-
 }

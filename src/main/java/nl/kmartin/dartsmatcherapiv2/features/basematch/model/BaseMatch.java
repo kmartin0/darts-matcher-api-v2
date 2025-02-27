@@ -13,14 +13,9 @@ import java.util.ArrayList;
 @NoArgsConstructor
 public abstract class BaseMatch<PlayerType extends MatchPlayer> {
     private ObjectId id;
-
     private LocalDateTime startDate;
-
     private LocalDateTime endDate;
-
     private MatchStatus matchStatus;
-
     private ArrayList<PlayerType> players;
-
     private MatchType matchType;
 }
