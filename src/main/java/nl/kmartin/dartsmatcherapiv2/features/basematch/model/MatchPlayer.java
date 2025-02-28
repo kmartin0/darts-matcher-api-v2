@@ -7,21 +7,21 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
+import org.hibernate.validator.constraints.Length;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class MatchPlayer {
-    @NotNull
     private ObjectId playerId;
 
     @NotNull
     @NotEmpty
+    @Length(min = 3, max = 40)
     private String playerName;
 
     @NotNull
     private PlayerType playerType;
 
-    @NotNull
     private ResultType resultType;
 }

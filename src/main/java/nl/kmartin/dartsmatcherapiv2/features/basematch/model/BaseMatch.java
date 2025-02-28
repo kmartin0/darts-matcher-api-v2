@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import nl.kmartin.dartsmatcherapiv2.validators.playername.NoDuplicateMatchPlayerName;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
@@ -17,18 +18,19 @@ import java.util.ArrayList;
 @NoArgsConstructor
 public abstract class BaseMatch<PlayerType extends MatchPlayer> {
     @MongoId
-    @NotNull
     private ObjectId id;
 
     private LocalDateTime startDate;
 
     private LocalDateTime endDate;
 
+    @NotNull
     private MatchStatus matchStatus;
 
     @Valid
     @NotNull
     @Size(min = 1, max = 4)
+    @NoDuplicateMatchPlayerName
     private ArrayList<PlayerType> players;
 
     @NotNull
