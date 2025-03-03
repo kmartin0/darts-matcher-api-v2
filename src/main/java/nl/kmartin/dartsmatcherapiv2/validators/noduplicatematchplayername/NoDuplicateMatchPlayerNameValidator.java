@@ -1,8 +1,9 @@
-package nl.kmartin.dartsmatcherapiv2.validators.playername;
+package nl.kmartin.dartsmatcherapiv2.validators.noduplicatematchplayername;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.MatchPlayer;
+import nl.kmartin.dartsmatcherapiv2.utils.MessageKeys;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 
 import java.util.HashSet;
@@ -10,8 +11,6 @@ import java.util.List;
 import java.util.Set;
 
 public class NoDuplicateMatchPlayerNameValidator implements ConstraintValidator<NoDuplicateMatchPlayerName, List<? extends MatchPlayer>> {
-    public static final String DUPLICATE_MESSAGE_PARAM = "name";
-    public static final String DUPLICATE_PLAYER_NAME_MESSAGE_KEY  = "{message.player.name.duplicate}";
 
     @Override
     public void initialize(NoDuplicateMatchPlayerName constraintAnnotation) {
@@ -60,8 +59,8 @@ public class NoDuplicateMatchPlayerNameValidator implements ConstraintValidator<
 
         // Build and add the custom violation message with conflicting player names
         hibernateContext
-                .addMessageParameter(DUPLICATE_MESSAGE_PARAM, duplicateName)
-                .buildConstraintViolationWithTemplate(DUPLICATE_PLAYER_NAME_MESSAGE_KEY)
+                .addMessageParameter(MessageKeys.Params.NAME, duplicateName)
+                .buildConstraintViolationWithTemplate("{" + MessageKeys.MESSAGE_PLAYER_NAME_DUPLICATE + "}")
                 .addConstraintViolation();
     }
 }

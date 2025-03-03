@@ -2,7 +2,8 @@ package nl.kmartin.dartsmatcherapiv2.validators;
 
 import jakarta.validation.*;
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.MatchPlayer;
-import nl.kmartin.dartsmatcherapiv2.validators.playername.NoDuplicateMatchPlayerNameValidator;
+import nl.kmartin.dartsmatcherapiv2.utils.MessageKeys;
+import nl.kmartin.dartsmatcherapiv2.validators.noduplicatematchplayername.NoDuplicateMatchPlayerNameValidator;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintViolationBuilder;
 import org.junit.jupiter.api.Assertions;
@@ -32,8 +33,6 @@ public class NoDuplicateMatchPlayerNameValidatorTests {
 
     @Mock
     private HibernateConstraintViolationBuilder hibernateConstraintViolationBuilder;
-
-    private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @BeforeEach
     void setup() {
@@ -69,8 +68,8 @@ public class NoDuplicateMatchPlayerNameValidatorTests {
 
         // Then
         assertFalse(result);
-        verify(hibernateContext).addMessageParameter(NoDuplicateMatchPlayerNameValidator.DUPLICATE_MESSAGE_PARAM, "John Doe");
-        verify(hibernateContext).buildConstraintViolationWithTemplate(NoDuplicateMatchPlayerNameValidator.DUPLICATE_PLAYER_NAME_MESSAGE_KEY);
+        verify(hibernateContext).addMessageParameter(MessageKeys.Params.NAME, "John Doe");
+        verify(hibernateContext).buildConstraintViolationWithTemplate("{" + MessageKeys.MESSAGE_PLAYER_NAME_DUPLICATE + "}");
         verify(hibernateConstraintViolationBuilder).addConstraintViolation();
     }
 
