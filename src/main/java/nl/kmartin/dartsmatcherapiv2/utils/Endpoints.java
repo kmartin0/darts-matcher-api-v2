@@ -12,4 +12,5 @@ public class Endpoints {
 
     // X01Match Endpoints
     public static final String CREATE_MATCH = "/matches";
+    public static final String GET_MATCH = "/matches/{matchId}";
 }

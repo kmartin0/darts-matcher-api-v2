@@ -1,6 +1,8 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01match;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceNotFoundException;
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.MatchStatus;
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.MatchType;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Match;
@@ -57,5 +59,18 @@ public class X01MatchServiceImpl implements IX01MatchService {
         // Set the start date of the match to the current time in UTC and make sure the end date is not set.
         x01Match.setStartDate(Instant.now());
         x01Match.setEndDate(null);
+    }
+
+
+    /**
+     * Get an X01Match from the repository using the id.
+     *
+     * @param matchId ObjectId the id of the X01Match to be retrieved
+     * @return X01Match corresponding to the matchId
+     * @throws ResourceNotFoundException when there is no match that has the matchId
+     */
+    @Override
+    public X01Match getMatch(@NotNull ObjectId matchId) throws ResourceNotFoundException {
+        return x01matchRepository.findById(matchId).orElseThrow(() -> new ResourceNotFoundException(X01Match.class, matchId));
     }
 }

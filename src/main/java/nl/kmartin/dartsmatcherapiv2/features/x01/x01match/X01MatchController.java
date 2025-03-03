@@ -1,14 +1,13 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01match;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Match;
 import nl.kmartin.dartsmatcherapiv2.utils.Endpoints;
+import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class X01MatchController {
@@ -23,5 +22,12 @@ public class X01MatchController {
     public X01Match createMatch(@Valid @RequestBody X01Match x01Match) {
 
         return x01MatchService.createMatch(x01Match);
+    }
+
+    @GetMapping(path = Endpoints.GET_MATCH, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public X01Match getMatch(@PathVariable @NotNull ObjectId matchId) {
+
+        return x01MatchService.getMatch(matchId);
     }
 }
