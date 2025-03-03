@@ -7,6 +7,9 @@ public class Endpoints {
 
     // Checkout Endpoints
     public static final String GET_CHECKOUTS = "/checkouts";
-    public static final String GET_CHECKOUT = "/checkouts";
-    public static final String GET_CHECKOUT_PARAM_REMAINING = "remaining";
+    public static final String GET_CHECKOUT = "/checkouts/{remaining}";
+
+
+    // X01Match Endpoints
+    public static final String CREATE_MATCH = "/matches";
 }

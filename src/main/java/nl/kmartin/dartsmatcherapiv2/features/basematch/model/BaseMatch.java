@@ -10,7 +10,7 @@ import nl.kmartin.dartsmatcherapiv2.validators.noduplicatematchplayername.NoDupl
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 
 @Data
@@ -20,11 +20,10 @@ public abstract class BaseMatch<PlayerType extends MatchPlayer> {
     @MongoId
     private ObjectId id;
 
-    private LocalDateTime startDate;
+    private Instant startDate;
 
-    private LocalDateTime endDate;
+    private Instant endDate;
 
-    @NotNull
     private MatchStatus matchStatus;
 
     @Valid

@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 public class X01Statistics {
     @Valid
     private X01AverageStatistics averageStats;
@@ -17,4 +16,10 @@ public class X01Statistics {
 
     @Valid
     private X01ScoresStatistics x01ScoresStatistics;
+
+    public X01Statistics() {
+        this.setAverageStats(new X01AverageStatistics());
+        this.setCheckoutStats(new X01CheckoutStatistics());
+        this.setX01ScoresStatistics(new X01ScoresStatistics());
+    }
 }

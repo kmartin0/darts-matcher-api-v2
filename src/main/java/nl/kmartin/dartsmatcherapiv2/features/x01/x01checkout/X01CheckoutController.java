@@ -4,10 +4,7 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Checkout;
 import nl.kmartin.dartsmatcherapiv2.utils.Endpoints;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,9 +23,9 @@ public class X01CheckoutController {
         return checkoutService.getCheckouts();
     }
 
-    @GetMapping(path = Endpoints.GET_CHECKOUT, params = {Endpoints.GET_CHECKOUT_PARAM_REMAINING}, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = Endpoints.GET_CHECKOUT, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public X01Checkout getCheckout(@RequestParam int remaining) throws IOException {
+    public X01Checkout getCheckout(@PathVariable int remaining) throws IOException {
         return checkoutService.getCheckout(remaining);
     }
 }
