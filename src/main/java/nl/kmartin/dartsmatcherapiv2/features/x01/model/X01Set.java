@@ -21,5 +21,7 @@ public class X01Set {
     @Valid
     private ArrayList<X01Leg> legs;
 
+    private ObjectId throwsFirst;
+
     private Map<ObjectId, ResultType> result;
 }

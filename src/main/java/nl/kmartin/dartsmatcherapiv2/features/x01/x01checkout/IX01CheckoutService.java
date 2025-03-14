@@ -8,5 +8,9 @@ import java.util.ArrayList;
 public interface IX01CheckoutService {
     ArrayList<X01Checkout> getCheckouts() throws IOException;
 
-    X01Checkout getCheckout(int remaining) throws IOException, RuntimeException;
+    X01Checkout getCheckout(int remaining) throws IOException;
+
+    boolean isValidCheckout(int score);
+
+    boolean isValidCheckout(int score, int dartsUsed) throws IOException;
 }

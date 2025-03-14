@@ -21,11 +21,11 @@ import java.util.ArrayList;
 public class X01Match extends BaseMatch<X01MatchPlayer> {
     @NotNull
     @Valid
-    private X01MatchSettings x01MatchSettings;
+    private X01MatchSettings matchSettings;
 
     @Valid
     private ArrayList<X01Set> sets;
 
     @Valid
-    private ArrayList<X01ScoreLineSnapshot> scoreLineTimeline;
+    private X01MatchProgress matchProgress;
 }

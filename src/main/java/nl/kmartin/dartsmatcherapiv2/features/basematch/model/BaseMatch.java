@@ -32,6 +32,5 @@ public abstract class BaseMatch<PlayerType extends MatchPlayer> {
     @NoDuplicateMatchPlayerName
     private ArrayList<PlayerType> players;
 
-    @NotNull
     private MatchType matchType;
 }
