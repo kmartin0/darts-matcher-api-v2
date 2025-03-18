@@ -36,4 +36,19 @@ public class NumberUtils {
         return nextNumber > max ? -1 : nextNumber; // Return -1 if no valid number is found
     }
 
+    /**
+     * Calculates the percentage based on the given numerator and denominator.
+     *
+     * @param numerator the value representing the successful attempts or relevant quantity.
+     * @param denominator the total number of attempts or the total quantity.
+     * @return the calculated percentage, or 0 if the denominator is 0 to avoid division by zero.
+     */
+    public static int calcPercentage(int numerator, int denominator) {
+        if (denominator > 0) {
+            return (int) Math.round(((double) numerator / denominator) * 100);
+        } else {
+            return 0; // Avoid division by zero, return 0 if no attempts are made
+        }
+    }
+
 }

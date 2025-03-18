@@ -11,6 +11,7 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leground.IX01LegRoundService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01set.IX01SetService;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01statistics.IX01StatisticsService;
 import nl.kmartin.dartsmatcherapiv2.utils.StandingsUtils;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
@@ -26,13 +27,15 @@ public class X01MatchServiceImpl implements IX01MatchService {
     private final IX01SetService setService;
     private final IX01LegService legService;
     private final IX01LegRoundService legRoundService;
+    private final IX01StatisticsService statisticsService;
 
     public X01MatchServiceImpl(IX01MatchRepository x01matchRepository, IX01SetService setService,
-                               IX01LegService legService, IX01LegRoundService legRoundService) {
+                               IX01LegService legService, IX01LegRoundService legRoundService, IX01StatisticsService statisticsService) {
         this.x01matchRepository = x01matchRepository;
         this.setService = setService;
         this.legService = legService;
         this.legRoundService = legRoundService;
+        this.statisticsService = statisticsService;
     }
 
     /**
@@ -72,10 +75,8 @@ public class X01MatchServiceImpl implements IX01MatchService {
 
         // Initialize the match progress.
         x01Match.setSets(new ArrayList<>());
-        X01MatchProgress initialMatchProgress = new X01MatchProgress(
-                1, 1, 1,
-                x01Match.getPlayers().get(0).getPlayerId(), new ArrayList<>()
-        );
+        ObjectId startsMatch = x01Match.getPlayers().get(0).getPlayerId();
+        X01MatchProgress initialMatchProgress = new X01MatchProgress(1, 1, 1, startsMatch);
         x01Match.setMatchProgress(initialMatchProgress);
     }
 
@@ -140,6 +141,9 @@ public class X01MatchServiceImpl implements IX01MatchService {
         // Update match results
         updateMatchResult(x01Match);
 
+        // Update match statistics
+        updateMatchStatistics(x01Match);
+
         // Update Match Progress
         updateMatchProgress(x01Match);
     }
@@ -174,6 +178,10 @@ public class X01MatchServiceImpl implements IX01MatchService {
 
         // When there are match winners the match is concluded
         x01Match.setMatchStatus(matchWinners.isEmpty() ? MatchStatus.IN_PLAY : MatchStatus.CONCLUDED);
+    }
+
+    private void updateMatchStatistics(X01Match x01Match) {
+        statisticsService.updatePlayerStatistics(x01Match.getSets(), x01Match.getPlayers());
     }
 
     /**

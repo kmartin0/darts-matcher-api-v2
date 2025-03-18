@@ -19,5 +19,7 @@ public interface IX01LegRoundService {
 
     Optional<X01LegRound> getLegRound(List<X01LegRound> rounds, int round);
 
+    Optional<X01LegRound> getLastRound(List<X01LegRound> rounds);
+
     int calculateRemainingScore(int x01, List<X01LegRound> rounds, ObjectId playerId);
 }

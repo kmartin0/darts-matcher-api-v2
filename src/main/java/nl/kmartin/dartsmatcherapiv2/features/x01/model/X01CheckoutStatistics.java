@@ -19,4 +19,20 @@ public class X01CheckoutStatistics {
     private int checkoutsMissed;
 
     private int checkoutsHit;
+
+    public void incrementCheckoutTonPlus() {
+        this.checkoutTonPlus++;
+    }
+
+    public void incrementCheckoutsHit() {
+        this.checkoutsHit++;
+    }
+
+    public void reset() {
+        this.checkoutHighest = 0;
+        this.checkoutTonPlus = 0;
+        this.checkoutPercentage = 0;
+        this.checkoutsMissed = 0;
+        this.checkoutsHit = 0;
+    }
 }

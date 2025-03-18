@@ -8,6 +8,7 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.IX01MatchRepository;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.IX01MatchService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.X01MatchServiceImpl;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01set.IX01SetService;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01statistics.IX01StatisticsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,9 +38,12 @@ public class X01MatchServiceTests {
     @Mock
     IX01LegRoundService legRoundService;
 
+    @Mock
+    IX01StatisticsService statisticsService;
+
     @BeforeEach
     void setUp() {
-        this.x01MatchService = new X01MatchServiceImpl(x01MatchRepository, setService, legService, legRoundService);
+        this.x01MatchService = new X01MatchServiceImpl(x01MatchRepository, setService, legService, legRoundService, statisticsService);
     }
 
     @Test

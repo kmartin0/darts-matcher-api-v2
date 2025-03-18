@@ -279,4 +279,18 @@ public class X01LegServiceImpl implements IX01LegService {
                 .max(Comparator.comparingInt(X01LegRound::getRound))
                 .flatMap(round -> Optional.ofNullable(round.getScores().get(throwerId)));
     }
+
+    /**
+     * Determines if a score made by a player in a round of a leg is a checkout.
+     *
+     * @param x01Leg      {@link X01Leg} the leg that the round is in
+     * @param x01LegRound {@link X01LegRound} the round the score is in
+     * @param playerId    {@link ObjectId} the player that scored
+     * @return boolean whether the score made a player is a checkout
+     */
+    public boolean isScoreCheckout(X01Leg x01Leg, X01LegRound x01LegRound, ObjectId playerId) {
+        if (x01Leg == null || x01LegRound == null) return false;
+
+        return playerId.equals(x01Leg.getWinner()) && legRoundService.getLegRound(x01Leg.getRounds(), x01LegRound.getRound() + 1).isEmpty();
+    }
 }

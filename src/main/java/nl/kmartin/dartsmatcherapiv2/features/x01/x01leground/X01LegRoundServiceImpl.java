@@ -68,6 +68,18 @@ public class X01LegRoundServiceImpl implements IX01LegRoundService {
     }
 
     /**
+     * Finds the last round from a list of rounds.
+     *
+     * @param rounds {@link List<X01LegRound>} the list of rounds
+     * @return {@link Optional<X01LegRound>} the highest numbered round from a list of rounds, empty if the list has no rounds
+     */
+    public Optional<X01LegRound> getLastRound(List<X01LegRound> rounds) {
+        if (rounds == null) return Optional.empty();
+
+        return rounds.stream().max(Comparator.comparingInt(X01LegRound::getRound));
+    }
+
+    /**
      * Find the player whose turn it is to throw in a round.
      *
      * @param x01LegRound      {@link X01LegRound} the round to check.

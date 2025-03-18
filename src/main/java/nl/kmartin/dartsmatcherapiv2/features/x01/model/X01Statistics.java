@@ -3,7 +3,6 @@ package nl.kmartin.dartsmatcherapiv2.features.x01.model;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
@@ -15,11 +14,22 @@ public class X01Statistics {
     private X01CheckoutStatistics checkoutStats;
 
     @Valid
-    private X01ScoresStatistics x01ScoresStatistics;
+    private X01ScoreStatistics scoreStatistics;
 
     public X01Statistics() {
         this.setAverageStats(new X01AverageStatistics());
         this.setCheckoutStats(new X01CheckoutStatistics());
-        this.setX01ScoresStatistics(new X01ScoresStatistics());
+        this.setScoreStatistics(new X01ScoreStatistics());
+    }
+
+    public void reset() {
+        if (this.averageStats == null) this.averageStats = new X01AverageStatistics();
+        else this.averageStats.reset();
+
+        if (this.checkoutStats == null) this.checkoutStats = new X01CheckoutStatistics();
+        else this.checkoutStats.reset();
+
+        if (this.scoreStatistics == null) this.scoreStatistics = new X01ScoreStatistics();
+        else this.scoreStatistics.reset();
     }
 }
