@@ -52,7 +52,7 @@ public class StandingsUtils {
      */
     private static boolean hasPlayerWonOrDrawInStandings(ObjectId playerId, long playerWins, long mostWins, Map<ObjectId, Long> standings, int bestOfRemaining) {
         if (standings == null) return false;
-        
+
         // If the player has the most wins, determine if they have won outright.
         if (playerWins == mostWins) {
             if (bestOfRemaining == 0)
