@@ -28,7 +28,9 @@ public interface IX01SetService {
 
     boolean isSetConcluded(X01Set x01Set, List<X01MatchPlayer> players);
 
-    Optional<X01Set> getSet(List<X01Set> sets, int setNumber);
+    Optional<X01Set> getSet(List<X01Set> sets, int setNumber, boolean throwIfNotFound);
 
     void updateSetResults(List<X01Set> sets, List<X01MatchPlayer> players, int bestOfLegs, int x01);
+
+    void deleteSet(List<X01Set> sets, int setNumber);
 }

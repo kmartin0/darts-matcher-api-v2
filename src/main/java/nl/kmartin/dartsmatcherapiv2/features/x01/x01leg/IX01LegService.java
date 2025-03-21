@@ -13,7 +13,7 @@ import java.util.Set;
 
 public interface IX01LegService {
 
-    void addScore(int x01, X01Leg x01Leg, X01LegRound x01LegRound, X01LegRoundScore x01LegRoundScore, List<X01MatchPlayer> matchPlayers, ObjectId throwerId) throws IOException;
+    void addScore(int x01, X01Leg x01Leg, int roundNumber, X01LegRoundScore x01LegRoundScore, List<X01MatchPlayer> matchPlayers, ObjectId throwerId) throws IOException;
 
     Optional<X01Leg> getCurrentLeg(List<X01Leg> legs);
 
@@ -27,7 +27,7 @@ public interface IX01LegService {
 
     boolean isLegConcluded(X01Leg x01Leg);
 
-    Optional<X01Leg> getLeg(List<X01Leg> legs, int legNumber);
+    Optional<X01Leg> getLeg(List<X01Leg> legs, int legNumber, boolean throwIfNotFound);
 
     boolean isLegEditable(X01Leg x01Leg, ObjectId playerId);
 
@@ -36,4 +36,8 @@ public interface IX01LegService {
     void updateLegResult(X01Leg leg, List<X01MatchPlayer> players, int x01);
 
     boolean isScoreCheckout(X01Leg x01Leg, X01LegRound x01LegRound, ObjectId playerId);
+
+    void deleteScore(int x01, X01Leg x01Leg, int roundNumber, ObjectId playerIdToDelete, List<X01MatchPlayer> matchPlayers);
+
+    void deleteLeg(List<X01Leg> legs, int legNumber);
 }

@@ -1,5 +1,6 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01set;
 
+import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceNotFoundException;
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.MatchPlayer;
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.ResultType;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
@@ -157,7 +158,8 @@ public class X01SetServiceImpl implements IX01SetService {
      */
     @Override
     public int calcRemainingLegs(int bestOfLegs, X01Set x01Set) {
-        if (x01Set == null || x01Set.getLegs() == null) return -1; // TODO: Error handling here.
+        // If the set or legs don't exist, the remaining legs are the maximum number of legs to be played
+        if (x01Set == null || x01Set.getLegs() == null) return bestOfLegs;
 
         // Count the number of completed legs (legs with a winner)
         long completedLegs = x01Set.getLegs().stream()
@@ -181,11 +183,11 @@ public class X01SetServiceImpl implements IX01SetService {
     public void updateSetResults(List<X01Set> sets, List<X01MatchPlayer> players, int bestOfLegs, int x01) {
         if (sets == null || players == null) return;
 
-        // First update the leg results.
-        sets.forEach(x01Set -> legService.updateLegResults(x01Set.getLegs(), players, x01));
-
-        // For each set update the results.
-        sets.forEach(x01Set -> updateSetResult(x01Set, bestOfLegs, players));
+        // For each set update the leg results and after update the set result
+        sets.forEach(x01Set -> {
+            legService.updateLegResults(x01Set.getLegs(), players, x01);
+            updateSetResult(x01Set, bestOfLegs, players);
+        });
     }
 
     /**
@@ -199,12 +201,8 @@ public class X01SetServiceImpl implements IX01SetService {
     public void updateSetResult(X01Set x01Set, int bestOfLegs, List<X01MatchPlayer> players) {
         if (x01Set == null || players == null) return;
 
-        // Get the standings for the set.
-        Map<ObjectId, Long> setStandings = getSetStandings(x01Set, players);
-
         // Get the player(s) that have won the set
-        int remainingLegs = calcRemainingLegs(bestOfLegs, x01Set);
-        List<ObjectId> setWinners = StandingsUtils.determineWinners(setStandings, remainingLegs);
+        List<ObjectId> setWinners = getSetWinners(x01Set, bestOfLegs, players);
 
         if (!setWinners.isEmpty()) { // The set has a result
             // If multiple players have won the set, that means they have drawn.
@@ -229,9 +227,53 @@ public class X01SetServiceImpl implements IX01SetService {
      * @param setNumber int the set number that needs to be found
      * @return {@link Optional<X01Set>} the matching set, empty if no set is found
      */
-    public Optional<X01Set> getSet(List<X01Set> sets, int setNumber) {
-        if (sets == null || setNumber < 1) return Optional.empty();
+    public Optional<X01Set> getSet(List<X01Set> sets, int setNumber, boolean throwIfNotFound) {
+        ResourceNotFoundException notFoundException = new ResourceNotFoundException(X01Set.class, setNumber);
 
-        return sets.stream().filter(x01Set -> x01Set.getSet() == setNumber).findFirst();
+        if (sets == null || setNumber < 1) {
+            if (throwIfNotFound) throw notFoundException;
+            else return Optional.empty();
+        }
+
+        Optional<X01Set> set = sets.stream().filter(x01Set -> x01Set.getSet() == setNumber).findFirst();
+
+        if (throwIfNotFound && set.isEmpty()) throw notFoundException;
+
+        return set;
+    }
+
+    /**
+     * Deletes a specific set from the list of sets in the match.
+     * If the set exists in the list, it will be removed.
+     *
+     * @param sets      {@link List<X01Set>} The list of sets in the match.
+     * @param setNumber int The number of the set to be deleted.
+     */
+    public void deleteSet(List<X01Set> sets, int setNumber) {
+        if (sets == null) return;
+
+        // Find the set in the list by its number.
+        Optional<X01Set> setToDelete = getSet(sets, setNumber, true);
+
+        // If the set is found, remove it from the list.
+        setToDelete.ifPresent(sets::remove);
+    }
+
+    /**
+     * A list of object ids is created containing all players that have won the set. Multiple set winners
+     * means a draw has occurred.
+     *
+     * @param x01Set     {@link X01Set} The set for which the winners are being determined.
+     * @param bestOfLegs int the best of setting for the legs
+     * @param players    {@link List<X01MatchPlayer>} the list of match players
+     * @return {@link List<ObjectId>} containing the IDs of players who won the set. multiple winners indicates a draw.
+     */
+    private List<ObjectId> getSetWinners(X01Set x01Set, int bestOfLegs, List<X01MatchPlayer> players) {
+        // Get the standings for the set.
+        Map<ObjectId, Long> setStandings = getSetStandings(x01Set, players);
+
+        // Get the player(s) that have won the set
+        int remainingLegs = calcRemainingLegs(bestOfLegs, x01Set);
+        return StandingsUtils.determineWinners(setStandings, remainingLegs);
     }
 }

@@ -1,9 +1,9 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01leg;
 
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.InvalidArgumentsException;
+import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceNotFoundException;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.response.TargetError;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01checkout.IX01CheckoutService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leground.IX01LegRoundService;
 import nl.kmartin.dartsmatcherapiv2.utils.MessageKeys;
 import nl.kmartin.dartsmatcherapiv2.utils.MessageResolver;
@@ -19,12 +19,10 @@ import java.util.stream.IntStream;
 @Service
 public class X01LegServiceImpl implements IX01LegService {
 
-    private final IX01CheckoutService checkoutService;
     private final MessageResolver messageResolver;
     private final IX01LegRoundService legRoundService;
 
-    public X01LegServiceImpl(IX01CheckoutService checkoutService, MessageResolver messageResolver, IX01LegRoundService legRoundService) {
-        this.checkoutService = checkoutService;
+    public X01LegServiceImpl(MessageResolver messageResolver, IX01LegRoundService legRoundService) {
         this.messageResolver = messageResolver;
         this.legRoundService = legRoundService;
     }
@@ -130,27 +128,64 @@ public class X01LegServiceImpl implements IX01LegService {
      *
      * @param x01              int the x01 the leg is played in
      * @param x01Leg           {@link X01Leg} the leg of which the round belongs to
-     * @param x01LegRound      {@link X01LegRound} the round of which the score belongs to
+     * @param roundNumber      int the round of which the score belongs to
      * @param x01LegRoundScore {@link X01LegRoundScore} the score that needs to be added to the round
      * @param matchPlayers     {@link List<X01MatchPlayer>} the list of match players.
      * @param throwerId        {@link ObjectId} the player that has thrown the score.
      * @throws IOException If there's an issue reading the checkouts file.
      */
     @Override
-    public void addScore(int x01, X01Leg x01Leg, X01LegRound x01LegRound, X01LegRoundScore x01LegRoundScore, List<X01MatchPlayer> matchPlayers, ObjectId throwerId) throws IOException {
-        if (x01Leg == null || x01LegRound == null || x01LegRound.getScores() == null || x01LegRoundScore == null)
-            return;
+    public void addScore(int x01, X01Leg x01Leg, int roundNumber, X01LegRoundScore x01LegRoundScore, List<X01MatchPlayer> matchPlayers, ObjectId throwerId) throws IOException {
+        if (x01Leg == null || x01LegRoundScore == null || matchPlayers == null) return;
+
+        Optional<X01LegRound> x01LegRound = legRoundService.getLegRound(x01Leg.getRounds(), roundNumber, true);
+        if (x01LegRound.isEmpty()) return;
 
         // Add the score to the round.
-        x01LegRound.getScores().put(throwerId, x01LegRoundScore);
+        x01LegRound.get().getScores().put(throwerId, x01LegRoundScore);
 
         // Verify if the rounds are legal after adding the new score.
-        boolean isPlayerRoundsLegal = validatePlayerRounds(x01, x01Leg.getRounds(), throwerId);
+        boolean isPlayerRoundsLegal = legRoundService.validateRoundsForPlayer(x01, x01Leg.getRounds(), throwerId);
 
         // When the round is not legal. Set the score to zero and darts used to 3
         if (!isPlayerRoundsLegal) {
             x01LegRoundScore.setScore(0);
             x01LegRoundScore.setDartsUsed(3);
+        }
+
+        // Update the leg result
+        updateLegResult(x01Leg, matchPlayers, x01);
+    }
+
+    /**
+     * Deletes a score for a specific player in a particular round of a given leg in the match.
+     * The method will ensure that the leg is editable, removes the score from the specified round,
+     * and if the round is the last one with no scores left, it will remove the round from the leg.
+     * Afterward, the leg result is updated.
+     *
+     * @param x01              int the x01 the leg is played in
+     * @param x01Leg           {@link X01Leg} the leg of which the round belongs to
+     * @param roundNumber      int the round of which the score belongs to
+     * @param playerIdToDelete {@link ObjectId}} The ID of the player whose score is being deleted.
+     * @param matchPlayers     {@link List<X01MatchPlayer>} the list of match players.
+     */
+    public void deleteScore(int x01, X01Leg x01Leg, int roundNumber, ObjectId playerIdToDelete, List<X01MatchPlayer> matchPlayers) {
+        // Determine if the leg is editable, will throw InvalidArgumentsException if the leg is not editable.
+        isLegEditable(x01Leg, playerIdToDelete);
+
+        // Get the round in which the score needs to be deleted.
+        Optional<X01LegRound> x01LegRound = legRoundService.getLegRound(x01Leg.getRounds(), roundNumber, true);
+        if (x01LegRound.isEmpty()) return;
+
+        // Remove the score from the round
+        x01LegRound.get().getScores().remove(playerIdToDelete);
+
+        // If it's the last round and no scores are remaining, remove the round.
+        Optional<X01LegRound> lastRound = legRoundService.getLastRound(x01Leg.getRounds());
+        if (lastRound.isPresent()) {
+            if (roundNumber == lastRound.get().getRound() && x01LegRound.get().getScores().isEmpty()) {
+                x01Leg.getRounds().remove(lastRound.get());
+            }
         }
 
         // Update the leg result
@@ -176,10 +211,19 @@ public class X01LegServiceImpl implements IX01LegService {
      * @return {@link Optional<X01Leg>} the matching leg, empty if no leg is found
      */
     @Override
-    public Optional<X01Leg> getLeg(List<X01Leg> legs, int legNumber) {
-        if (legs == null || legNumber < 0) return Optional.empty();
+    public Optional<X01Leg> getLeg(List<X01Leg> legs, int legNumber, boolean throwIfNotFound) {
+        ResourceNotFoundException notFoundException = new ResourceNotFoundException(X01Leg.class, legNumber);
 
-        return legs.stream().filter(x01Leg -> x01Leg.getLeg() == legNumber).findFirst();
+        if (legs == null || legNumber < 0) {
+            if (throwIfNotFound) throw notFoundException;
+            else return Optional.empty();
+        }
+
+        Optional<X01Leg> leg = legs.stream().filter(x01Leg -> x01Leg.getLeg() == legNumber).findFirst();
+
+        if (throwIfNotFound && leg.isEmpty()) throw notFoundException;
+
+        return leg;
     }
 
     /**
@@ -237,50 +281,6 @@ public class X01LegServiceImpl implements IX01LegService {
     }
 
     /**
-     * Validates the scores (and checkout if applicable) of a player in a list of rounds are valid according to the game rules.
-     *
-     * @param x01       int the x01 rule of the match
-     * @param rounds    {@link List<X01LegRound>} the list of rounds that need to be checked
-     * @param throwerId {@link ObjectId} the player who needs to be validated
-     * @return boolean whether the list of scores in the rounds are valid for a player according to the game rules.
-     * @throws IOException If there's an issue reading the checkouts file.
-     */
-    private boolean validatePlayerRounds(int x01, List<X01LegRound> rounds, ObjectId throwerId) throws IOException {
-        // Get the remaining score for the player
-        int remaining = legRoundService.calculateRemainingScore(x01, rounds, throwerId);
-
-        // The remaining score cannot 1 or below 0
-        if (remaining < 0 || remaining == 1) return false;
-
-        // When no remaining points are left, determine the validity of the last score (checkout)
-        if (remaining == 0) {
-            Optional<X01LegRoundScore> playerLatestTurn = getPlayerLatestTurn(rounds, throwerId);
-            if (playerLatestTurn.isPresent())
-                return checkoutService.isValidCheckout(playerLatestTurn.get().getScore(), playerLatestTurn.get().getDartsUsed());
-        }
-
-        // The rounds are in line with the game rules.
-        return true;
-    }
-
-    /**
-     * Find the latest player turn.
-     *
-     * @param rounds    {@link List<X01LegRound>} the list of rounds containing the player scores
-     * @param throwerId {@link ObjectId} the player id for which the latest turn needs to be found
-     * @return {@link Optional<X01LegRoundScore>} the round score for a player in their latest round, if no score found empty
-     */
-    private Optional<X01LegRoundScore> getPlayerLatestTurn(List<X01LegRound> rounds, ObjectId throwerId) {
-        // Find the rounds containing a score for the player
-        List<X01LegRound> playerRounds = rounds.stream().filter(round -> round.getScores().containsKey(throwerId)).toList();
-
-        // Get the highest round containing the player score
-        return playerRounds.stream()
-                .max(Comparator.comparingInt(X01LegRound::getRound))
-                .flatMap(round -> Optional.ofNullable(round.getScores().get(throwerId)));
-    }
-
-    /**
      * Determines if a score made by a player in a round of a leg is a checkout.
      *
      * @param x01Leg      {@link X01Leg} the leg that the round is in
@@ -291,6 +291,24 @@ public class X01LegServiceImpl implements IX01LegService {
     public boolean isScoreCheckout(X01Leg x01Leg, X01LegRound x01LegRound, ObjectId playerId) {
         if (x01Leg == null || x01LegRound == null) return false;
 
-        return playerId.equals(x01Leg.getWinner()) && legRoundService.getLegRound(x01Leg.getRounds(), x01LegRound.getRound() + 1).isEmpty();
+        return playerId.equals(x01Leg.getWinner()) &&
+                legRoundService.getLegRound(x01Leg.getRounds(), x01LegRound.getRound() + 1, false).isEmpty();
+    }
+
+    /**
+     * Deletes a specific leg from the list of legs in the match.
+     * If the leg exists in the list, it will be removed.
+     *
+     * @param legs      {@link List<X01Leg>} The list of legs in the match.
+     * @param legNumber int The number of the leg to be deleted.
+     */
+    public void deleteLeg(List<X01Leg> legs, int legNumber) {
+        if (legs == null) return;
+
+        // Find the leg in the list by its number.
+        Optional<X01Leg> legToDelete = getLeg(legs, legNumber, true);
+
+        // If the leg is found, remove it from the list.
+        legToDelete.ifPresent(legs::remove);
     }
 }

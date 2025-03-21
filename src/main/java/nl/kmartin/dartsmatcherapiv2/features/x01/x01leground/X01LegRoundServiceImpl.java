@@ -1,15 +1,24 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01leground;
 
+import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceNotFoundException;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01checkout.IX01CheckoutService;
 import nl.kmartin.dartsmatcherapiv2.utils.NumberUtils;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class X01LegRoundServiceImpl implements IX01LegRoundService {
+
+    private final IX01CheckoutService checkoutService;
+
+    public X01LegRoundServiceImpl(IX01CheckoutService checkoutService) {
+        this.checkoutService = checkoutService;
+    }
 
     /**
      * Finds the lowest-numbered round which does not have a score for all players.
@@ -117,11 +126,20 @@ public class X01LegRoundServiceImpl implements IX01LegRoundService {
      * @return {@link Optional<X01LegRound>} an optional round containing the round if it exists otherwise empty.
      */
     @Override
-    public Optional<X01LegRound> getLegRound(List<X01LegRound> rounds, int round) {
-        if (rounds == null || round < 0) return Optional.empty();
+    public Optional<X01LegRound> getLegRound(List<X01LegRound> rounds, int roundNumber, boolean throwIfNotFound) {
+        ResourceNotFoundException notFoundException = new ResourceNotFoundException(X01LegRound.class, roundNumber);
+
+        if (rounds == null || roundNumber < 0) {
+            if (throwIfNotFound) throw notFoundException;
+            else return Optional.empty();
+        }
+
+        Optional<X01LegRound> round = rounds.stream().filter(x01LegRound -> x01LegRound.getRound() == roundNumber).findFirst();
+
+        if (throwIfNotFound && round.isEmpty()) throw notFoundException;
 
         // Return the first round with the round number otherwise empty.
-        return rounds.stream().filter(x01LegRound -> x01LegRound.getRound() == round).findFirst();
+        return round;
     }
 
     /**
@@ -134,7 +152,8 @@ public class X01LegRoundServiceImpl implements IX01LegRoundService {
      */
     @Override
     public int calculateRemainingScore(int x01, List<X01LegRound> rounds, ObjectId playerId) {
-        if (rounds == null) return -1; // TODO: Error handling here.
+        // When no rounds exist, the player has no throws so his remaining score is the starting score
+        if (rounds == null) return x01;
 
         // For every round map the player score and sum these up.
         int totalScored = rounds.stream()
@@ -147,6 +166,50 @@ public class X01LegRoundServiceImpl implements IX01LegRoundService {
         return x01 - totalScored;
     }
 
+    /**
+     * Validates that the scores (and checkout if applicable) of a player in a list of rounds
+     * are valid according to the game rules.
+     *
+     * @param x01       int the x01 rule of the match
+     * @param rounds    {@link List<X01LegRound>} the list of rounds that need to be checked
+     * @param throwerId {@link ObjectId} the player who needs to be validated
+     * @return boolean whether the list of scores in the rounds are valid for a player according to the game rules.
+     * @throws IOException If there's an issue reading the checkouts file.
+     */
+    public boolean validateRoundsForPlayer(int x01, List<X01LegRound> rounds, ObjectId throwerId) throws IOException {
+        // Get the remaining score for the player
+        int remaining = calculateRemainingScore(x01, rounds, throwerId);
+
+        // The remaining score cannot 1 or below 0
+        if (remaining < 0 || remaining == 1) return false;
+
+        // When no remaining points are left, determine the validity of the last score (checkout)
+        if (remaining == 0) {
+            Optional<X01LegRoundScore> playerLatestTurn = getLastScoreForPlayer(rounds, throwerId);
+            if (playerLatestTurn.isPresent())
+                return checkoutService.isValidCheckout(playerLatestTurn.get().getScore(), playerLatestTurn.get().getDartsUsed());
+        }
+
+        // The rounds are in line with the game rules.
+        return true;
+    }
+
+    /**
+     * Find the last score for a player from a list of rounds.
+     *
+     * @param rounds    {@link List<X01LegRound>} the list of rounds containing the player scores
+     * @param throwerId {@link ObjectId} the player id for which the latest turn needs to be found
+     * @return {@link Optional<X01LegRoundScore>} the round score for a player in their latest round, if no score found empty
+     */
+    public Optional<X01LegRoundScore> getLastScoreForPlayer(List<X01LegRound> rounds, ObjectId throwerId) {
+        // Find the rounds containing a score for the player
+        List<X01LegRound> playerRounds = rounds.stream().filter(round -> round.getScores().containsKey(throwerId)).toList();
+
+        // Get the highest round containing the player score
+        return playerRounds.stream()
+                .max(Comparator.comparingInt(X01LegRound::getRound))
+                .flatMap(round -> Optional.ofNullable(round.getScores().get(throwerId)));
+    }
 
     /**
      * Find all players that have yet to score in a round.

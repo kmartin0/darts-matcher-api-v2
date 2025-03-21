@@ -2,8 +2,7 @@ package nl.kmartin.dartsmatcherapiv2.features.x01.x01match;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Match;
-import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Turn;
+import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
 import nl.kmartin.dartsmatcherapiv2.utils.Endpoints;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
@@ -36,8 +35,36 @@ public class X01MatchController {
 
     @PostMapping(path = Endpoints.X01_ADD_TURN, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public X01Match addThrow(@Valid @RequestBody X01Turn x01Turn) throws IOException {
+    public X01Match addTurn(@Valid @RequestBody X01Turn x01Turn) throws IOException {
 
         return x01MatchService.addTurn(x01Turn);
+    }
+
+    @PostMapping(path = Endpoints.X01_EDIT_TURN, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public X01Match editTurn(@Valid @RequestBody X01EditTurn x01EditTurn) throws IOException {
+
+        return x01MatchService.editTurn(x01EditTurn);
+    }
+
+    @PostMapping(path = Endpoints.X01_DELETE_TURN, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public X01Match deleteTurn(@Valid @RequestBody X01DeleteTurn x01DeleteTurn) {
+
+        return x01MatchService.deleteTurn(x01DeleteTurn);
+    }
+
+    @PostMapping(path = Endpoints.X01_DELETE_LEG, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public X01Match deleteLeg(@Valid @RequestBody X01DeleteLeg x01DeleteLeg) {
+
+        return x01MatchService.deleteLeg(x01DeleteLeg);
+    }
+
+    @PostMapping(path = Endpoints.X01_DELETE_SET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public X01Match deleteSet(@Valid @RequestBody X01DeleteSet x01DeleteSet) {
+
+        return x01MatchService.deleteSet(x01DeleteSet);
     }
 }
