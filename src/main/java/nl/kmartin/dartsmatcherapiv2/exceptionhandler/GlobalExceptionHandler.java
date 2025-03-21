@@ -1,8 +1,6 @@
 package nl.kmartin.dartsmatcherapiv2.exceptionhandler;
 
-import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.Path;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ForbiddenException;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.InvalidArgumentsException;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceAlreadyExistsException;
@@ -10,14 +8,13 @@ import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceNotFoundE
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.response.ApiErrorCode;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.response.ErrorResponse;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.response.TargetError;
+import nl.kmartin.dartsmatcherapiv2.utils.ErrorUtil;
 import nl.kmartin.dartsmatcherapiv2.utils.MessageResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.HttpMediaTypeException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -81,16 +78,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler({MethodArgumentNotValidException.class})
     public ResponseEntity<ErrorResponse> handleMethodArgumentsInvalidException(MethodArgumentNotValidException e) {
-        ArrayList<TargetError> errors = new ArrayList<>();
+        ArrayList<TargetError> errors = ErrorUtil.extractFieldErrors(e);
         ApiErrorCode apiErrorCode = ApiErrorCode.INVALID_ARGUMENTS;
-
-        for (ObjectError error : e.getBindingResult().getAllErrors()) {
-            if (error instanceof FieldError) {
-                errors.add(new TargetError(((FieldError) error).getField(), error.getDefaultMessage()));
-            } else {
-                errors.add(new TargetError(error.getCode(), error.getDefaultMessage()));
-            }
-        }
 
         ErrorResponse responseBody = new ErrorResponse(
                 apiErrorCode,
@@ -109,34 +98,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler({ConstraintViolationException.class})
     public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException e) {
-        ArrayList<TargetError> errors = new ArrayList<>();
+        ArrayList<TargetError> errors = ErrorUtil.extractTargetErrors(e);
         ApiErrorCode apiErrorCode = ApiErrorCode.INVALID_ARGUMENTS;
-
-        // Constructs the path disregarding the first two path nodes.
-        for (ConstraintViolation<?> violation : e.getConstraintViolations()) {
-            // List of property paths.
-            ArrayList<Path.Node> violationPropertyPaths = new ArrayList<>();
-            violation.getPropertyPath().iterator().forEachRemaining(violationPropertyPaths::add);
-
-            // The response error path.
-            StringBuilder errorPath = new StringBuilder();
-
-            // Ignore method and object path if the property path is nested.
-            int startIndex = 0;
-            if (violationPropertyPaths.size() > 1) startIndex = 1;
-            if (violationPropertyPaths.size() > 2) startIndex = 2;
-
-            for (int i = startIndex; i < violationPropertyPaths.size(); i++) {
-                // Append the path.
-                errorPath.append(violationPropertyPaths.get(i));
-
-                // Append a dot between paths.
-                if (i < violationPropertyPaths.size() - 1) errorPath.append(".");
-            }
-
-            errors.add(new TargetError(errorPath.toString(), violation.getMessage()));
-        }
-
         ErrorResponse responseBody = new ErrorResponse(
                 apiErrorCode,
                 messageResolver.getMessage("exception.invalid.arguments"),
