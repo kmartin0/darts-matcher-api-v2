@@ -1,7 +1,9 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01match;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01dartbot.IX01DartBotService;
 import nl.kmartin.dartsmatcherapiv2.utils.WebsocketDestinations;
 import org.bson.types.ObjectId;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -17,10 +19,12 @@ public class X01MatchWebsocketController {
 
     private final IX01MatchService x01MatchService;
     private final IX01MatchWebsocketService x01MatchWebsocketService;
+    private final IX01DartBotService x01DartBotService;
 
-    public X01MatchWebsocketController(IX01MatchService x01MatchService, IX01MatchWebsocketService x01MatchWebsocketService) {
+    public X01MatchWebsocketController(IX01MatchService x01MatchService, IX01MatchWebsocketService x01MatchWebsocketService, IX01DartBotService x01DartBotService) {
         this.x01MatchService = x01MatchService;
         this.x01MatchWebsocketService = x01MatchWebsocketService;
+        this.x01DartBotService = x01DartBotService;
     }
 
     @SubscribeMapping(WebsocketDestinations.X01_GET_MATCH)
@@ -32,6 +36,14 @@ public class X01MatchWebsocketController {
     @MessageMapping(WebsocketDestinations.X01_ADD_TURN)
     public X01Match addTurn(@Valid @Payload X01Turn x01Turn) throws IOException {
         X01Match updatedMatch = x01MatchService.addTurn(x01Turn);
+        x01MatchWebsocketService.sendX01MatchUpdate(updatedMatch);
+        return updatedMatch;
+    }
+
+    @MessageMapping(WebsocketDestinations.X01_TURN_DART_BOT)
+    public X01Match addDartBotTurn(@Payload ObjectId matchId) throws IOException {
+        X01Turn dartBotTurn = x01DartBotService.createDartBotTurn(matchId);
+        X01Match updatedMatch = x01MatchService.addTurn(dartBotTurn);
         x01MatchWebsocketService.sendX01MatchUpdate(updatedMatch);
         return updatedMatch;
     }

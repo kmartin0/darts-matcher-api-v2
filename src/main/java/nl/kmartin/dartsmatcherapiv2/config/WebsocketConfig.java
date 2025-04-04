@@ -13,7 +13,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
  * Server to client (single response subscription) prefix:  /app
  * Server to client (Broadcast subscription) prefix:        /topic
  * Server to user prefix:                                   /user
- * Websocket connection url:                                ws://localhost:8080/darts-matcher-websocket/websocket
+ * Websocket connection url:                                ws://localhost:8080/darts-matcher-websocket
  * =
  * Example Destinations:
  * STOMP subscribe destination (Single Response):       /app/matches/67dd4a0746cdab5415620e01
@@ -21,6 +21,8 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
  * STOMP subscribe error queue destination:             /user/queue/errors
  * STOMP send destination:                              /app/matches/x01/turn:add
  * STOMP message content (add turn):                    {"matchId": "67dd4a0746cdab5415620e01", "score": 60, "dartsUsed": 3, "doublesMissed": 0}
+ * =
+ * Websocket Debug Tool: https://jiangxy.github.io/websocket-debug-tool/
  */
 @Configuration
 @EnableWebSocketMessageBroker

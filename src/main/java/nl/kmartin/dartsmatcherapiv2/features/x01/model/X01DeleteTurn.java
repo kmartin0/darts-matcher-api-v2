@@ -19,12 +19,12 @@ public class X01DeleteTurn {
     @NotNull
     private ObjectId playerId;
 
-    @Min(0)
+    @Min(1)
     private int set;
 
-    @Min(0)
+    @Min(1)
     private int leg;
 
-    @Min(0)
+    @Min(1)
     private int round;
 }

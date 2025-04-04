@@ -8,9 +8,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Dart {
-    private int section;
+    private DartBoardSection section;
     private DartboardSectionArea area;
+
     public int getScore() {
-        return section * area.getMultiplier();
+        return section.getScore(area);
+    }
+
+    public Dart(Dart dart) {
+        this(dart.getSection(), dart.getArea());
     }
 }

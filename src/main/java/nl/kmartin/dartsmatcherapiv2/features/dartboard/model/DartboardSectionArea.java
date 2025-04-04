@@ -1,24 +1,26 @@
 package nl.kmartin.dartsmatcherapiv2.features.dartboard.model;
 
+import lombok.Getter;
+
+@Getter
 public enum DartboardSectionArea {
-    DOUBLE_BULL, SINGLE_BULL, INNER_SINGLE, TRIPLE, OUTER_SINGLE, DOUBLE, MISS;
+    DOUBLE_BULL(2), SINGLE_BULL(1), INNER_SINGLE(1), TRIPLE(3), OUTER_SINGLE(1), DOUBLE(2), MISS(0);
 
-    public int getMultiplier() {
-        switch (this) {
-            case INNER_SINGLE:
-            case OUTER_SINGLE:
-            case SINGLE_BULL:
-            case DOUBLE_BULL:
-                return 1;
+    private final int multiplier;
 
-            case DOUBLE:
-                return 2;
+    DartboardSectionArea(int multiplier) {
+        this.multiplier = multiplier;
+    }
 
-            case TRIPLE:
-                return 3;
+    public boolean isSingle() {
+        return this == INNER_SINGLE || this == OUTER_SINGLE || this == SINGLE_BULL;
+    }
 
-            default:
-                return 0;
-        }
+    public boolean isDouble() {
+        return this == DOUBLE || this == DOUBLE_BULL;
+    }
+
+    public boolean isTriple() {
+        return this == TRIPLE;
     }
 }

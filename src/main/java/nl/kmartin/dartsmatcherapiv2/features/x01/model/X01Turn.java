@@ -1,6 +1,5 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.model;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -19,7 +18,7 @@ public class X01Turn {
     @Min(0)
     int score;
 
-    @Min(0)
+    @Min(1)
     @Max(3)
     int dartsUsed;
 

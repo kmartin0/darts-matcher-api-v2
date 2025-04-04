@@ -16,9 +16,9 @@ public class X01DeleteLeg {
     @NotNull
     ObjectId matchId;
 
-    @Min(0)
+    @Min(1)
     int set;
 
-    @Min(0)
+    @Min(1)
     int leg;
 }

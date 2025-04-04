@@ -1,5 +1,6 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -23,4 +24,9 @@ public class X01LegRoundScore {
     @Min(0)
     @Max(180)
     private int score;
+
+    @JsonIgnore
+    public int getDartsLeft() {
+        return Math.max(0, 3 - this.getDartsUsed());
+    }
 }

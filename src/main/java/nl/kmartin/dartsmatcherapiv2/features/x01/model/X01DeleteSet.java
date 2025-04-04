@@ -16,6 +16,6 @@ public class X01DeleteSet {
     @NotNull
     ObjectId matchId;
 
-    @Min(0)
+    @Min(1)
     int set;
 }

@@ -33,6 +33,9 @@ public class MessageKeys {
     public static final String MESSAGE_LEG_ALREADY_WON = "message.leg.already.won";
     public static final String MESSAGE_X01_DART_BOT_SETTINGS_HUMAN = "message.x01.dart.bot.settings.human";
     public static final String MESSAGE_X01_DART_BOT_SETTINGS_BOT_MISSING = "message.x01.dart.bot.settings.bot.missing";
+    public static final String MESSAGE_X01_DART_BOT_PLAYER_NOT_BOT = "message.x01.dart.bot.player.not.bot";
+    public static final String MESSAGE_X01_PLAYER_NOT_FOUND = "message.x01.player.not.found";
+    public static final String MESSAGE_X01_DART_BOT_CURRENT_THROWER_ERROR = "message.x01.dart.bot.current.thrower.error";
 
     /**
      * Developer-facing Exceptions (exception.*)

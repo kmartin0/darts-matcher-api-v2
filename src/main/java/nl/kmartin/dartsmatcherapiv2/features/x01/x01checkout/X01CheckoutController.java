@@ -26,6 +26,6 @@ public class X01CheckoutController {
     @GetMapping(path = RestEndpoints.GET_CHECKOUT, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public X01Checkout getCheckout(@PathVariable int remaining) throws IOException {
-        return checkoutService.getCheckout(remaining);
+        return checkoutService.getCheckout(remaining).orElse(null);
     }
 }

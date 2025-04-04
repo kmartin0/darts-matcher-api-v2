@@ -4,7 +4,7 @@
     "minDarts": 1,
     "suggested": [
       {
-        "section": 1,
+        "section": "ONE",
         "area": "DOUBLE"
       }
     ]
@@ -14,11 +14,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 1,
+        "section": "ONE",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 1,
+        "section": "ONE",
         "area": "DOUBLE"
       }
     ]
@@ -28,7 +28,7 @@
     "minDarts": 1,
     "suggested": [
       {
-        "section": 2,
+        "section": "TWO",
         "area": "DOUBLE"
       }
     ]
@@ -38,11 +38,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 1,
+        "section": "ONE",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 2,
+        "section": "TWO",
         "area": "DOUBLE"
       }
     ]
@@ -52,7 +52,7 @@
     "minDarts": 1,
     "suggested": [
       {
-        "section": 3,
+        "section": "THREE",
         "area": "DOUBLE"
       }
     ]
@@ -62,11 +62,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 3,
+        "section": "THREE",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 2,
+        "section": "TWO",
         "area": "DOUBLE"
       }
     ]
@@ -76,7 +76,7 @@
     "minDarts": 1,
     "suggested": [
       {
-        "section": 4,
+        "section": "FOUR",
         "area": "DOUBLE"
       }
     ]
@@ -86,11 +86,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 1,
+        "section": "ONE",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 4,
+        "section": "FOUR",
         "area": "DOUBLE"
       }
     ]
@@ -100,7 +100,7 @@
     "minDarts": 1,
     "suggested": [
       {
-        "section": 5,
+        "section": "FIVE",
         "area": "DOUBLE"
       }
     ]
@@ -110,11 +110,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 3,
+        "section": "THREE",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 4,
+        "section": "FOUR",
         "area": "DOUBLE"
       }
     ]
@@ -124,7 +124,7 @@
     "minDarts": 1,
     "suggested": [
       {
-        "section": 6,
+        "section": "SIX",
         "area": "DOUBLE"
       }
     ]
@@ -134,11 +134,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 5,
+        "section": "FIVE",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 4,
+        "section": "FOUR",
         "area": "DOUBLE"
       }
     ]
@@ -148,7 +148,7 @@
     "minDarts": 1,
     "suggested": [
       {
-        "section": 7,
+        "section": "SEVEN",
         "area": "DOUBLE"
       }
     ]
@@ -158,11 +158,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 7,
+        "section": "SEVEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 4,
+        "section": "FOUR",
         "area": "DOUBLE"
       }
     ]
@@ -172,7 +172,7 @@
     "minDarts": 1,
     "suggested": [
       {
-        "section": 8,
+        "section": "EIGHT",
         "area": "DOUBLE"
       }
     ]
@@ -182,11 +182,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 1,
+        "section": "ONE",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 8,
+        "section": "EIGHT",
         "area": "DOUBLE"
       }
     ]
@@ -196,7 +196,7 @@
     "minDarts": 1,
     "suggested": [
       {
-        "section": 9,
+        "section": "NINE",
         "area": "DOUBLE"
       }
     ]
@@ -206,11 +206,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 3,
+        "section": "THREE",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 8,
+        "section": "EIGHT",
         "area": "DOUBLE"
       }
     ]
@@ -220,7 +220,7 @@
     "minDarts": 1,
     "suggested": [
       {
-        "section": 10,
+        "section": "TEN",
         "area": "DOUBLE"
       }
     ]
@@ -230,11 +230,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 5,
+        "section": "FIVE",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 8,
+        "section": "EIGHT",
         "area": "DOUBLE"
       }
     ]
@@ -244,7 +244,7 @@
     "minDarts": 1,
     "suggested": [
       {
-        "section": 11,
+        "section": "ELEVEN",
         "area": "DOUBLE"
       }
     ]
@@ -254,11 +254,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 7,
+        "section": "SEVEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 8,
+        "section": "EIGHT",
         "area": "DOUBLE"
       }
     ]
@@ -268,7 +268,7 @@
     "minDarts": 1,
     "suggested": [
       {
-        "section": 12,
+        "section": "TWELVE",
         "area": "DOUBLE"
       }
     ]
@@ -278,11 +278,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 9,
+        "section": "NINE",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 8,
+        "section": "EIGHT",
         "area": "DOUBLE"
       }
     ]
@@ -292,7 +292,7 @@
     "minDarts": 1,
     "suggested": [
       {
-        "section": 13,
+        "section": "THIRTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -302,11 +302,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 11,
+        "section": "ELEVEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 8,
+        "section": "EIGHT",
         "area": "DOUBLE"
       }
     ]
@@ -316,7 +316,7 @@
     "minDarts": 1,
     "suggested": [
       {
-        "section": 14,
+        "section": "FOURTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -326,11 +326,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 13,
+        "section": "THIRTEEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 8,
+        "section": "EIGHT",
         "area": "DOUBLE"
       }
     ]
@@ -340,7 +340,7 @@
     "minDarts": 1,
     "suggested": [
       {
-        "section": 15,
+        "section": "FIFTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -350,11 +350,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 15,
+        "section": "FIFTEEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 8,
+        "section": "EIGHT",
         "area": "DOUBLE"
       }
     ]
@@ -364,7 +364,7 @@
     "minDarts": 1,
     "suggested": [
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -374,11 +374,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 1,
+        "section": "ONE",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -388,7 +388,7 @@
     "minDarts": 1,
     "suggested": [
       {
-        "section": 17,
+        "section": "SEVENTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -398,11 +398,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 3,
+        "section": "THREE",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -412,7 +412,7 @@
     "minDarts": 1,
     "suggested": [
       {
-        "section": 18,
+        "section": "EIGHTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -422,11 +422,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 5,
+        "section": "FIVE",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -436,7 +436,7 @@
     "minDarts": 1,
     "suggested": [
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "DOUBLE"
       }
     ]
@@ -446,11 +446,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 7,
+        "section": "SEVEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -460,7 +460,7 @@
     "minDarts": 1,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -470,11 +470,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 9,
+        "section": "NINE",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -484,11 +484,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 10,
+        "section": "TEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -498,11 +498,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 11,
+        "section": "ELEVEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -512,11 +512,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 12,
+        "section": "TWELVE",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -526,11 +526,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 13,
+        "section": "THIRTEEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -540,11 +540,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 14,
+        "section": "FOURTEEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -554,11 +554,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 15,
+        "section": "FIFTEEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -568,11 +568,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -582,11 +582,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 17,
+        "section": "SEVENTEEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -596,11 +596,11 @@
     "minDarts": 1,
     "suggested": [
       {
-        "section": 18,
+        "section": "EIGHTEEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -610,11 +610,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -624,11 +624,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -638,11 +638,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 13,
+        "section": "THIRTEEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -652,11 +652,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 14,
+        "section": "FOURTEEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -666,11 +666,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 15,
+        "section": "FIFTEEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -680,11 +680,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -694,11 +694,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 17,
+        "section": "SEVENTEEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -708,11 +708,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 18,
+        "section": "EIGHTEEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -722,11 +722,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -736,11 +736,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -750,11 +750,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 15,
+        "section": "FIFTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 8,
+        "section": "EIGHT",
         "area": "DOUBLE"
       }
     ]
@@ -764,11 +764,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 10,
+        "section": "TEN",
         "area": "TRIPLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -778,11 +778,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 13,
+        "section": "THIRTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 12,
+        "section": "TWELVE",
         "area": "DOUBLE"
       }
     ]
@@ -792,11 +792,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 8,
+        "section": "EIGHT",
         "area": "DOUBLE"
       }
     ]
@@ -806,11 +806,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 4,
+        "section": "FOUR",
         "area": "DOUBLE"
       }
     ]
@@ -820,11 +820,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 10,
+        "section": "TEN",
         "area": "TRIPLE"
       },
       {
-        "section": 18,
+        "section": "EIGHTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -834,11 +834,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 17,
+        "section": "SEVENTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 8,
+        "section": "EIGHT",
         "area": "DOUBLE"
       }
     ]
@@ -848,11 +848,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 4,
+        "section": "FOUR",
         "area": "DOUBLE"
       }
     ]
@@ -862,11 +862,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 15,
+        "section": "FIFTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 12,
+        "section": "TWELVE",
         "area": "DOUBLE"
       }
     ]
@@ -876,11 +876,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 10,
+        "section": "TEN",
         "area": "TRIPLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -890,11 +890,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 13,
+        "section": "THIRTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -904,11 +904,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 12,
+        "section": "TWELVE",
         "area": "DOUBLE"
       }
     ]
@@ -918,11 +918,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 8,
+        "section": "EIGHT",
         "area": "DOUBLE"
       }
     ]
@@ -932,11 +932,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 14,
+        "section": "FOURTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -946,11 +946,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 17,
+        "section": "SEVENTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 12,
+        "section": "TWELVE",
         "area": "DOUBLE"
       }
     ]
@@ -960,11 +960,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 8,
+        "section": "EIGHT",
         "area": "DOUBLE"
       }
     ]
@@ -974,11 +974,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 10,
+        "section": "TEN",
         "area": "DOUBLE"
       }
     ]
@@ -988,11 +988,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 18,
+        "section": "EIGHTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 12,
+        "section": "TWELVE",
         "area": "DOUBLE"
       }
     ]
@@ -1002,11 +1002,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 13,
+        "section": "THIRTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -1016,11 +1016,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 10,
+        "section": "TEN",
         "area": "DOUBLE"
       }
     ]
@@ -1030,11 +1030,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 12,
+        "section": "TWELVE",
         "area": "DOUBLE"
       }
     ]
@@ -1044,11 +1044,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 14,
+        "section": "FOURTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -1058,11 +1058,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 17,
+        "section": "SEVENTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -1072,11 +1072,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 12,
+        "section": "TWELVE",
         "area": "DOUBLE"
       }
     ]
@@ -1086,11 +1086,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 15,
+        "section": "FIFTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -1100,11 +1100,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 18,
+        "section": "EIGHTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -1114,11 +1114,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 17,
+        "section": "SEVENTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 18,
+        "section": "EIGHTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -1128,11 +1128,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -1142,11 +1142,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -1156,11 +1156,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 15,
+        "section": "FIFTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -1170,11 +1170,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 17,
+        "section": "SEVENTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -1184,11 +1184,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -1198,11 +1198,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 18,
+        "section": "EIGHTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -1212,11 +1212,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 18,
+        "section": "EIGHTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -1226,11 +1226,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "DOUBLE"
       }
     ]
@@ -1240,11 +1240,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 18,
+        "section": "EIGHTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -1254,11 +1254,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -1268,11 +1268,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "DOUBLE"
       }
     ]
@@ -1282,15 +1282,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 10,
+        "section": "TEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -1300,11 +1300,11 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -1314,15 +1314,15 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 9,
+        "section": "NINE",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -1332,15 +1332,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 10,
+        "section": "TEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -1350,15 +1350,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 14,
+        "section": "FOURTEEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -1368,15 +1368,15 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -1386,15 +1386,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 13,
+        "section": "THIRTEEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -1404,15 +1404,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 14,
+        "section": "FOURTEEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -1422,15 +1422,15 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 18,
+        "section": "EIGHTEEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -1440,15 +1440,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -1458,15 +1458,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 17,
+        "section": "SEVENTEEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -1476,15 +1476,15 @@
     "minDarts": 2,
     "suggested": [
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 13,
+        "section": "THIRTEEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -1494,15 +1494,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -1512,15 +1512,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 12,
+        "section": "TWELVE",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -1530,15 +1530,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 13,
+        "section": "THIRTEEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -1548,15 +1548,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 14,
+        "section": "FOURTEEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -1566,15 +1566,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 15,
+        "section": "FIFTEEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -1584,15 +1584,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -1602,15 +1602,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 17,
+        "section": "SEVENTEEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -1620,15 +1620,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 18,
+        "section": "EIGHTEEN",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -1638,15 +1638,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 10,
+        "section": "TEN",
         "area": "TRIPLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -1656,15 +1656,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -1674,15 +1674,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 17,
+        "section": "SEVENTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 10,
+        "section": "TEN",
         "area": "TRIPLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -1692,15 +1692,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 18,
+        "section": "EIGHTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 4,
+        "section": "FOUR",
         "area": "DOUBLE"
       }
     ]
@@ -1710,15 +1710,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 9,
+        "section": "NINE",
         "area": "DOUBLE"
       }
     ]
@@ -1728,15 +1728,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 8,
+        "section": "EIGHT",
         "area": "DOUBLE"
       }
     ]
@@ -1746,15 +1746,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 25,
+        "section": "BULL",
         "area": "SINGLE_BULL"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -1764,15 +1764,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 6,
+        "section": "SIX",
         "area": "DOUBLE"
       }
     ]
@@ -1782,15 +1782,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 17,
+        "section": "SEVENTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 8,
+        "section": "EIGHT",
         "area": "DOUBLE"
       }
     ]
@@ -1800,15 +1800,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 18,
+        "section": "EIGHTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 14,
+        "section": "FOURTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -1818,15 +1818,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 12,
+        "section": "TWELVE",
         "area": "DOUBLE"
       }
     ]
@@ -1836,15 +1836,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "OUTER_SINGLE"
       },
       {
-        "section": 50,
+        "section": "BULL",
         "area": "DOUBLE_BULL"
       }
     ]
@@ -1854,15 +1854,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 13,
+        "section": "THIRTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -1872,15 +1872,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 12,
+        "section": "TWELVE",
         "area": "DOUBLE"
       }
     ]
@@ -1890,15 +1890,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 8,
+        "section": "EIGHT",
         "area": "DOUBLE"
       }
     ]
@@ -1908,15 +1908,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 14,
+        "section": "FOURTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -1926,15 +1926,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 17,
+        "section": "SEVENTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 12,
+        "section": "TWELVE",
         "area": "DOUBLE"
       }
     ]
@@ -1944,15 +1944,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 8,
+        "section": "EIGHT",
         "area": "DOUBLE"
       }
     ]
@@ -1962,15 +1962,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -1980,15 +1980,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 18,
+        "section": "EIGHTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 12,
+        "section": "TWELVE",
         "area": "DOUBLE"
       }
     ]
@@ -1998,15 +1998,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 14,
+        "section": "FOURTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -2016,15 +2016,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 10,
+        "section": "TEN",
         "area": "DOUBLE"
       }
     ]
@@ -2034,15 +2034,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 12,
+        "section": "TWELVE",
         "area": "DOUBLE"
       }
     ]
@@ -2052,15 +2052,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 14,
+        "section": "FOURTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -2070,15 +2070,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 17,
+        "section": "SEVENTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -2088,15 +2088,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 12,
+        "section": "TWELVE",
         "area": "DOUBLE"
       }
     ]
@@ -2106,15 +2106,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 15,
+        "section": "FIFTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -2124,15 +2124,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 18,
+        "section": "EIGHTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -2142,15 +2142,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 17,
+        "section": "SEVENTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 18,
+        "section": "EIGHTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -2160,15 +2160,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -2178,15 +2178,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -2196,15 +2196,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 18,
+        "section": "EIGHTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 18,
+        "section": "EIGHTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -2214,15 +2214,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 17,
+        "section": "SEVENTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -2232,15 +2232,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 16,
+        "section": "SIXTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -2250,15 +2250,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 18,
+        "section": "EIGHTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -2268,15 +2268,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 18,
+        "section": "EIGHTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -2286,15 +2286,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "DOUBLE"
       }
     ]
@@ -2304,15 +2304,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 18,
+        "section": "EIGHTEEN",
         "area": "DOUBLE"
       }
     ]
@@ -2322,15 +2322,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -2340,15 +2340,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "DOUBLE"
       }
     ]
@@ -2358,15 +2358,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "DOUBLE"
       }
     ]
@@ -2376,15 +2376,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 17,
+        "section": "SEVENTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 50,
+        "section": "BULL",
         "area": "DOUBLE_BULL"
       }
     ]
@@ -2394,15 +2394,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 18,
+        "section": "EIGHTEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 50,
+        "section": "BULL",
         "area": "DOUBLE_BULL"
       }
     ]
@@ -2412,15 +2412,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 19,
+        "section": "NINETEEN",
         "area": "TRIPLE"
       },
       {
-        "section": 50,
+        "section": "BULL",
         "area": "DOUBLE_BULL"
       }
     ]
@@ -2430,15 +2430,15 @@
     "minDarts": 3,
     "suggested": [
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 20,
+        "section": "TWENTY",
         "area": "TRIPLE"
       },
       {
-        "section": 50,
+        "section": "BULL",
         "area": "DOUBLE_BULL"
       }
     ]

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import nl.kmartin.dartsmatcherapiv2.serializers.InstantSerializer;
+import nl.kmartin.dartsmatcherapiv2.serializers.ObjectIdDeserializer;
 import nl.kmartin.dartsmatcherapiv2.serializers.ObjectIdSerializer;
 import org.bson.types.ObjectId;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +19,7 @@ public class JacksonConfig {
     public Module customSerializerModule() {
         SimpleModule module = new SimpleModule();
         module.addSerializer(ObjectId.class, new ObjectIdSerializer());
+        module.addDeserializer(ObjectId.class, new ObjectIdDeserializer());
         module.addSerializer(Instant.class, new InstantSerializer());
         return module;
     }

@@ -13,7 +13,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 
 @Service
-public class X01MatchSetupService implements IX01MatchSetupService {
+public class X01MatchSetupServiceImpl implements IX01MatchSetupService {
     public void setupNewMatch(@Valid X01Match x01Match) {
         if (x01Match == null) return;
 

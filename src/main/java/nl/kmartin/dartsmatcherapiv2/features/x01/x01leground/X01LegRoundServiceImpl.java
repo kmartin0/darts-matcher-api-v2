@@ -166,6 +166,17 @@ public class X01LegRoundServiceImpl implements IX01LegRoundService {
         return x01 - totalScored;
     }
 
+    public int calculateDartsUsed(List<X01LegRound> rounds, ObjectId playerId) {
+        if (rounds == null) return 0;
+
+        // For every round map the player darts used and sum these up.
+        return rounds.stream()
+                .mapToInt(value -> {
+                    X01LegRoundScore playerScore = value.getScores().get(playerId);
+                    return (playerScore != null) ? playerScore.getDartsUsed() : 0;
+                }).sum();
+    }
+
     /**
      * Validates that the scores (and checkout if applicable) of a player in a list of rounds
      * are valid according to the game rules.
@@ -180,14 +191,14 @@ public class X01LegRoundServiceImpl implements IX01LegRoundService {
         // Get the remaining score for the player
         int remaining = calculateRemainingScore(x01, rounds, throwerId);
 
-        // The remaining score cannot 1 or below 0
-        if (remaining < 0 || remaining == 1) return false;
+        // The remaining score cannot be 1 or below 0
+        if (checkoutService.isRemainingBust(remaining)) return false;
 
         // When no remaining points are left, determine the validity of the last score (checkout)
-        if (remaining == 0) {
+        if (checkoutService.isRemainingZero(remaining)) {
             Optional<X01LegRoundScore> playerLatestTurn = getLastScoreForPlayer(rounds, throwerId);
             if (playerLatestTurn.isPresent())
-                return checkoutService.isValidCheckout(playerLatestTurn.get().getScore(), playerLatestTurn.get().getDartsUsed());
+                return checkoutService.isScoreCheckout(playerLatestTurn.get().getScore(), playerLatestTurn.get().getDartsUsed());
         }
 
         // The rounds are in line with the game rules.

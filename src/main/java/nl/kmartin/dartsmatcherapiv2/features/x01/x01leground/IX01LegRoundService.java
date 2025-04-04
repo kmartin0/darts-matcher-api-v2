@@ -25,6 +25,8 @@ public interface IX01LegRoundService {
 
     int calculateRemainingScore(int x01, List<X01LegRound> rounds, ObjectId playerId);
 
+    int calculateDartsUsed(List<X01LegRound> rounds, ObjectId playerId);
+
     boolean validateRoundsForPlayer(int x01, List<X01LegRound> rounds, ObjectId throwerId) throws IOException;
 
     Optional<X01LegRoundScore> getLastScoreForPlayer(List<X01LegRound> rounds, ObjectId throwerId);
