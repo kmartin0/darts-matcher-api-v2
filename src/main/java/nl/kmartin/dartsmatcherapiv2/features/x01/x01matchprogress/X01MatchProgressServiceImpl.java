@@ -72,9 +72,9 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
 
         // Update the match progress with the new state of the match
         x01Match.setMatchProgress(new X01MatchProgress(
-                currentSet != null ? currentSet.getSet() : 0,
-                currentLeg != null ? currentLeg.getLeg() : 0,
-                currentLegRound != null ? currentLegRound.getRound() : 0,
+                currentSet != null ? currentSet.getSet() : null,
+                currentLeg != null ? currentLeg.getLeg() : null,
+                currentLegRound != null ? currentLegRound.getRound() : null,
                 currentThrower
         ));
     }

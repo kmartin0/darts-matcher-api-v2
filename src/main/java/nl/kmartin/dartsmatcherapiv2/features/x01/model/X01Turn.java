@@ -16,6 +16,7 @@ public class X01Turn {
     private ObjectId matchId;
 
     @Min(0)
+    @Max(180)
     int score;
 
     @Min(1)

@@ -138,6 +138,9 @@ public class X01LegServiceImpl implements IX01LegService {
     public void addScore(int x01, X01Leg x01Leg, int roundNumber, X01LegRoundScore x01LegRoundScore, List<X01MatchPlayer> matchPlayers, ObjectId throwerId) throws IOException {
         if (x01Leg == null || x01LegRoundScore == null || matchPlayers == null) return;
 
+        // Determine if the leg is editable, will throw InvalidArgumentsException if the leg is not editable.
+        checkLegEditable(x01Leg, throwerId);
+
         Optional<X01LegRound> x01LegRound = legRoundService.getLegRound(x01Leg.getRounds(), roundNumber, true);
         if (x01LegRound.isEmpty()) return;
 
@@ -171,7 +174,7 @@ public class X01LegServiceImpl implements IX01LegService {
      */
     public void deleteScore(int x01, X01Leg x01Leg, int roundNumber, ObjectId playerIdToDelete, List<X01MatchPlayer> matchPlayers) {
         // Determine if the leg is editable, will throw InvalidArgumentsException if the leg is not editable.
-        isLegEditable(x01Leg, playerIdToDelete);
+        checkLegEditable(x01Leg, playerIdToDelete);
 
         // Get the round in which the score needs to be deleted.
         Optional<X01LegRound> x01LegRound = legRoundService.getLegRound(x01Leg.getRounds(), roundNumber, true);
@@ -231,16 +234,13 @@ public class X01LegServiceImpl implements IX01LegService {
      *
      * @param x01Leg   {@link X01Leg} the leg to be modified
      * @param playerId {@link ObjectId} the player of which the score is going to be modified
-     * @return boolean if the score of the player in the leg can be modified
      */
     @Override
-    public boolean isLegEditable(X01Leg x01Leg, ObjectId playerId) {
+    public void checkLegEditable(X01Leg x01Leg, ObjectId playerId) {
         // If the leg is already won by another player the turn cannot be modified.
         if (isLegConcluded(x01Leg) && !Objects.equals(x01Leg.getWinner(), playerId)) {
             throw new InvalidArgumentsException(new TargetError("score", messageResolver.getMessage(MessageKeys.MESSAGE_LEG_ALREADY_WON)));
         }
-
-        return true;
     }
 
     /**

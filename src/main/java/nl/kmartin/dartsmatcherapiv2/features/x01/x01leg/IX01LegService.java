@@ -29,7 +29,7 @@ public interface IX01LegService {
 
     Optional<X01Leg> getLeg(List<X01Leg> legs, int legNumber, boolean throwIfNotFound);
 
-    boolean isLegEditable(X01Leg x01Leg, ObjectId playerId);
+    void checkLegEditable(X01Leg x01Leg, ObjectId playerId);
 
     void updateLegResults(List<X01Leg> legs, List<X01MatchPlayer> players, int x01);
 

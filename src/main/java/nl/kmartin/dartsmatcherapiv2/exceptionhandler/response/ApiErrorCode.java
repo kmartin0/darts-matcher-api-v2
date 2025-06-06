@@ -14,7 +14,6 @@ import org.springframework.http.HttpStatus;
 public enum ApiErrorCode {
     INVALID_ARGUMENTS(HttpStatus.BAD_REQUEST), // 400
     MESSAGE_NOT_READABLE(HttpStatus.BAD_REQUEST), // 400
-    UNAUTHENTICATED(HttpStatus.UNAUTHORIZED), // 401
     PERMISSION_DENIED(HttpStatus.FORBIDDEN), // 403
     RESOURCE_NOT_FOUND(HttpStatus.NOT_FOUND), // 404
     URI_NOT_FOUND(HttpStatus.NOT_FOUND), // 404
