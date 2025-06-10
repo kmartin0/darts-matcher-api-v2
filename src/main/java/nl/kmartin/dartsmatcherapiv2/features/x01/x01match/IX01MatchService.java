@@ -17,9 +17,5 @@ public interface IX01MatchService {
 
     X01Match editTurn(@NotNull @Valid X01EditTurn x01EditTurn) throws IOException;
 
-    X01Match deleteTurn(@NotNull @Valid X01DeleteTurn x01DeleteTurn);
-
-    X01Match deleteLeg(@NotNull @Valid X01DeleteLeg x01DeleteLeg);
-
-    X01Match deleteSet(@NotNull @Valid X01DeleteSet x01DeleteSet);
+    X01Match deleteLastTurn(@NotNull @Valid X01DeleteLastTurn x01DeleteLastTurn);
 }

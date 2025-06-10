@@ -14,6 +14,14 @@ import java.util.ArrayList;
 
 @Service
 public class X01MatchSetupServiceImpl implements IX01MatchSetupService {
+
+    /**
+     * Sets up an X01 match by setting up players, match type and status,
+     * start and end dates, and initial match progress.
+     *
+     * @param x01Match the {@link X01Match} instance to set up
+     */
+    @Override
     public void setupNewMatch(@Valid X01Match x01Match) {
         if (x01Match == null) return;
 

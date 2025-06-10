@@ -3,9 +3,12 @@ package nl.kmartin.dartsmatcherapiv2.features.x01.x01set;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceNotFoundException;
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.MatchPlayer;
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.ResultType;
+import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Leg;
+import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01LegRound;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Set;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegService;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01leground.IX01LegRoundService;
 import nl.kmartin.dartsmatcherapiv2.utils.NumberUtils;
 import nl.kmartin.dartsmatcherapiv2.utils.StandingsUtils;
 import org.bson.types.ObjectId;
@@ -18,9 +21,11 @@ import java.util.stream.Collectors;
 public class X01SetServiceImpl implements IX01SetService {
 
     private final IX01LegService legService;
+    private final IX01LegRoundService legRoundService;
 
-    public X01SetServiceImpl(IX01LegService legService) {
+    public X01SetServiceImpl(IX01LegService legService, IX01LegRoundService legRoundService) {
         this.legService = legService;
+        this.legRoundService = legRoundService;
     }
 
     /**
@@ -227,6 +232,7 @@ public class X01SetServiceImpl implements IX01SetService {
      * @param setNumber int the set number that needs to be found
      * @return {@link Optional<X01Set>} the matching set, empty if no set is found
      */
+    @Override
     public Optional<X01Set> getSet(List<X01Set> sets, int setNumber, boolean throwIfNotFound) {
         ResourceNotFoundException notFoundException = new ResourceNotFoundException(X01Set.class, setNumber);
 
@@ -243,20 +249,36 @@ public class X01SetServiceImpl implements IX01SetService {
     }
 
     /**
-     * Deletes a specific set from the list of sets in the match.
-     * If the set exists in the list, it will be removed.
+     * Removes the most last added score from a list of sets.
+     * While traversing also cleans up empty rounds, legs or sets.
      *
-     * @param sets      {@link List<X01Set>} The list of sets in the match.
-     * @param setNumber int The number of the set to be deleted.
+     * @param sets {@link X01Set} The list of sets to remove the last score from.
      */
-    public void deleteSet(List<X01Set> sets, int setNumber) {
-        if (sets == null) return;
+    @Override
+    public void deleteLastScore(List<X01Set> sets) {
+        List<X01Set> setsReverse = new ArrayList<>(sets);
+        Collections.reverse(setsReverse);
 
-        // Find the set in the list by its number.
-        Optional<X01Set> setToDelete = getSet(sets, setNumber, true);
+        // Iterate the sets, legs and rounds in reverse order to remove the last score and empty rounds, legs or sets.
+        // Stops after the first removal of a score.
+        outer:
+        for (X01Set set : setsReverse) {
+            List<X01Leg> legsReverse = new ArrayList<>(set.getLegs());
+            Collections.reverse(legsReverse);
 
-        // If the set is found, remove it from the list.
-        setToDelete.ifPresent(sets::remove);
+            for (X01Leg leg : legsReverse) {
+                List<X01LegRound> legRoundsReverse = new ArrayList<>(leg.getRounds());
+                Collections.reverse(legRoundsReverse);
+
+                for (X01LegRound legRound : legRoundsReverse) {
+                    boolean removed = legRoundService.removeLastScoreFromRound(legRound);
+                    if (legRound.getScores().isEmpty()) leg.getRounds().remove(legRound);
+                    if (leg.getRounds().isEmpty()) set.getLegs().remove(leg);
+                    if (set.getLegs().isEmpty()) sets.remove(set);
+                    if (removed) break outer;
+                }
+            }
+        }
     }
 
     /**

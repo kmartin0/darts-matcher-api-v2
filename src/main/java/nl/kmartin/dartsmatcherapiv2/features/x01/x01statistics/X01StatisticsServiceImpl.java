@@ -33,6 +33,7 @@ public class X01StatisticsServiceImpl implements IX01StatisticsService {
      * @param sets         {@link List<X01Set>} the list of sets containing the data for the statistics
      * @param matchPlayers {@link List<X01MatchPlayer>} the players for which the statistics need to be updated
      */
+    @Override
     public void updatePlayerStatistics(List<X01Set> sets, List<X01MatchPlayer> matchPlayers) {
         if (sets == null || matchPlayers == null) return;
 

@@ -20,14 +20,15 @@ import java.util.*;
 public class X01MatchServiceImpl implements IX01MatchService {
     private final IX01MatchRepository x01matchRepository;
     private final IX01MatchSetupService matchSetupService;
-    private final IX01SetService setService;
     private final IX01LegService legService;
+    private final IX01SetService setService;
     private final IX01LegRoundService legRoundService;
     private final IX01StatisticsService statisticsService;
     private final IX01MatchProgressService matchProgressService;
 
-    public X01MatchServiceImpl(IX01MatchRepository x01matchRepository, IX01MatchSetupService matchSetupService, IX01SetService setService,
-                               IX01LegService legService, IX01LegRoundService legRoundService, IX01StatisticsService statisticsService, IX01MatchProgressService matchProgressService) {
+    public X01MatchServiceImpl(IX01MatchRepository x01matchRepository, IX01MatchSetupService matchSetupService,
+                               IX01SetService setService, IX01LegService legService, IX01LegRoundService legRoundService,
+                               IX01StatisticsService statisticsService, IX01MatchProgressService matchProgressService) {
         this.x01matchRepository = x01matchRepository;
         this.matchSetupService = matchSetupService;
         this.setService = setService;
@@ -100,6 +101,7 @@ public class X01MatchServiceImpl implements IX01MatchService {
      * @return {@link X01Match} The updated match
      * @throws IOException If there's an issue reading the checkouts file.
      */
+    @Override
     public X01Match editTurn(@NotNull @Valid X01EditTurn x01EditTurn) throws IOException {
         // Find the match
         X01Match x01Match = this.getMatch(x01EditTurn.getMatchId());
@@ -118,64 +120,20 @@ public class X01MatchServiceImpl implements IX01MatchService {
     }
 
     /**
-     * Deletes a score from a round for a player. After the score is deleted will update the match state and save to
-     * the repository
+     * Deletes the last turn (X01LegRoundScore) from a match.
      *
-     * @param x01DeleteTurn {@link X01DeleteTurn} the model containing the information about which score to delete
-     * @return {@link X01Match} The updated match
-     */
-    public X01Match deleteTurn(@NotNull @Valid X01DeleteTurn x01DeleteTurn) {
-        // Find the match
-        X01Match x01Match = this.getMatch(x01DeleteTurn.getMatchId());
-
-        // Get the leg that contains the round to delete.
-        Optional<X01Leg> legOpt = setService.getSet(x01Match.getSets(), x01DeleteTurn.getSet(), true)
-                .flatMap(set -> legService.getLeg(set.getLegs(), x01DeleteTurn.getLeg(), true));
-
-        // If the leg exists, delete the score.
-        legOpt.ifPresent(x01Leg -> legService.deleteScore(
-                x01Match.getMatchSettings().getX01(), x01Leg, x01DeleteTurn.getRound(),
-                x01DeleteTurn.getPlayerId(), x01Match.getPlayers()
-        ));
-
-        // Save the updated match to the repository.
-        return saveMatch(x01Match);
-    }
-
-    /**
-     * Deletes a leg from a match. After the leg is deleted will update the match state and save to
-     * the repository
+     * Finds the match by ID, removes the last submitted score , and then saves the updated match.
      *
-     * @param x01DeleteLeg {@link X01DeleteLeg} the model containing the information about which leg to delete
-     * @return {@link X01Match} The updated match
+     * @param x01DeleteLastTurn {@link X01DeleteLastTurn} Object containing the match ID for which the last turn should be deleted.
+     * @return {@link X01Match} The updated match after deleting the last turn.
      */
-    public X01Match deleteLeg(@NotNull @Valid X01DeleteLeg x01DeleteLeg) {
+    @Override
+    public X01Match deleteLastTurn(@NotNull @Valid X01DeleteLastTurn x01DeleteLastTurn) {
         // Find the match
-        X01Match x01Match = this.getMatch(x01DeleteLeg.getMatchId());
+        X01Match x01Match = this.getMatch(x01DeleteLastTurn.getMatchId());
 
-        // Get the set that contains the leg to delete.
-        Optional<X01Set> setOpt = setService.getSet(x01Match.getSets(), x01DeleteLeg.getSet(), true);
-
-        // If the set exists, delete the leg.
-        setOpt.ifPresent(set -> legService.deleteLeg(set.getLegs(), x01DeleteLeg.getLeg()));
-
-        // Save the updated match to the repository.
-        return saveMatch(x01Match);
-    }
-
-    /**
-     * Deletes a set from a match. After the set is deleted will update the match state and save to
-     * the repository
-     *
-     * @param x01DeleteSet {@link X01DeleteSet} the model containing the information about which set to delete
-     * @return {@link X01Match} The updated match
-     */
-    public X01Match deleteSet(@NotNull @Valid X01DeleteSet x01DeleteSet) {
-        // Find the match
-        X01Match x01Match = this.getMatch(x01DeleteSet.getMatchId());
-
-        // Delete the set
-        setService.deleteSet(x01Match.getSets(), x01DeleteSet.getSet());
+        // Delete the last round score
+        setService.deleteLastScore(x01Match.getSets());
 
         // Save the updated match to the repository.
         return saveMatch(x01Match);

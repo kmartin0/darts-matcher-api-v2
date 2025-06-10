@@ -30,4 +30,6 @@ public interface IX01LegRoundService {
     boolean validateRoundsForPlayer(int x01, List<X01LegRound> rounds, ObjectId throwerId) throws IOException;
 
     Optional<X01LegRoundScore> getLastScoreForPlayer(List<X01LegRound> rounds, ObjectId throwerId);
+
+    boolean removeLastScoreFromRound(X01LegRound legRound);
 }

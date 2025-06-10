@@ -36,8 +36,4 @@ public interface IX01LegService {
     void updateLegResult(X01Leg leg, List<X01MatchPlayer> players, int x01);
 
     boolean isScoreCheckout(X01Leg x01Leg, X01LegRound x01LegRound, ObjectId playerId);
-
-    void deleteScore(int x01, X01Leg x01Leg, int roundNumber, ObjectId playerIdToDelete, List<X01MatchPlayer> matchPlayers);
-
-    void deleteLeg(List<X01Leg> legs, int legNumber);
 }

@@ -161,41 +161,6 @@ public class X01LegServiceImpl implements IX01LegService {
     }
 
     /**
-     * Deletes a score for a specific player in a particular round of a given leg in the match.
-     * The method will ensure that the leg is editable, removes the score from the specified round,
-     * and if the round is the last one with no scores left, it will remove the round from the leg.
-     * Afterward, the leg result is updated.
-     *
-     * @param x01              int the x01 the leg is played in
-     * @param x01Leg           {@link X01Leg} the leg of which the round belongs to
-     * @param roundNumber      int the round of which the score belongs to
-     * @param playerIdToDelete {@link ObjectId}} The ID of the player whose score is being deleted.
-     * @param matchPlayers     {@link List<X01MatchPlayer>} the list of match players.
-     */
-    public void deleteScore(int x01, X01Leg x01Leg, int roundNumber, ObjectId playerIdToDelete, List<X01MatchPlayer> matchPlayers) {
-        // Determine if the leg is editable, will throw InvalidArgumentsException if the leg is not editable.
-        checkLegEditable(x01Leg, playerIdToDelete);
-
-        // Get the round in which the score needs to be deleted.
-        Optional<X01LegRound> x01LegRound = legRoundService.getLegRound(x01Leg.getRounds(), roundNumber, true);
-        if (x01LegRound.isEmpty()) return;
-
-        // Remove the score from the round
-        x01LegRound.get().getScores().remove(playerIdToDelete);
-
-        // If it's the last round and no scores are remaining, remove the round.
-        Optional<X01LegRound> lastRound = legRoundService.getLastRound(x01Leg.getRounds());
-        if (lastRound.isPresent()) {
-            if (roundNumber == lastRound.get().getRound() && x01LegRound.get().getScores().isEmpty()) {
-                x01Leg.getRounds().remove(lastRound.get());
-            }
-        }
-
-        // Update the leg result
-        updateLegResult(x01Leg, matchPlayers, x01);
-    }
-
-    /**
      * Determines if a leg is concluded by checking the winner property
      *
      * @param x01Leg {@link X01Leg} the leg that needs to be checked
@@ -288,27 +253,11 @@ public class X01LegServiceImpl implements IX01LegService {
      * @param playerId    {@link ObjectId} the player that scored
      * @return boolean whether the score made a player is a checkout
      */
+    @Override
     public boolean isScoreCheckout(X01Leg x01Leg, X01LegRound x01LegRound, ObjectId playerId) {
         if (x01Leg == null || x01LegRound == null) return false;
 
         return playerId.equals(x01Leg.getWinner()) &&
                 legRoundService.getLegRound(x01Leg.getRounds(), x01LegRound.getRound() + 1, false).isEmpty();
-    }
-
-    /**
-     * Deletes a specific leg from the list of legs in the match.
-     * If the leg exists in the list, it will be removed.
-     *
-     * @param legs      {@link List<X01Leg>} The list of legs in the match.
-     * @param legNumber int The number of the leg to be deleted.
-     */
-    public void deleteLeg(List<X01Leg> legs, int legNumber) {
-        if (legs == null) return;
-
-        // Find the leg in the list by its number.
-        Optional<X01Leg> legToDelete = getLeg(legs, legNumber, true);
-
-        // If the leg is found, remove it from the list.
-        legToDelete.ifPresent(legs::remove);
     }
 }

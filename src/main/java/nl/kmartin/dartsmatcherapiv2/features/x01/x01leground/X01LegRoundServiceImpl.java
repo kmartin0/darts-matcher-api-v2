@@ -82,6 +82,7 @@ public class X01LegRoundServiceImpl implements IX01LegRoundService {
      * @param rounds {@link List<X01LegRound>} the list of rounds
      * @return {@link Optional<X01LegRound>} the highest numbered round from a list of rounds, empty if the list has no rounds
      */
+    @Override
     public Optional<X01LegRound> getLastRound(List<X01LegRound> rounds) {
         if (rounds == null) return Optional.empty();
 
@@ -166,6 +167,14 @@ public class X01LegRoundServiceImpl implements IX01LegRoundService {
         return x01 - totalScored;
     }
 
+    /**
+     * Calculates the total number of darts used by a specific player across a list of leg rounds.
+     *
+     * @param rounds   {@link X01LegRound} list of rounds to check
+     * @param playerId the ID of the player whose darts usage is being calculated
+     * @return int The sum of darts used by the player across all provided rounds.
+     */
+    @Override
     public int calculateDartsUsed(List<X01LegRound> rounds, ObjectId playerId) {
         if (rounds == null) return 0;
 
@@ -187,6 +196,7 @@ public class X01LegRoundServiceImpl implements IX01LegRoundService {
      * @return boolean whether the list of scores in the rounds are valid for a player according to the game rules.
      * @throws IOException If there's an issue reading the checkouts file.
      */
+    @Override
     public boolean validateRoundsForPlayer(int x01, List<X01LegRound> rounds, ObjectId throwerId) throws IOException {
         // Get the remaining score for the player
         int remaining = calculateRemainingScore(x01, rounds, throwerId);
@@ -212,6 +222,7 @@ public class X01LegRoundServiceImpl implements IX01LegRoundService {
      * @param throwerId {@link ObjectId} the player id for which the latest turn needs to be found
      * @return {@link Optional<X01LegRoundScore>} the round score for a player in their latest round, if no score found empty
      */
+    @Override
     public Optional<X01LegRoundScore> getLastScoreForPlayer(List<X01LegRound> rounds, ObjectId throwerId) {
         // Find the rounds containing a score for the player
         List<X01LegRound> playerRounds = rounds.stream().filter(round -> round.getScores().containsKey(throwerId)).toList();
@@ -220,6 +231,29 @@ public class X01LegRoundServiceImpl implements IX01LegRoundService {
         return playerRounds.stream()
                 .max(Comparator.comparingInt(X01LegRound::getRound))
                 .flatMap(round -> Optional.ofNullable(round.getScores().get(throwerId)));
+    }
+
+    /**
+     * Removes the last round score from the given leg round.
+     *
+     * @param legRound {@link X01LegRound} from which to remove the last score
+     * @return boolean if a score was removed
+     */
+    @Override
+    public boolean removeLastScoreFromRound(X01LegRound legRound) {
+        // Create a list of the score keys and reverse it to have the last score first.
+        Map<ObjectId, X01LegRoundScore> scores = legRound.getScores();
+        List<ObjectId> reverseKeys = new ArrayList<>(scores.keySet());
+        Collections.reverse(reverseKeys);
+
+        // If there is at least one score, remove the most recently added one
+        if (!reverseKeys.isEmpty()) {
+            legRound.getScores().remove(reverseKeys.get(0));
+            return true;
+        }
+
+        // No scores were present to remove
+        return false;
     }
 
     /**

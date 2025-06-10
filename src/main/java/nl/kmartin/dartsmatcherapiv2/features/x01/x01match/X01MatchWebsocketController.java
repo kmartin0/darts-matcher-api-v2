@@ -1,7 +1,6 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01match;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01dartbot.IX01DartBotService;
 import nl.kmartin.dartsmatcherapiv2.utils.WebsocketDestinations;
@@ -48,30 +47,9 @@ public class X01MatchWebsocketController {
         return updatedMatch;
     }
 
-    @MessageMapping(WebsocketDestinations.X01_EDIT_TURN)
-    public X01Match editTurn(@Valid @Payload X01EditTurn x01EditTurn) throws IOException {
-        X01Match updatedMatch = x01MatchService.editTurn(x01EditTurn);
-        x01MatchWebsocketService.sendX01MatchUpdate(updatedMatch);
-        return updatedMatch;
-    }
-
-    @MessageMapping(WebsocketDestinations.X01_DELETE_TURN)
-    public X01Match deleteTurn(@Valid @Payload X01DeleteTurn x01DeleteTurn) {
-        X01Match updatedMatch = x01MatchService.deleteTurn(x01DeleteTurn);
-        x01MatchWebsocketService.sendX01MatchUpdate(updatedMatch);
-        return updatedMatch;
-    }
-
-    @MessageMapping(WebsocketDestinations.X01_DELETE_LEG)
-    public X01Match deleteLeg(@Valid @Payload X01DeleteLeg x01DeleteLeg) {
-        X01Match updatedMatch = x01MatchService.deleteLeg(x01DeleteLeg);
-        x01MatchWebsocketService.sendX01MatchUpdate(updatedMatch);
-        return updatedMatch;
-    }
-
-    @MessageMapping(WebsocketDestinations.X01_DELETE_SET)
-    public X01Match deleteSet(@Valid @Payload X01DeleteSet x01DeleteSet) {
-        X01Match updatedMatch = x01MatchService.deleteSet(x01DeleteSet);
+    @MessageMapping(WebsocketDestinations.X01_DELETE_LAST_TURN)
+    public X01Match deleteLastTurn(@Payload X01DeleteLastTurn x01DeleteLastTurn) {
+        X01Match updatedMatch = x01MatchService.deleteLastTurn(x01DeleteLastTurn);
         x01MatchWebsocketService.sendX01MatchUpdate(updatedMatch);
         return updatedMatch;
     }

@@ -32,6 +32,7 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
      *
      * @param x01Match {@link X01Match} the match to be updated
      */
+    @Override
     public void updateMatchResult(X01Match x01Match) {
         if (x01Match == null) return;
 
@@ -58,6 +59,7 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
      *
      * @param x01Match {@link X01Match} the match to be updated
      */
+    @Override
     public void updateMatchProgress(X01Match x01Match) {
         if (x01Match == null) return;
 
@@ -86,6 +88,7 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
      * @param x01Match {@link X01Match} the match for which the current set needs to be determined
      * @return {@link Optional<X01Set>} the current set in play.
      */
+    @Override
     public Optional<X01Set> getCurrentSet(X01Match x01Match) {
         if (x01Match == null) return Optional.empty();
 
@@ -107,6 +110,7 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
      * @param currentSet {@link X01Set} the current set in play.
      * @return {@link Optional<X01Leg>} the current leg in play.
      */
+    @Override
     public Optional<X01Leg> getCurrentLeg(X01Match x01Match, X01Set currentSet) {
         if (x01Match == null || currentSet == null) return Optional.empty();
 
@@ -128,6 +132,7 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
      * @param currentLeg {@link X01Leg} the current leg in play.
      * @return {@link Optional<X01LegRound>} the current leg round in play.
      */
+    @Override
     public Optional<X01LegRound> getCurrentLegRound(X01Match x01Match, X01Leg currentLeg) {
         if (x01Match == null || currentLeg == null) return Optional.empty();
 

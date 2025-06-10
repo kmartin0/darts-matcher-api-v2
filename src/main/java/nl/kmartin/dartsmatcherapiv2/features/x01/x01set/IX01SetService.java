@@ -32,5 +32,5 @@ public interface IX01SetService {
 
     void updateSetResults(List<X01Set> sets, List<X01MatchPlayer> players, int bestOfLegs, int x01);
 
-    void deleteSet(List<X01Set> sets, int setNumber);
+    void deleteLastScore(List<X01Set> sets);
 }

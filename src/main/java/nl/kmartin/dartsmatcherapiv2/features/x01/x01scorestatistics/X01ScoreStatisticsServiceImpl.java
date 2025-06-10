@@ -12,6 +12,7 @@ public class X01ScoreStatisticsServiceImpl implements IX01ScoreStatisticsService
      * @param playerScoreStats  {@link X01ScoreStatistics} the object to store the updated score statistics
      * @param playerScore {@link X01LegRoundScore} the score information from the current round
      */
+    @Override
     public void updateScoreStatistics(X01ScoreStatistics playerScoreStats, X01LegRoundScore playerScore) {
         if (playerScoreStats == null || playerScore == null) return;
 

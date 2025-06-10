@@ -8,9 +8,6 @@ import nl.kmartin.dartsmatcherapiv2.utils.RestEndpoints;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -50,43 +47,19 @@ public class X01MatchRestController {
         return updatedMatch;
     }
 
+    @PostMapping(path = RestEndpoints.X01_DELETE_LAST_TURN, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public X01Match deleteLastTurn(@Valid @RequestBody X01DeleteLastTurn x01DeleteLastTurn) {
+        X01Match updatedMatch = x01MatchService.deleteLastTurn(x01DeleteLastTurn);
+        x01MatchWebsocketService.sendX01MatchUpdate(updatedMatch);
+        return updatedMatch;
+    }
+
     @PostMapping(path = RestEndpoints.X01_TURN_DART_BOT, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public X01Match addDartBotTurn(@RequestBody @NotNull ObjectId matchId) throws IOException {
         X01Turn dartBotTurn = x01DartBotService.createDartBotTurn(matchId);
         X01Match updatedMatch = x01MatchService.addTurn(dartBotTurn);
-        x01MatchWebsocketService.sendX01MatchUpdate(updatedMatch);
-        return updatedMatch;
-    }
-
-    @PostMapping(path = RestEndpoints.X01_EDIT_TURN, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public X01Match editTurn(@Valid @RequestBody X01EditTurn x01EditTurn) throws IOException {
-        X01Match updatedMatch = x01MatchService.editTurn(x01EditTurn);
-        x01MatchWebsocketService.sendX01MatchUpdate(updatedMatch);
-        return updatedMatch;
-    }
-
-    @PostMapping(path = RestEndpoints.X01_DELETE_TURN, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public X01Match deleteTurn(@Valid @RequestBody X01DeleteTurn x01DeleteTurn) {
-        X01Match updatedMatch = x01MatchService.deleteTurn(x01DeleteTurn);
-        x01MatchWebsocketService.sendX01MatchUpdate(updatedMatch);
-        return updatedMatch;
-    }
-
-    @PostMapping(path = RestEndpoints.X01_DELETE_LEG, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public X01Match deleteLeg(@Valid @RequestBody X01DeleteLeg x01DeleteLeg) {
-        X01Match updatedMatch = x01MatchService.deleteLeg(x01DeleteLeg);
-        x01MatchWebsocketService.sendX01MatchUpdate(updatedMatch);
-        return updatedMatch;
-    }
-
-    @PostMapping(path = RestEndpoints.X01_DELETE_SET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public X01Match deleteSet(@Valid @RequestBody X01DeleteSet x01DeleteSet) {
-        X01Match updatedMatch = x01MatchService.deleteSet(x01DeleteSet);
         x01MatchWebsocketService.sendX01MatchUpdate(updatedMatch);
         return updatedMatch;
     }

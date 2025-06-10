@@ -14,6 +14,7 @@ public class X01AverageStatisticsServiceImpl implements IX01AverageStatisticsSer
      * @param playerScore  {@link X01LegRoundScore} the score and dart usage details for the current round.
      * @param roundNumber       {@link int} the current round number (used to differentiate first nine rounds).
      */
+    @Override
     public void updateAverageStats(X01AverageStatistics playerAverageStats, X01LegRoundScore playerScore, int roundNumber) {
         if (playerAverageStats == null || playerScore == null) return;
 

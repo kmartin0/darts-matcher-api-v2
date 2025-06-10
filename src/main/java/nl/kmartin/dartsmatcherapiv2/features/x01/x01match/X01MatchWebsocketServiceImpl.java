@@ -21,6 +21,7 @@ public class X01MatchWebsocketServiceImpl implements IX01MatchWebsocketService {
      *
      * @param x01Match {@link X01Match} the match the subscribers will get
      */
+    @Override
     public void sendX01MatchUpdate(X01Match x01Match) {
         if (x01Match == null) return;
 

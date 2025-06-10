@@ -143,11 +143,11 @@ public class X01DartBotTests {
         IX01CheckoutService checkoutService = createCheckoutService();
         IX01LegRoundService legRoundService = new X01LegRoundServiceImpl(checkoutService);
         IX01LegService legService = new X01LegServiceImpl(messageResolver, legRoundService);
-        IX01SetService setService = new X01SetServiceImpl(legService);
+        IX01SetService setService = new X01SetServiceImpl(legService, legRoundService);
 
         IX01MatchProgressService matchProgressService = new X01MatchProgressServiceImpl(setService, legService, legRoundService);
 
-        return new X01DartBotServiceImpl(createMatchService(), matchProgressService, legRoundService, createDartBotThrowSimulator());
+        return new X01DartBotServiceImpl(createMatchService(), matchProgressService, legRoundService, createDartBotThrowSimulator(), messageResolver);
     }
 
     private IX01CheckoutService createCheckoutService() {
@@ -170,7 +170,7 @@ public class X01DartBotTests {
         IX01CheckoutService checkoutService = createCheckoutService();
         IX01LegRoundService legRoundService = new X01LegRoundServiceImpl(checkoutService);
         IX01LegService legService = new X01LegServiceImpl(messageResolver, legRoundService);
-        IX01SetService setService = new X01SetServiceImpl(legService);
+        IX01SetService setService = new X01SetServiceImpl(legService, legRoundService);
 
         IX01ScoreStatisticsService scoreStatisticsService = new X01ScoreStatisticsServiceImpl();
         IX01AverageStatisticsService averageStatisticsService = new X01AverageStatisticsServiceImpl();

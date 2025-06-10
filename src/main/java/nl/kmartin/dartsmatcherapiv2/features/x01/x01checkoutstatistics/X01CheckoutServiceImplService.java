@@ -15,6 +15,7 @@ public class X01CheckoutServiceImplService implements IX01CheckoutStatisticsServ
      * @param isCheckout          boolean indicating if the player has attempted a checkout.
      * @param trackDoubles        boolean indicating if the player wants to track their checkout percentage
      */
+    @Override
     public void updateCheckoutStatistics(X01CheckoutStatistics playerCheckoutStats, X01LegRoundScore playerScore,
                                          boolean isCheckout) {
         if (playerCheckoutStats == null || playerScore == null) return;
