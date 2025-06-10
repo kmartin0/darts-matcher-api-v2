@@ -47,6 +47,13 @@ public class X01MatchWebsocketController {
         return updatedMatch;
     }
 
+    @MessageMapping(WebsocketDestinations.X01_EDIT_TURN)
+    public X01Match editTurn(@Valid @Payload X01EditTurn x01EditTurn) throws IOException {
+        X01Match updatedMatch = x01MatchService.editTurn(x01EditTurn);
+        x01MatchWebsocketService.sendX01MatchUpdate(updatedMatch);
+        return updatedMatch;
+    }
+
     @MessageMapping(WebsocketDestinations.X01_DELETE_LAST_TURN)
     public X01Match deleteLastTurn(@Payload X01DeleteLastTurn x01DeleteLastTurn) {
         X01Match updatedMatch = x01MatchService.deleteLastTurn(x01DeleteLastTurn);

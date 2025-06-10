@@ -220,6 +220,9 @@ public class X01SetServiceImpl implements IX01SetService {
                             player -> setWinners.contains(player.getPlayerId()) ? winOrDrawType : ResultType.LOSS
                     ))
             );
+
+            // Clears legs that might linger after the set winners.
+            legService.removeLegsAfterSetWinner(x01Set.getLegs(), setWinners);
         } else { // The set has no result
             x01Set.setResult(null);
         }
@@ -278,6 +281,34 @@ public class X01SetServiceImpl implements IX01SetService {
                     if (removed) break outer;
                 }
             }
+        }
+    }
+
+    /**
+     * Removes all sets from the given list that occur after the last set won by a player
+     * present in the matchWinners list.
+     *
+     * This is useful for cleaning up any trailing sets after a match winner has
+     * already been decided, which may happen after score edits or corrections.
+     *
+     * @param sets       {@link List<X01Set>} the list of sets to be potentially modified
+     * @param matchWinners {@link List<ObjectId>} the list of player IDs who have won (or drawn) the match
+     */
+    @Override
+    public void removeSetsAfterWinner(List<X01Set> sets, List<ObjectId> matchWinners) {
+        if (sets == null || sets.isEmpty() || matchWinners == null || matchWinners.isEmpty()) return;
+
+        List<X01Set> setsReverse = new ArrayList<>(sets);
+        Collections.reverse(setsReverse);
+
+        for (X01Set set : setsReverse) {
+            Map<ObjectId, ResultType> setResultMap = set.getResult();
+            boolean setContainsWinner = setResultMap != null && matchWinners.stream().anyMatch(winner -> {
+                ResultType result = setResultMap.get(winner);
+                return result == ResultType.WIN || result == ResultType.DRAW;
+            });
+            if (setContainsWinner) break;
+            sets.remove(set);
         }
     }
 

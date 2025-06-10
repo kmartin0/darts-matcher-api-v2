@@ -50,6 +50,9 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
                 matchWinners.isEmpty() ? null : (matchWinners.contains(player.getPlayerId()) ? winOrDrawType : ResultType.LOSS)
         ));
 
+        // Cleanup trailing sets that may linger beyond the final set.
+        setService.removeSetsAfterWinner(x01Match.getSets(), matchWinners);
+
         // When there are match winners the match is concluded
         x01Match.setMatchStatus(matchWinners.isEmpty() ? MatchStatus.IN_PLAY : MatchStatus.CONCLUDED);
     }

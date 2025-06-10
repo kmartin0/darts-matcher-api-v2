@@ -122,8 +122,8 @@ public class X01LegRoundServiceImpl implements IX01LegRoundService {
     /**
      * Find a round by its round number in a list of rounds.
      *
-     * @param rounds {@link List<X01LegRound>} the list of rounds to find the round in
-     * @param round  int the round number to find
+     * @param rounds      {@link List<X01LegRound>} the list of rounds to find the round in
+     * @param roundNumber int the round number to find
      * @return {@link Optional<X01LegRound>} an optional round containing the round if it exists otherwise empty.
      */
     @Override
@@ -256,6 +256,41 @@ public class X01LegRoundServiceImpl implements IX01LegRoundService {
         return false;
     }
 
+
+    /**
+     * Removes all scores that appear after the final score of the leg winner. If rounds become empty after
+     * removing scores they will also be removed. The situation of scores/rounds beyond the winning point could
+     * occur due to editing a score.
+     *
+     * @param rounds    {@link List<X01LegRound>} the list of rounds
+     * @param legWinner {@link ObjectId} the player id of the leg winner
+     */
+    @Override
+    public void removeScoresAfterWinner(List<X01LegRound> rounds, ObjectId legWinner) {
+        // If there is no leg winner. No trimming needs to happen.
+        if (rounds == null || rounds.isEmpty() || legWinner == null) return;
+
+        // Create a reversed copy of the rounds to iterate from last to first
+        List<X01LegRound> reverseRounds = new ArrayList<>(rounds);
+        Collections.reverse(reverseRounds);
+
+        // Trims scores beyond the final score of the leg winner.
+        // This situation can occur if a score is edited and, as a result, another player becomes the winner.
+        outer:
+        for (X01LegRound round : reverseRounds) {
+            List<ObjectId> reverseKeys = new ArrayList<>(round.getScores().keySet());
+            Collections.reverse(reverseKeys);
+
+            for (ObjectId playerId : reverseKeys) {
+                if (!playerId.equals(legWinner)) {
+                    round.getScores().remove(playerId);
+                    if (round.getScores().isEmpty()) rounds.remove(round);
+                } else break outer;
+            }
+        }
+    }
+
+
     /**
      * Find all players that have yet to score in a round.
      *
@@ -297,3 +332,5 @@ public class X01LegRoundServiceImpl implements IX01LegRoundService {
         return orderedPlayers;
     }
 }
+
+

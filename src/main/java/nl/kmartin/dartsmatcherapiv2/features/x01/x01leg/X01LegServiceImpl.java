@@ -240,7 +240,10 @@ public class X01LegServiceImpl implements IX01LegService {
 
         // If a winner is present, set the player ID, otherwise set the winner to null
         winner.ifPresentOrElse(
-                matchPlayer -> leg.setWinner(matchPlayer.getPlayerId()),
+                matchPlayer -> {
+                    leg.setWinner(matchPlayer.getPlayerId());
+                    legRoundService.removeScoresAfterWinner(leg.getRounds(), leg.getWinner());
+                },
                 () -> leg.setWinner(null)
         );
     }
@@ -259,5 +262,29 @@ public class X01LegServiceImpl implements IX01LegService {
 
         return playerId.equals(x01Leg.getWinner()) &&
                 legRoundService.getLegRound(x01Leg.getRounds(), x01LegRound.getRound() + 1, false).isEmpty();
+    }
+
+    /**
+     * Removes all legs from the given list that occur after the last leg won by a player
+     * present in the setWinners list.
+     *
+     * This is useful for cleaning up any trailing legs after a set winner has
+     * already been decided, which may happen after score edits or corrections.
+     *
+     * @param legs       {@link List<X01Leg>} the list of legs to be potentially modified
+     * @param setWinners {@link List<ObjectId>} the list of player IDs who have won (or drawn) the set
+     */
+    @Override
+    public void removeLegsAfterSetWinner(List<X01Leg> legs, List<ObjectId> setWinners) {
+        if (legs == null || legs.isEmpty() || setWinners == null || setWinners.isEmpty()) return;
+
+        List<X01Leg> reverseLegs = new ArrayList<>(legs);
+        Collections.reverse(reverseLegs);
+
+        // Iterate legs backwards, removing any legs that come after a set winner. Stop when a winner is matched.
+        for (X01Leg leg : reverseLegs) {
+            if (setWinners.contains(leg.getWinner())) break;
+            legs.remove(leg);
+        }
     }
 }

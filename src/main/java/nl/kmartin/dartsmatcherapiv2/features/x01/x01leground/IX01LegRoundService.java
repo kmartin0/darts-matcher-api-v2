@@ -32,4 +32,6 @@ public interface IX01LegRoundService {
     Optional<X01LegRoundScore> getLastScoreForPlayer(List<X01LegRound> rounds, ObjectId throwerId);
 
     boolean removeLastScoreFromRound(X01LegRound legRound);
+
+    void removeScoresAfterWinner(List<X01LegRound> rounds, ObjectId legWinner);
 }

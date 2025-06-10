@@ -47,6 +47,14 @@ public class X01MatchRestController {
         return updatedMatch;
     }
 
+    @PostMapping(path = RestEndpoints.X01_EDIT_TURN, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public X01Match editTurn(@Valid @RequestBody X01EditTurn x01EditTurn) throws IOException {
+        X01Match updatedMatch = x01MatchService.addTurn(x01EditTurn);
+        x01MatchWebsocketService.sendX01MatchUpdate(updatedMatch);
+        return updatedMatch;
+    }
+
     @PostMapping(path = RestEndpoints.X01_DELETE_LAST_TURN, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public X01Match deleteLastTurn(@Valid @RequestBody X01DeleteLastTurn x01DeleteLastTurn) {
