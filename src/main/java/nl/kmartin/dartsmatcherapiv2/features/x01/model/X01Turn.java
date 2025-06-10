@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import nl.kmartin.dartsmatcherapiv2.validators.validdartscore.ValidDartScore;
 import org.bson.types.ObjectId;
 
 @Data
@@ -15,8 +16,7 @@ public class X01Turn {
     @NotNull
     private ObjectId matchId;
 
-    @Min(0)
-    @Max(180)
+    @ValidDartScore
     int score;
 
     @Min(1)
