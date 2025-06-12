@@ -57,8 +57,8 @@ public class X01DartBotServiceImpl implements IX01DartBotService {
         X01MatchPlayer dartBotPlayer = getCurrentDartBotPlayer(match);
 
         // Get the current leg for the match.
-        X01Set currentSet = x01MatchProgressService.getCurrentSet(match).orElse(null);
-        X01Leg currentLeg = x01MatchProgressService.getCurrentLeg(match, currentSet)
+        X01Set currentSet = x01MatchProgressService.getCurrentSetOrCreate(match).orElse(null);
+        X01Leg currentLeg = x01MatchProgressService.getCurrentLegOrCreate(match, currentSet)
                 .orElseThrow(() -> new InvalidArgumentsException(new TargetError("currentLeg", messageResolver.getMessage(MessageKeys.EXCEPTION_INVALID_ARGUMENTS))));
 
         // Create the round score object for this turn.

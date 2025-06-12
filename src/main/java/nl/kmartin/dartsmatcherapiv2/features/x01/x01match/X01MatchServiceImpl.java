@@ -77,9 +77,9 @@ public class X01MatchServiceImpl implements IX01MatchService {
         X01Match x01Match = this.getMatch(x01Turn.getMatchId());
 
         // Get the current set/leg/round.
-        Optional<X01Set> currentSet = matchProgressService.getCurrentSet(x01Match);
-        Optional<X01Leg> currentLeg = matchProgressService.getCurrentLeg(x01Match, currentSet.orElse(null));
-        Optional<X01LegRound> currentLegRound = matchProgressService.getCurrentLegRound(x01Match, currentLeg.orElse(null));
+        Optional<X01Set> currentSet = matchProgressService.getCurrentSetOrCreate(x01Match);
+        Optional<X01Leg> currentLeg = matchProgressService.getCurrentLegOrCreate(x01Match, currentSet.orElse(null));
+        Optional<X01LegRound> currentLegRound = matchProgressService.getCurrentLegRoundOrCreate(x01Match, currentLeg.orElse(null));
 
         // Add the turn to the current thrower of the current round.
         if (currentLeg.isPresent() && currentLegRound.isPresent()) {

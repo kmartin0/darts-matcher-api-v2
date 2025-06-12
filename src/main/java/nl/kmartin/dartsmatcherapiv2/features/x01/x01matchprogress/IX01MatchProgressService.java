@@ -12,9 +12,9 @@ public interface IX01MatchProgressService {
 
     void updateMatchProgress(X01Match x01Match);
 
-    Optional<X01Set> getCurrentSet(X01Match x01Match);
+    Optional<X01Set> getCurrentSetOrCreate(X01Match x01Match);
 
-    Optional<X01Leg> getCurrentLeg(X01Match x01Match, X01Set currentSet);
+    Optional<X01Leg> getCurrentLegOrCreate(X01Match x01Match, X01Set currentSet);
 
-    Optional<X01LegRound> getCurrentLegRound(X01Match x01Match, X01Leg currentLeg);
+    Optional<X01LegRound> getCurrentLegRoundOrCreate(X01Match x01Match, X01Leg currentLeg);
 }
