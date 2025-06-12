@@ -1,13 +1,14 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01leground;
 
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceNotFoundException;
-import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
+import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01LegRound;
+import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01LegRoundScore;
+import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01checkout.IX01CheckoutService;
 import nl.kmartin.dartsmatcherapiv2.utils.NumberUtils;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -194,10 +195,9 @@ public class X01LegRoundServiceImpl implements IX01LegRoundService {
      * @param rounds    {@link List<X01LegRound>} the list of rounds that need to be checked
      * @param throwerId {@link ObjectId} the player who needs to be validated
      * @return boolean whether the list of scores in the rounds are valid for a player according to the game rules.
-     * @throws IOException If there's an issue reading the checkouts file.
      */
     @Override
-    public boolean validateRoundsForPlayer(int x01, List<X01LegRound> rounds, ObjectId throwerId) throws IOException {
+    public boolean validateRoundsForPlayer(int x01, List<X01LegRound> rounds, ObjectId throwerId) {
         // Get the remaining score for the player
         int remaining = calculateRemainingScore(x01, rounds, throwerId);
 

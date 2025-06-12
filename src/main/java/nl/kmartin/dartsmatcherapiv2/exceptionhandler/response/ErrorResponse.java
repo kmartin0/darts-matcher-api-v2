@@ -1,7 +1,8 @@
 package nl.kmartin.dartsmatcherapiv2.exceptionhandler.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.HashMap;

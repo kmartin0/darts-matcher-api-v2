@@ -2,15 +2,16 @@ package nl.kmartin.dartsmatcherapiv2.features.x01.x01match;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
+import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01DeleteLastTurn;
+import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01EditTurn;
+import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Match;
+import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Turn;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01dartbot.IX01DartBotService;
 import nl.kmartin.dartsmatcherapiv2.utils.RestEndpoints;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
 
 @RestController
 public class X01MatchRestController {
@@ -41,7 +42,7 @@ public class X01MatchRestController {
 
     @PostMapping(path = RestEndpoints.X01_ADD_TURN, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public X01Match addTurn(@Valid @RequestBody X01Turn x01Turn) throws IOException {
+    public X01Match addTurn(@Valid @RequestBody X01Turn x01Turn) {
         X01Match updatedMatch = x01MatchService.addTurn(x01Turn);
         x01MatchWebsocketService.sendX01MatchUpdate(updatedMatch);
         return updatedMatch;
@@ -49,7 +50,7 @@ public class X01MatchRestController {
 
     @PostMapping(path = RestEndpoints.X01_EDIT_TURN, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public X01Match editTurn(@Valid @RequestBody X01EditTurn x01EditTurn) throws IOException {
+    public X01Match editTurn(@Valid @RequestBody X01EditTurn x01EditTurn) {
         X01Match updatedMatch = x01MatchService.addTurn(x01EditTurn);
         x01MatchWebsocketService.sendX01MatchUpdate(updatedMatch);
         return updatedMatch;
@@ -65,7 +66,7 @@ public class X01MatchRestController {
 
     @PostMapping(path = RestEndpoints.X01_TURN_DART_BOT, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public X01Match addDartBotTurn(@RequestBody @NotNull ObjectId matchId) throws IOException {
+    public X01Match addDartBotTurn(@RequestBody @NotNull ObjectId matchId) {
         X01Turn dartBotTurn = x01DartBotService.createDartBotTurn(matchId);
         X01Match updatedMatch = x01MatchService.addTurn(dartBotTurn);
         x01MatchWebsocketService.sendX01MatchUpdate(updatedMatch);

@@ -2,7 +2,6 @@ package nl.kmartin.dartsmatcherapiv2.features.x01.model;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;

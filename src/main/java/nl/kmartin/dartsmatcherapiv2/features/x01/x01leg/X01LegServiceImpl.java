@@ -3,7 +3,10 @@ package nl.kmartin.dartsmatcherapiv2.features.x01.x01leg;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.InvalidArgumentsException;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceNotFoundException;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.response.TargetError;
-import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
+import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Leg;
+import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01LegRound;
+import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01LegRoundScore;
+import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leground.IX01LegRoundService;
 import nl.kmartin.dartsmatcherapiv2.utils.MessageKeys;
 import nl.kmartin.dartsmatcherapiv2.utils.MessageResolver;
@@ -11,7 +14,6 @@ import nl.kmartin.dartsmatcherapiv2.utils.NumberUtils;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -132,10 +134,9 @@ public class X01LegServiceImpl implements IX01LegService {
      * @param x01LegRoundScore {@link X01LegRoundScore} the score that needs to be added to the round
      * @param matchPlayers     {@link List<X01MatchPlayer>} the list of match players.
      * @param throwerId        {@link ObjectId} the player that has thrown the score.
-     * @throws IOException If there's an issue reading the checkouts file.
      */
     @Override
-    public void addScore(int x01, X01Leg x01Leg, int roundNumber, X01LegRoundScore x01LegRoundScore, List<X01MatchPlayer> matchPlayers, ObjectId throwerId) throws IOException {
+    public void addScore(int x01, X01Leg x01Leg, int roundNumber, X01LegRoundScore x01LegRoundScore, List<X01MatchPlayer> matchPlayers, ObjectId throwerId) {
         if (x01Leg == null || x01LegRoundScore == null || matchPlayers == null) return;
 
         // Determine if the leg is editable, will throw InvalidArgumentsException if the leg is not editable.

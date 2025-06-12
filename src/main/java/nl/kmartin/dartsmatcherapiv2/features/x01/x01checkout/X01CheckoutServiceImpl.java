@@ -15,41 +15,67 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class X01CheckoutServiceImpl implements IX01CheckoutService {
 
-    @Value("classpath:data/checkouts.json")
-    private Resource checkoutsResourceFile;
-
     private final MessageResolver messageResolver;
+    private final Map<Integer, X01Checkout> checkoutsMap;
 
-    public X01CheckoutServiceImpl(MessageResolver messageResolver) {
+    public X01CheckoutServiceImpl(@Value("classpath:data/checkouts.json") Resource checkoutsResourceFile,
+                                  MessageResolver messageResolver) {
         this.messageResolver = messageResolver;
+        this.checkoutsMap = createCheckoutMap(checkoutsResourceFile);
     }
 
     /**
-     * Reads all checkouts from a JSON file and maps it to an ArrayList of type X01Checkout.
+     * Loads and parses X01 checkout data from a JSON resource file into an unmodifiable Map.
      *
-     * @return ArrayList<X01Checkout> list of all available x01 checkouts.
-     * @throws IOException If there's an issue reading the file.
+     * @param checkoutsResourceFile {@link Resource}
+     * @return {@code Map<Integer,X01Checkout>} an unmodifiable map where the key is the checkout score and the value is the checkout
+     * @throws IllegalStateException if the checkout map is empty or an io error occurred.
+     */
+    public static Map<Integer, X01Checkout> createCheckoutMap(Resource checkoutsResourceFile) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+
+            // Read the JSON file to a list of X01Checkout objects
+            List<X01Checkout> checkoutsList = mapper.readValue(
+                    checkoutsResourceFile.getInputStream(),
+                    new TypeReference<>() {
+                    }
+            );
+
+            if (checkoutsList == null || checkoutsList.isEmpty()) {
+                throw new IllegalStateException("Checkouts not found or empty");
+            }
+
+            return checkoutsList.stream().collect(Collectors.toUnmodifiableMap(X01Checkout::getCheckout, Function.identity()));
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to initialize X01CheckoutService due to IO error", e);
+        }
+    }
+
+    /**
+     * Return the checkouts map
+     *
+     * @return Map<Integer, X01Checkout> map of all available x01 checkouts.
      */
     @Override
-    public ArrayList<X01Checkout> getCheckouts() throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
+    public Map<Integer, X01Checkout> getCheckouts() {
+        return checkoutsMap;
+    }
 
-        // Read the JSON file to an ArrayList of X01Checkout objects
-        ArrayList<X01Checkout> checkouts = mapper.readValue(
-                checkoutsResourceFile.getInputStream(),
-                new TypeReference<>() {
-                });
-
-        // If for some reason the checkouts is empty throw a RuntimeException as this should not happen.
-        if (checkouts == null || checkouts.isEmpty()) {
-            throw new RuntimeException("Checkouts not found");
-        }
-
-        return checkouts;
+    /**
+     * Returns the checkouts in a list
+     *
+     * @return List<X01Checkout> list of all available x01 checkouts.
+     */
+    @Override
+    public List<X01Checkout> getCheckoutsAsList() {
+        return checkoutsMap.values().stream().toList();
     }
 
     /**
@@ -57,14 +83,12 @@ public class X01CheckoutServiceImpl implements IX01CheckoutService {
      *
      * @param remaining int The value to search for in the checkouts.
      * @return Optional<X01Checkout> containing the matching checkout. if no checkout available an empty Optional.
-     * @throws IOException If there's an issue reading the file.
      */
     @Override
-    public Optional<X01Checkout> getCheckout(int remaining) throws IOException {
-        return getCheckouts().stream()
-                .filter(x01Checkout -> x01Checkout.getCheckout() == remaining)
-                .findFirst();
+    public Optional<X01Checkout> getCheckout(int remaining) {
+        return Optional.ofNullable(checkoutsMap.get(remaining));
     }
+
 
     /**
      * Determine if a score could be a checkout
@@ -85,10 +109,9 @@ public class X01CheckoutServiceImpl implements IX01CheckoutService {
      * @param score     int the score that needs to be verified
      * @param dartsUsed int the darts used to reach the score
      * @return boolean whether the score could be a checkout and if the minimum darts needed were used
-     * @throws IOException If there's an issue reading the checkout file.
      */
     @Override
-    public boolean isScoreCheckout(int score, int dartsUsed) throws IOException {
+    public boolean isScoreCheckout(int score, int dartsUsed) {
         if (!isScoreCheckout(score)) return false;
         Optional<X01Checkout> checkout = getCheckout(score);
 

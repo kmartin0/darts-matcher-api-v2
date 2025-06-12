@@ -6,14 +6,13 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01LegRoundScore;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
 import org.bson.types.ObjectId;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 public interface IX01LegService {
 
-    void addScore(int x01, X01Leg x01Leg, int roundNumber, X01LegRoundScore x01LegRoundScore, List<X01MatchPlayer> matchPlayers, ObjectId throwerId) throws IOException;
+    void addScore(int x01, X01Leg x01Leg, int roundNumber, X01LegRoundScore x01LegRoundScore, List<X01MatchPlayer> matchPlayers, ObjectId throwerId);
 
     Optional<X01Leg> getCurrentLeg(List<X01Leg> legs);
 

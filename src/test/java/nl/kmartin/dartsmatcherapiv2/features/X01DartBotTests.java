@@ -10,7 +10,7 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.x01averagestatistics.X01Average
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01checkout.IX01CheckoutService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01checkout.X01CheckoutServiceImpl;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01checkoutstatistics.IX01CheckoutStatisticsService;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01checkoutstatistics.X01CheckoutServiceImplService;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01checkoutstatistics.X01CheckoutStatisticsServiceImplService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01dartbot.*;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.X01LegServiceImpl;
@@ -40,9 +40,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.test.util.ReflectionTestUtils;
 
-import java.io.IOException;
 import java.util.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -66,7 +64,7 @@ public class X01DartBotTests {
     }
 
     @Test
-    void testDartBotLegs() throws IOException {
+    void testDartBotLegs() {
         final ObjectId dartBotId = new ObjectId();
         final X01Match match = createTestMatch(dartBotId);
 
@@ -77,7 +75,7 @@ public class X01DartBotTests {
         }
     }
 
-    private void executeTestForTargetAvg(X01Match match, ObjectId dartBotId, int targetAvg) throws IOException {
+    private void executeTestForTargetAvg(X01Match match, ObjectId dartBotId, int targetAvg) {
         printTargetAvg(targetAvg);
         // Initialize the match with the base settings.
         X01Leg x01Leg = new X01Leg(1, null, dartBotId, new ArrayList<>());
@@ -100,7 +98,7 @@ public class X01DartBotTests {
         System.out.println("\nDarts Used Map: " + dartsUsedMap);
     }
 
-    private int simulateLeg(int targetAvg, X01Match match, X01Leg currentLeg, ObjectId dartBotId) throws IOException {
+    private int simulateLeg(int targetAvg, X01Match match, X01Leg currentLeg, ObjectId dartBotId) {
         int round = 1;
         int remaining = match.getMatchSettings().getX01();
         int dartsUsed = 0;
@@ -151,16 +149,8 @@ public class X01DartBotTests {
     }
 
     private IX01CheckoutService createCheckoutService() {
-        IX01CheckoutService checkoutService = new X01CheckoutServiceImpl(messageResolver);
-
-        // 2. Manually load the checkouts resource
         Resource checkoutsResource = new ClassPathResource("data/checkouts.json");
-
-        // 3. Inject the resource into the private field using reflection
-        ReflectionTestUtils.setField(checkoutService, // Target object
-                "checkoutsResourceFile", // Field name to inject
-                checkoutsResource // Value to set
-        );
+        IX01CheckoutService checkoutService = new X01CheckoutServiceImpl(checkoutsResource, messageResolver);
 
         return checkoutService;
     }
@@ -174,7 +164,7 @@ public class X01DartBotTests {
 
         IX01ScoreStatisticsService scoreStatisticsService = new X01ScoreStatisticsServiceImpl();
         IX01AverageStatisticsService averageStatisticsService = new X01AverageStatisticsServiceImpl();
-        IX01CheckoutStatisticsService checkoutStatisticsService = new X01CheckoutServiceImplService();
+        IX01CheckoutStatisticsService checkoutStatisticsService = new X01CheckoutStatisticsServiceImplService();
         IX01StatisticsService statisticsService = new X01StatisticsServiceImpl(scoreStatisticsService, checkoutStatisticsService, averageStatisticsService, legService);
 
         IX01MatchProgressService matchProgressService = new X01MatchProgressServiceImpl(setService, legService, legRoundService);

@@ -1,6 +1,6 @@
 package nl.kmartin.dartsmatcherapiv2.validators;
 
-import jakarta.validation.*;
+import jakarta.validation.ConstraintValidatorContext;
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.MatchPlayer;
 import nl.kmartin.dartsmatcherapiv2.utils.MessageKeys;
 import nl.kmartin.dartsmatcherapiv2.validators.noduplicatematchplayername.NoDuplicateMatchPlayerNameValidator;
@@ -18,8 +18,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class NoDuplicateMatchPlayerNameValidatorTests {

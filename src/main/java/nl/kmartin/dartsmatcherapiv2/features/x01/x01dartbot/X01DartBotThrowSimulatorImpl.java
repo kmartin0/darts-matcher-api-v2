@@ -1,14 +1,16 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01dartbot;
 
 import nl.kmartin.dartsmatcherapiv2.features.dartboard.IDartboardService;
-import nl.kmartin.dartsmatcherapiv2.features.dartboard.model.*;
+import nl.kmartin.dartsmatcherapiv2.features.dartboard.model.Dart;
+import nl.kmartin.dartsmatcherapiv2.features.dartboard.model.DartThrow;
+import nl.kmartin.dartsmatcherapiv2.features.dartboard.model.DartboardSectionArea;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Checkout;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01DartBotLegState;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01checkout.IX01CheckoutService;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,10 +45,9 @@ public class X01DartBotThrowSimulatorImpl implements IX01DartBotThrowSimulator {
      *
      * @param dartBotLegState {@link X01DartBotLegState} the current state of the dart bot in the leg
      * @return {@link List<DartThrow>} a list containing the dart throws for the next turn.
-     * @throws IOException If there's an issue reading the checkouts file.
      */
     @Override
-    public List<DartThrow> getNextDartThrows(X01DartBotLegState dartBotLegState) throws IOException {
+    public List<DartThrow> getNextDartThrows(X01DartBotLegState dartBotLegState) {
         // When the bot is outside checkout range, create a scoring throw. Otherwise, create a checkout throw.
         boolean isRemainingCheckout = x01CheckoutService.isScoreCheckout(dartBotLegState.getRemainingPoints());
         return isRemainingCheckout
@@ -90,9 +91,8 @@ public class X01DartBotThrowSimulatorImpl implements IX01DartBotThrowSimulator {
      *
      * @param dartBotLegState {@link X01DartBotLegState} the current state of the dart bot in the leg
      * @return {@link List<DartThrow>} a list of dart throws that were thrown aiming at a checkout
-     * @throws IOException If there's an issue reading the checkouts file.
      */
-    private List<DartThrow> createCheckoutThrowResult(X01DartBotLegState dartBotLegState) throws IOException {
+    private List<DartThrow> createCheckoutThrowResult(X01DartBotLegState dartBotLegState) {
         Optional<X01Checkout> checkout = x01CheckoutService.getCheckout(dartBotLegState.getRemainingPoints());
 
         // When there is no checkout, return a scoring throw.

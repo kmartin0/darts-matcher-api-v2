@@ -5,7 +5,6 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01LegRoundScore;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
 import org.bson.types.ObjectId;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -27,7 +26,7 @@ public interface IX01LegRoundService {
 
     int calculateDartsUsed(List<X01LegRound> rounds, ObjectId playerId);
 
-    boolean validateRoundsForPlayer(int x01, List<X01LegRound> rounds, ObjectId throwerId) throws IOException;
+    boolean validateRoundsForPlayer(int x01, List<X01LegRound> rounds, ObjectId throwerId);
 
     Optional<X01LegRoundScore> getLastScoreForPlayer(List<X01LegRound> rounds, ObjectId throwerId);
 

@@ -13,8 +13,7 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.x01statistics.IX01StatisticsSer
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.util.*;
+import java.util.Optional;
 
 @Service
 public class X01MatchServiceImpl implements IX01MatchService {
@@ -71,10 +70,9 @@ public class X01MatchServiceImpl implements IX01MatchService {
      *
      * @param x01Turn {@link X01Turn} The turn of a player
      * @return {@link X01Match} The updated match
-     * @throws IOException If there's an issue reading the checkouts file.
      */
     @Override
-    public X01Match addTurn(@NotNull @Valid X01Turn x01Turn) throws IOException {
+    public X01Match addTurn(@NotNull @Valid X01Turn x01Turn) {
         // Find the match
         X01Match x01Match = this.getMatch(x01Turn.getMatchId());
 
@@ -99,10 +97,9 @@ public class X01MatchServiceImpl implements IX01MatchService {
      *
      * @param x01EditTurn {@link X01EditTurn} the edited score of a player
      * @return {@link X01Match} The updated match
-     * @throws IOException If there's an issue reading the checkouts file.
      */
     @Override
-    public X01Match editTurn(@NotNull @Valid X01EditTurn x01EditTurn) throws IOException {
+    public X01Match editTurn(@NotNull @Valid X01EditTurn x01EditTurn) {
         // Find the match
         X01Match x01Match = this.getMatch(x01EditTurn.getMatchId());
 
@@ -148,9 +145,8 @@ public class X01MatchServiceImpl implements IX01MatchService {
      * @param roundNumber int the specific round of the leg in which the turn occurs.
      * @param x01Turn     The turn object containing details about the player's turn (score, darts used, doubles missed).
      * @param throwerId   The id of the player who has thrown this turn
-     * @throws IOException If there's an issue reading the checkouts file.
      */
-    private void addTurnToRound(X01Match x01Match, X01Leg x01Leg, int roundNumber, X01Turn x01Turn, ObjectId throwerId) throws IOException {
+    private void addTurnToRound(X01Match x01Match, X01Leg x01Leg, int roundNumber, X01Turn x01Turn, ObjectId throwerId) {
         if (x01Match == null || x01Leg == null || x01Turn == null) return;
 
         // Make the score object containing the turn details (score, darts used, doubles missed)

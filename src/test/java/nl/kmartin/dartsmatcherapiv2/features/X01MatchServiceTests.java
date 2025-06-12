@@ -18,7 +18,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
@@ -55,7 +54,7 @@ public class X01MatchServiceTests {
     }
 
     @Test
-    void test_1() throws IOException {
+    void test_1() {
         // Given
         Mockito.when(x01MatchRepository.save(Mockito.any(X01Match.class))).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
         X01Match x01Match = new X01Match();

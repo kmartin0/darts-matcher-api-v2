@@ -1,6 +1,5 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

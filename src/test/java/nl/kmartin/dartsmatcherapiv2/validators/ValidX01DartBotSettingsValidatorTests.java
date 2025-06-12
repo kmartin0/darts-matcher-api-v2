@@ -5,9 +5,7 @@ import nl.kmartin.dartsmatcherapiv2.features.basematch.model.PlayerType;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01DartBotSettings;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
 import nl.kmartin.dartsmatcherapiv2.utils.MessageKeys;
-import nl.kmartin.dartsmatcherapiv2.validators.noduplicatematchplayername.NoDuplicateMatchPlayerNameValidator;
 import nl.kmartin.dartsmatcherapiv2.validators.x01dartsbotsettings.ValidX01DartBotSettingsValidator;
-
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintViolationBuilder;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,8 +17,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class ValidX01DartBotSettingsValidatorTests {

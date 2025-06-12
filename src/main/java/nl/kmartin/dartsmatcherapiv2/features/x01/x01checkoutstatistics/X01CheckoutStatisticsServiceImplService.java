@@ -6,7 +6,7 @@ import nl.kmartin.dartsmatcherapiv2.utils.NumberUtils;
 import org.springframework.stereotype.Service;
 
 @Service
-public class X01CheckoutServiceImplService implements IX01CheckoutStatisticsService {
+public class X01CheckoutStatisticsServiceImplService implements IX01CheckoutStatisticsService {
     /**
      * Updates the player's checkout statistics based on the current round's score and checkout attempt.
      *

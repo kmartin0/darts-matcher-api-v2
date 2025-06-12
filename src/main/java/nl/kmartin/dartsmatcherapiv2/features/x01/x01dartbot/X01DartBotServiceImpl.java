@@ -4,7 +4,8 @@ import jakarta.validation.constraints.NotNull;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.InvalidArgumentsException;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.response.TargetError;
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.PlayerType;
-import nl.kmartin.dartsmatcherapiv2.features.dartboard.model.*;
+import nl.kmartin.dartsmatcherapiv2.features.dartboard.model.DartThrow;
+import nl.kmartin.dartsmatcherapiv2.features.dartboard.model.DartboardSectionArea;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leground.IX01LegRoundService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.IX01MatchService;
@@ -15,8 +16,7 @@ import nl.kmartin.dartsmatcherapiv2.utils.MessageResolver;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.util.*;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
@@ -49,10 +49,9 @@ public class X01DartBotServiceImpl implements IX01DartBotService {
      *
      * @param matchId {@link ObjectId} the ID of the match for which to create the turn.
      * @return {@link X01Turn} the turn created for the dart bot (if the current thrower is a dart bot).
-     * @throws IOException If there's an issue reading the checkouts file.
      */
     @Override
-    public X01Turn createDartBotTurn(@NotNull ObjectId matchId) throws IOException {
+    public X01Turn createDartBotTurn(@NotNull ObjectId matchId) {
         // Get the match and dart bot for this turn.
         X01Match match = x01MatchService.getMatch(matchId);
         X01MatchPlayer dartBotPlayer = getCurrentDartBotPlayer(match);
@@ -158,9 +157,8 @@ public class X01DartBotServiceImpl implements IX01DartBotService {
      *
      * @param dartBotLegState {@link X01DartBotLegState} representing the dart bot's current state in the leg.
      * @return {@link X01LegRoundScore} representing the score, darts used, and doubles missed for the dart bot's turn in the current leg.
-     * @throws IOException If there's an issue reading the checkouts file.
      */
-    private X01LegRoundScore createRoundScore(X01DartBotLegState dartBotLegState) throws IOException {
+    private X01LegRoundScore createRoundScore(X01DartBotLegState dartBotLegState) {
         int remaining = dartBotLegState.getRemainingPoints();
 
         // Simulate dart throws until either the remaining points has reached zero or there no darts left to throw in the round
