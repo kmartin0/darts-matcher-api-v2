@@ -46,16 +46,16 @@ public class X01MatchServiceImpl implements IX01MatchService {
     /**
      * Creates a new Match with default properties and saves it to the database.
      *
-     * @param x01Match X01Match to be created
+     * @param match X01Match to be created
      * @return X01Match the saved match
      */
     @Override
-    public X01Match createMatch(@NotNull @Valid X01Match x01Match) {
+    public X01Match createMatch(@NotNull @Valid X01Match match) {
         // Initialize properties for the new match.
-        matchSetupService.setupNewMatch(x01Match);
+        matchSetupService.setupNewMatch(match);
 
         // Save the match to the repository and return it.
-        return saveMatch(x01Match);
+        return saveMatch(match);
     }
 
     /**
@@ -74,13 +74,13 @@ public class X01MatchServiceImpl implements IX01MatchService {
      * Verifies and adds the current player's turn to the current round of the match.
      * After adding the turn, the match progress and state are recalculated.
      *
-     * @param x01Turn {@link X01Turn} The turn of a player
+     * @param turn {@link X01Turn} The turn of a player
      * @return {@link X01Match} The updated match
      */
     @Override
-    public X01Match addTurn(@NotNull @Valid X01Turn x01Turn) {
+    public X01Match addTurn(@NotNull @Valid X01Turn turn) {
         // Find the match
-        X01Match x01Match = this.getMatch(x01Turn.getMatchId());
+        X01Match x01Match = this.getMatch(turn.getMatchId());
 
         // Get the current set/leg/round.
         Optional<X01Set> currentSet = matchProgressService.getCurrentSetOrCreate(x01Match);
@@ -90,7 +90,7 @@ public class X01MatchServiceImpl implements IX01MatchService {
         // Add the turn to the current thrower of the current round.
         if (currentLeg.isPresent() && currentLegRound.isPresent()) {
             ObjectId currentThrower = legRoundService.getCurrentThrowerInRound(currentLegRound.get(), currentLeg.get().getThrowsFirst(), x01Match.getPlayers());
-            addTurnToRound(x01Match, currentLeg.get(), currentLegRound.get().getRound(), x01Turn, currentThrower);
+            addTurnToRound(x01Match, currentLeg.get(), currentLegRound.get().getRound(), turn, currentThrower);
         }
 
         // Save the updated match to the repository.
@@ -101,20 +101,20 @@ public class X01MatchServiceImpl implements IX01MatchService {
      * Edits a score from a round for a player. After the score is edited will update the match state and save to
      * the repository
      *
-     * @param x01EditTurn {@link X01EditTurn} the edited score of a player
+     * @param editTurn {@link X01EditTurn} the edited score of a player
      * @return {@link X01Match} The updated match
      */
     @Override
-    public X01Match editTurn(@NotNull @Valid X01EditTurn x01EditTurn) {
+    public X01Match editTurn(@NotNull @Valid X01EditTurn editTurn) {
         // Find the match
-        X01Match x01Match = this.getMatch(x01EditTurn.getMatchId());
+        X01Match x01Match = this.getMatch(editTurn.getMatchId());
 
         // Get the leg that contains the round.
-        Optional<X01Leg> legOpt = matchProgressService.getSet(x01Match, x01EditTurn.getSet(), true)
-                .flatMap(set -> setProgressService.getLeg(set, x01EditTurn.getLeg(), true));
+        Optional<X01Leg> legOpt = matchProgressService.getSet(x01Match, editTurn.getSet(), true)
+                .flatMap(set -> setProgressService.getLeg(set, editTurn.getLeg(), true));
 
         // Replace the current score with the updated turn
-        legOpt.ifPresent(x01Leg -> addTurnToRound(x01Match, x01Leg, x01EditTurn.getRound(), x01EditTurn, x01EditTurn.getPlayerId()));
+        legOpt.ifPresent(x01Leg -> addTurnToRound(x01Match, x01Leg, editTurn.getRound(), editTurn, editTurn.getPlayerId()));
 
         // Save the updated match to the repository.
         return saveMatch(x01Match);
@@ -125,13 +125,13 @@ public class X01MatchServiceImpl implements IX01MatchService {
      *
      * Finds the match by ID, removes the last submitted score , and then saves the updated match.
      *
-     * @param x01DeleteLastTurn {@link X01DeleteLastTurn} Object containing the match ID for which the last turn should be deleted.
+     * @param deleteLastTurn {@link X01DeleteLastTurn} Object containing the match ID for which the last turn should be deleted.
      * @return {@link X01Match} The updated match after deleting the last turn.
      */
     @Override
-    public X01Match deleteLastTurn(@NotNull @Valid X01DeleteLastTurn x01DeleteLastTurn) {
+    public X01Match deleteLastTurn(@NotNull @Valid X01DeleteLastTurn deleteLastTurn) {
         // Find the match
-        X01Match x01Match = this.getMatch(x01DeleteLastTurn.getMatchId());
+        X01Match x01Match = this.getMatch(deleteLastTurn.getMatchId());
 
         // Delete the last round score
         matchProgressService.deleteLastScore(x01Match);
@@ -144,40 +144,40 @@ public class X01MatchServiceImpl implements IX01MatchService {
      * Adds a turn to the specified leg round of a given match.
      * Updates and validates the current leg round with the score from the provided turn.
      *
-     * @param x01Match    The match to which the turn is being added.
-     * @param x01Leg      The leg of the match that the turn is part of.
+     * @param match    The match to which the turn is being added.
+     * @param leg      The leg of the match that the turn is part of.
      * @param roundNumber int the specific round of the leg in which the turn occurs.
-     * @param x01Turn     The turn object containing details about the player's turn (score, darts used, doubles missed).
+     * @param turn     The turn object containing details about the player's turn (score, darts used, doubles missed).
      * @param throwerId   The id of the player who has thrown this turn
      */
-    private void addTurnToRound(X01Match x01Match, X01Leg x01Leg, int roundNumber, X01Turn x01Turn, ObjectId throwerId) {
-        if (x01Match == null || x01Leg == null || x01Turn == null) return;
+    private void addTurnToRound(X01Match match, X01Leg leg, int roundNumber, X01Turn turn, ObjectId throwerId) {
+        if (match == null || leg == null || turn == null) return;
 
         // Make the score object containing the turn details (score, darts used, doubles missed)
-        X01LegRoundScore roundScore = new X01LegRoundScore(x01Turn.getDoublesMissed(), x01Turn.getDartsUsed(), x01Turn.getScore());
+        X01LegRoundScore roundScore = new X01LegRoundScore(turn.getDoublesMissed(), turn.getDartsUsed(), turn.getScore());
 
         // Validate and add the score to the round.
-        legService.addScore(x01Match.getMatchSettings().getX01(), x01Leg, roundNumber, roundScore, x01Match.getPlayers(), throwerId);
+        legService.addScore(match.getMatchSettings().getX01(), leg, roundNumber, roundScore, match.getPlayers(), throwerId);
     }
 
     /**
      * Helper method which updates the match state before saving it to the repository
      *
-     * @param x01Match {@link X01Match} the match to be saved
+     * @param match {@link X01Match} the match to be saved
      * @return {@link X01Match} the saved match with updated match progress
      */
-    private X01Match saveMatch(@Valid @NotNull X01Match x01Match) {
+    private X01Match saveMatch(@Valid @NotNull X01Match match) {
         // Update match results
-        matchResultService.updateMatchResult(x01Match);
+        matchResultService.updateMatchResult(match);
 
         // Update match statistics
-        statisticsService.updatePlayerStatistics(x01Match.getSets(), x01Match.getPlayers());
+        statisticsService.updatePlayerStatistics(match.getSets(), match.getPlayers());
 
         // Update Match Progress
-        matchProgressService.updateMatchProgress(x01Match);
+        matchProgressService.updateMatchProgress(match);
 
         // Save and return the saved match
-        return x01matchRepository.save(x01Match);
+        return x01matchRepository.save(match);
     }
 
 }

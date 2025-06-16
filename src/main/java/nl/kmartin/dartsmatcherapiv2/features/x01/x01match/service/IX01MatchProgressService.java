@@ -16,15 +16,15 @@ public interface IX01MatchProgressService {
 
     java.util.Set<Integer> getSetNumbers(X01Match match);
 
-    Optional<X01Set> getCurrentSetOrCreate(X01Match x01Match);
+    Optional<X01Set> getCurrentSetOrCreate(X01Match match);
 
-    Optional<X01Leg> getCurrentLegOrCreate(X01Match x01Match, X01Set currentSet);
+    Optional<X01Leg> getCurrentLegOrCreate(X01Match match, X01Set currentSet);
 
-    Optional<X01LegRound> getCurrentLegRoundOrCreate(X01Match x01Match, X01Leg currentLeg);
+    Optional<X01LegRound> getCurrentLegRoundOrCreate(X01Match match, X01Leg currentLeg);
 
-    boolean isMatchConcluded(X01Match x01Match);
+    boolean isMatchConcluded(X01Match match);
 
     void deleteLastScore(X01Match match);
 
-    void updateMatchProgress(X01Match x01Match);
+    void updateMatchProgress(X01Match match);
 }

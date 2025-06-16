@@ -7,9 +7,9 @@ import org.bson.types.ObjectId;
 import java.util.List;
 
 public interface IX01LegRoundService {
-    ObjectId getCurrentThrowerInRound(X01LegRound x01LegRound, ObjectId throwsFirstInLeg, List<X01MatchPlayer> players);
+    ObjectId getCurrentThrowerInRound(X01LegRound legRound, ObjectId throwsFirstInLeg, List<X01MatchPlayer> players);
 
-    List<X01MatchPlayer> getPlayersToThrowInRound(X01LegRound x01LegRound, List<X01MatchPlayer> players);
+    List<X01MatchPlayer> getPlayersToThrowInRound(X01LegRound legRound, List<X01MatchPlayer> players);
 
     List<X01MatchPlayer> getLegRoundThrowingOrder(ObjectId throwsFirst, List<X01MatchPlayer> players);
 

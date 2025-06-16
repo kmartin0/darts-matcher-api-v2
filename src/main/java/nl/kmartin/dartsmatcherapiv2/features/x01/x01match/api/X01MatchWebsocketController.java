@@ -6,6 +6,7 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01EditTurn;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Match;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Turn;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01dartbot.IX01DartBotService;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service.IX01MatchService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service.X01MatchServiceImpl;
 import nl.kmartin.dartsmatcherapiv2.utils.WebsocketDestinations;
 import org.bson.types.ObjectId;
@@ -18,22 +19,13 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class X01MatchWebsocketController {
 
-//    private final IX01MatchService x01MatchService;
-//    private final IX01MatchWebsocketService x01MatchWebsocketService;
-//    private final IX01DartBotService x01DartBotService;
-//
-//    public X01MatchWebsocketController(IX01MatchService x01MatchService, IX01MatchWebsocketService x01MatchWebsocketService, IX01DartBotService x01DartBotService) {
-//        this.x01MatchService = x01MatchService;
-//        this.x01MatchWebsocketService = x01MatchWebsocketService;
-//        this.x01DartBotService = x01DartBotService;
-//    }
-
-    private final X01MatchServiceImpl x01MatchService;
+    private final IX01MatchService x01MatchService;
     private final IX01MatchWebsocketService x01MatchWebsocketService;
     private final IX01DartBotService x01DartBotService;
 
-    public X01MatchWebsocketController(X01MatchServiceImpl x01MatchService, IX01MatchWebsocketService x01MatchWebsocketService, IX01DartBotService x01DartBotService) {
-
+    public X01MatchWebsocketController(IX01MatchService x01MatchService,
+                                       IX01MatchWebsocketService x01MatchWebsocketService,
+                                       IX01DartBotService x01DartBotService) {
         this.x01MatchService = x01MatchService;
         this.x01MatchWebsocketService = x01MatchWebsocketService;
         this.x01DartBotService = x01DartBotService;
@@ -46,8 +38,8 @@ public class X01MatchWebsocketController {
     }
 
     @MessageMapping(WebsocketDestinations.X01_ADD_TURN)
-    public X01Match addTurn(@Valid @Payload X01Turn x01Turn) {
-        X01Match updatedMatch = x01MatchService.addTurn(x01Turn);
+    public X01Match addTurn(@Valid @Payload X01Turn turn) {
+        X01Match updatedMatch = x01MatchService.addTurn(turn);
         x01MatchWebsocketService.sendX01MatchUpdate(updatedMatch);
         return updatedMatch;
     }
@@ -61,15 +53,15 @@ public class X01MatchWebsocketController {
     }
 
     @MessageMapping(WebsocketDestinations.X01_EDIT_TURN)
-    public X01Match editTurn(@Valid @Payload X01EditTurn x01EditTurn) {
-        X01Match updatedMatch = x01MatchService.editTurn(x01EditTurn);
+    public X01Match editTurn(@Valid @Payload X01EditTurn editTurn) {
+        X01Match updatedMatch = x01MatchService.editTurn(editTurn);
         x01MatchWebsocketService.sendX01MatchUpdate(updatedMatch);
         return updatedMatch;
     }
 
     @MessageMapping(WebsocketDestinations.X01_DELETE_LAST_TURN)
-    public X01Match deleteLastTurn(@Payload X01DeleteLastTurn x01DeleteLastTurn) {
-        X01Match updatedMatch = x01MatchService.deleteLastTurn(x01DeleteLastTurn);
+    public X01Match deleteLastTurn(@Payload X01DeleteLastTurn deleteLastTurn) {
+        X01Match updatedMatch = x01MatchService.deleteLastTurn(deleteLastTurn);
         x01MatchWebsocketService.sendX01MatchUpdate(updatedMatch);
         return updatedMatch;
     }

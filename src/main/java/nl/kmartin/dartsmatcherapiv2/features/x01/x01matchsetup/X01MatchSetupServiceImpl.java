@@ -19,26 +19,26 @@ public class X01MatchSetupServiceImpl implements IX01MatchSetupService {
      * Sets up an X01 match by setting up players, match type and status,
      * start and end dates, and initial match progress.
      *
-     * @param x01Match the {@link X01Match} instance to set up
+     * @param match the {@link X01Match} instance to set up
      */
     @Override
-    public void setupNewMatch(@Valid X01Match x01Match) {
-        if (x01Match == null) return;
+    public void setupNewMatch(@Valid X01Match match) {
+        if (match == null) return;
 
-        setupMatchPlayers(x01Match);
-        setMatchTypeAndStatus(x01Match);
-        setMatchDates(x01Match);
-        setupMatchProgress(x01Match);
+        setupMatchPlayers(match);
+        setMatchTypeAndStatus(match);
+        setMatchDates(match);
+        setupMatchProgress(match);
     }
 
     /**
      * Generate a unique id for all match players and initialize their statistics.
      *
-     * @param x01Match {@link X01Match} the match whose players need to be set up
+     * @param match {@link X01Match} the match whose players need to be set up
      */
-    private void setupMatchPlayers(X01Match x01Match) {
+    private void setupMatchPlayers(X01Match match) {
         // Generate a unique id for each player and set their statistics.
-        x01Match.getPlayers().forEach(player -> {
+        match.getPlayers().forEach(player -> {
             player.setPlayerId(new ObjectId());
             player.setStatistics(new X01Statistics());
         });
@@ -47,38 +47,38 @@ public class X01MatchSetupServiceImpl implements IX01MatchSetupService {
     /**
      * Sets the match type to X01 and the initial match status to IN_PLAY
      *
-     * @param x01Match {@link X01Match} the match whose type and status need to be set up
+     * @param match {@link X01Match} the match whose type and status need to be set up
      */
-    private void setMatchTypeAndStatus(X01Match x01Match) {
+    private void setMatchTypeAndStatus(X01Match match) {
         // Set the match type to X01 and the status to IN_PLAY
-        x01Match.setMatchType(MatchType.X01);
-        x01Match.setMatchStatus(MatchStatus.IN_PLAY);
+        match.setMatchType(MatchType.X01);
+        match.setMatchStatus(MatchStatus.IN_PLAY);
     }
 
     /**
      * Initializes the start date to the current time in UTC and clears the end date.
      *
-     * @param x01Match {@link X01Match} the match whose start and end date need to be initialized
+     * @param match {@link X01Match} the match whose start and end date need to be initialized
      */
-    private void setMatchDates(X01Match x01Match) {
+    private void setMatchDates(X01Match match) {
         // Set the start date of the match to the current time in UTC and make sure the end date is not set.
-        x01Match.setStartDate(Instant.now());
-        x01Match.setEndDate(null);
+        match.setStartDate(Instant.now());
+        match.setEndDate(null);
     }
 
     /**
      * Initializes the match progress by setting up an empty list of sets and
      * creating an initial match progress with the first player in the list of players starting the match.
      *
-     * @param x01Match {@link X01Match} the match whose progress needs to be set up
+     * @param match {@link X01Match} the match whose progress needs to be set up
      */
-    private void setupMatchProgress(X01Match x01Match) {
+    private void setupMatchProgress(X01Match match) {
         // Initialize the sets list.
-        x01Match.setSets(new ArrayList<>());
+        match.setSets(new ArrayList<>());
 
         // Initialize the match progress indicating the starting round and starting player.
-        ObjectId startsMatch = x01Match.getPlayers().get(0).getPlayerId();
+        ObjectId startsMatch = match.getPlayers().get(0).getPlayerId();
         X01MatchProgress initialMatchProgress = new X01MatchProgress(1, 1, 1, startsMatch);
-        x01Match.setMatchProgress(initialMatchProgress);
+        match.setMatchProgress(initialMatchProgress);
     }
 }

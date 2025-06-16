@@ -79,18 +79,18 @@ public class X01MatchResultServiceImpl implements IX01MatchResultService {
      * A list of object ids is created containing all players that have won the match. Multiple match winners
      * means a draw has occurred.
      *
-     * @param x01Match {@link X01Match} The match for which the winners are being determined.
+     * @param match {@link X01Match} The match for which the winners are being determined.
      * @return {@link List<ObjectId>} containing the IDs of players who won the match. multiple winners indicates a draw.
      */
     @Override
-    public List<ObjectId> getMatchWinners(X01Match x01Match) {
-        if (x01Match == null) return Collections.emptyList();
+    public List<ObjectId> getMatchWinners(X01Match match) {
+        if (match == null) return Collections.emptyList();
 
         // Get the standings for the match.
-        Map<ObjectId, Long> matchStandings = getMatchStandings(x01Match);
+        Map<ObjectId, Long> matchStandings = getMatchStandings(match);
 
         // Get the player(s) that have won the match
-        int remainingSets = calcRemainingSets(x01Match);
+        int remainingSets = calcRemainingSets(match);
         return StandingsUtils.determineWinners(matchStandings, remainingSets);
     }
 

@@ -10,13 +10,13 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Turn;
 import org.bson.types.ObjectId;
 
 public interface IX01MatchService {
-    X01Match createMatch(@NotNull @Valid X01Match x01Match);
+    X01Match createMatch(@NotNull @Valid X01Match match);
 
     X01Match getMatch(@NotNull ObjectId matchId) throws ResourceNotFoundException;
 
-    X01Match addTurn(@NotNull @Valid X01Turn x01Turn);
+    X01Match addTurn(@NotNull @Valid X01Turn turn);
 
-    X01Match editTurn(@NotNull @Valid X01EditTurn x01EditTurn);
+    X01Match editTurn(@NotNull @Valid X01EditTurn editTurn);
 
-    X01Match deleteLastTurn(@NotNull @Valid X01DeleteLastTurn x01DeleteLastTurn);
+    X01Match deleteLastTurn(@NotNull @Valid X01DeleteLastTurn deleteLastTurn);
 }

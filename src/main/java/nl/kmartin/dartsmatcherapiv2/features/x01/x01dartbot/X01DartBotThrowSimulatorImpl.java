@@ -16,18 +16,18 @@ import java.util.stream.Collectors;
 @Service
 public class X01DartBotThrowSimulatorImpl implements IX01DartBotThrowSimulator {
     private final IDartboardService dartboardService;
-    private final IX01CheckoutService x01CheckoutService;
+    private final IX01CheckoutService checkoutService;
     private final IX01DartBotCheckoutPolicy dartBotCheckoutPolicy;
     private final IX01DartBotAccuracyCalculator dartBotAccuracyCalculator;
     private final IX01DartBotScoringStrategy dartBotScoringStrategy;
 
     public X01DartBotThrowSimulatorImpl(IDartboardService dartboardService,
-                                        IX01CheckoutService x01CheckoutService,
+                                        IX01CheckoutService checkoutService,
                                         IX01DartBotCheckoutPolicy dartBotCheckoutPolicy,
                                         IX01DartBotAccuracyCalculator dartBotAccuracyCalculator,
                                         IX01DartBotScoringStrategy dartBotScoringStrategy) {
         this.dartboardService = dartboardService;
-        this.x01CheckoutService = x01CheckoutService;
+        this.checkoutService = checkoutService;
         this.dartBotCheckoutPolicy = dartBotCheckoutPolicy;
         this.dartBotAccuracyCalculator = dartBotAccuracyCalculator;
         this.dartBotScoringStrategy = dartBotScoringStrategy;
@@ -49,7 +49,7 @@ public class X01DartBotThrowSimulatorImpl implements IX01DartBotThrowSimulator {
     @Override
     public List<DartThrow> getNextDartThrows(X01DartBotLegState dartBotLegState) {
         // When the bot is outside checkout range, create a scoring throw. Otherwise, create a checkout throw.
-        boolean isRemainingCheckout = x01CheckoutService.isScoreCheckout(dartBotLegState.getRemainingPoints());
+        boolean isRemainingCheckout = checkoutService.isScoreCheckout(dartBotLegState.getRemainingPoints());
         return isRemainingCheckout
                 ? createCheckoutThrowResult(dartBotLegState)
                 : List.of(createScoringThrowResult(dartBotLegState));
@@ -93,7 +93,7 @@ public class X01DartBotThrowSimulatorImpl implements IX01DartBotThrowSimulator {
      * @return {@link List<DartThrow>} a list of dart throws that were thrown aiming at a checkout
      */
     private List<DartThrow> createCheckoutThrowResult(X01DartBotLegState dartBotLegState) {
-        Optional<X01Checkout> checkout = x01CheckoutService.getCheckout(dartBotLegState.getRemainingPoints());
+        Optional<X01Checkout> checkout = checkoutService.getCheckout(dartBotLegState.getRemainingPoints());
 
         // When there is no checkout, return a scoring throw.
         if (checkout.isEmpty()) {

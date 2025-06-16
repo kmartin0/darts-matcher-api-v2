@@ -30,7 +30,8 @@ public class X01DartBotServiceImpl implements IX01DartBotService {
 
     public X01DartBotServiceImpl(IX01MatchService matchService,
                                  IX01MatchProgressService matchProgressService,
-                                 IX01DartBotThrowSimulator dartBotThrowSimulatorService, MessageResolver messageResolver, IX01LegResultService legResultService) {
+                                 IX01DartBotThrowSimulator dartBotThrowSimulatorService,
+                                 MessageResolver messageResolver, IX01LegResultService legResultService) {
         this.matchService = matchService;
         this.matchProgressService = matchProgressService;
         this.dartBotThrowSimulatorService = dartBotThrowSimulatorService;

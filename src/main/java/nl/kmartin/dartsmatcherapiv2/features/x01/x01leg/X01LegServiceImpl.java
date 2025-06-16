@@ -56,50 +56,50 @@ public class X01LegServiceImpl implements IX01LegService {
      * score results in an illegal leg state, then the score will be set to zero and darts used to 3.
      *
      * @param x01              int the x01 the leg is played in
-     * @param x01Leg           {@link X01Leg} the leg of which the round belongs to
+     * @param leg           {@link X01Leg} the leg of which the round belongs to
      * @param roundNumber      int the round of which the score belongs to
-     * @param x01LegRoundScore {@link X01LegRoundScore} the score that needs to be added to the round
-     * @param matchPlayers     {@link List<X01MatchPlayer>} the list of match players.
+     * @param roundScore {@link X01LegRoundScore} the score that needs to be added to the round
+     * @param players     {@link List<X01MatchPlayer>} the list of match players.
      * @param throwerId        {@link ObjectId} the player that has thrown the score.
      */
     @Override
-    public void addScore(int x01, X01Leg x01Leg, int roundNumber, X01LegRoundScore x01LegRoundScore, List<X01MatchPlayer> matchPlayers, ObjectId throwerId) {
-        if (x01Leg == null || x01LegRoundScore == null || matchPlayers == null) return;
+    public void addScore(int x01, X01Leg leg, int roundNumber, X01LegRoundScore roundScore, List<X01MatchPlayer> players, ObjectId throwerId) {
+        if (leg == null || roundScore == null || players == null) return;
 
         // Determine if the leg is editable, will throw InvalidArgumentsException if the leg is not editable.
-        checkLegEditable(x01Leg, throwerId);
+        checkLegEditable(leg, throwerId);
 
-        Optional<X01LegRound> x01LegRound = legProgressService.getLegRound(x01Leg, roundNumber, true);
+        Optional<X01LegRound> x01LegRound = legProgressService.getLegRound(leg, roundNumber, true);
         if (x01LegRound.isEmpty()) return;
 
         // Add the score to the round.
-        x01LegRound.get().getScores().put(throwerId, x01LegRoundScore);
+        x01LegRound.get().getScores().put(throwerId, roundScore);
 
         // Verify if the rounds are legal after adding the new score.
-        boolean isPlayerRoundsLegal = validateLegForPlayer(x01Leg, x01, throwerId);
+        boolean isPlayerRoundsLegal = validateLegForPlayer(leg, x01, throwerId);
 
         // When the round is not legal. Set the score to zero and darts used to 3
         if (!isPlayerRoundsLegal) {
-            x01LegRoundScore.setScore(0);
-            x01LegRoundScore.setDartsUsed(3);
+            roundScore.setScore(0);
+            roundScore.setDartsUsed(3);
         }
 
         // Update the leg result
-        legResultService.updateLegResult(x01Leg, matchPlayers, x01);
+        legResultService.updateLegResult(leg, players, x01);
     }
 
     /**
      * Determines if a leg can be edited. When a leg is concluded, only the score of the winner can be modified.
      *
-     * @param x01Leg   {@link X01Leg} the leg to be modified
+     * @param leg   {@link X01Leg} the leg to be modified
      * @param playerId {@link ObjectId} the player of which the score is going to be modified
      */
     @Override
-    public void checkLegEditable(X01Leg x01Leg, ObjectId playerId) {
-        if (x01Leg == null) return;
+    public void checkLegEditable(X01Leg leg, ObjectId playerId) {
+        if (leg == null) return;
 
         // If the leg is already won by another player the turn cannot be modified.
-        if (legProgressService.isLegConcluded(x01Leg) && !Objects.equals(x01Leg.getWinner(), playerId)) {
+        if (legProgressService.isLegConcluded(leg) && !Objects.equals(leg.getWinner(), playerId)) {
             throw new InvalidArgumentsException(new TargetError("score", messageResolver.getMessage(MessageKeys.MESSAGE_LEG_ALREADY_WON)));
         }
     }
@@ -107,17 +107,17 @@ public class X01LegServiceImpl implements IX01LegService {
     /**
      * Determines if a score made by a player in a round of a leg is a checkout.
      *
-     * @param x01Leg      {@link X01Leg} the leg that the round is in
-     * @param x01LegRound {@link X01LegRound} the round the score is in
+     * @param leg      {@link X01Leg} the leg that the round is in
+     * @param legRound {@link X01LegRound} the round the score is in
      * @param playerId    {@link ObjectId} the player that scored
      * @return boolean whether the score made a player is a checkout
      */
     @Override
-    public boolean isScoreCheckout(X01Leg x01Leg, X01LegRound x01LegRound, ObjectId playerId) {
-        if (x01Leg == null || x01LegRound == null) return false;
+    public boolean isScoreCheckout(X01Leg leg, X01LegRound legRound, ObjectId playerId) {
+        if (leg == null || legRound == null) return false;
 
-        return playerId.equals(x01Leg.getWinner()) &&
-                legProgressService.getLegRound(x01Leg, x01LegRound.getRound() + 1, false).isEmpty();
+        return playerId.equals(leg.getWinner()) &&
+                legProgressService.getLegRound(leg, legRound.getRound() + 1, false).isEmpty();
     }
 
     /**

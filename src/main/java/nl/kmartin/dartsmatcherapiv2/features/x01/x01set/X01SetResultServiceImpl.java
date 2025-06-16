@@ -33,30 +33,30 @@ public class X01SetResultServiceImpl implements IX01SetResultService {
     /**
      * Updates the player results for a set.
      *
-     * @param x01Set     {@link X01Set} the set to be updated
+     * @param set     {@link X01Set} the set to be updated
      * @param bestOfLegs int the best of setting for the legs
      * @param players    {@link List<X01MatchPlayer>} the list of match players
      */
     @Override
-    public void updateSetResult(X01Set x01Set, int bestOfLegs, List<X01MatchPlayer> players, int x01) {
+    public void updateSetResult(X01Set set, int bestOfLegs, List<X01MatchPlayer> players, int x01) {
         // If the set is null exit early, if the players are null clear the set result and exit early.
-        if (x01Set == null) return;
+        if (set == null) return;
         if (X01ValidationUtils.isPlayersEmpty(players)) {
-            x01Set.setResult(null);
+            set.setResult(null);
             return;
         }
 
-        updateLegResults(x01Set, players, x01);
+        updateLegResults(set, players, x01);
 
         // Get the player(s) that have won the set
-        List<ObjectId> setWinners = getSetWinners(x01Set, bestOfLegs, players);
+        List<ObjectId> setWinners = getSetWinners(set, bestOfLegs, players);
 
         if (!setWinners.isEmpty()) { // The set has a result
             // If multiple players have won the set, that means they have drawn.
             ResultType winOrDrawType = setWinners.size() > 1 ? ResultType.DRAW : ResultType.WIN;
 
             // Map and set the player results in the set. Players in the setWinners list get a win/draw. The rest gets a loss
-            x01Set.setResult(players.stream()
+            set.setResult(players.stream()
                     .collect(Collectors.toMap(
                             X01MatchPlayer::getPlayerId,
                             player -> setWinners.contains(player.getPlayerId()) ? winOrDrawType : ResultType.LOSS
@@ -64,9 +64,9 @@ public class X01SetResultServiceImpl implements IX01SetResultService {
             );
 
             // Clears legs that might linger after the set winners.
-            removeLegsAfterSetWinner(x01Set, setWinners);
+            removeLegsAfterSetWinner(set, setWinners);
         } else { // The set has no result
-            x01Set.setResult(null);
+            set.setResult(null);
         }
     }
 
@@ -89,21 +89,21 @@ public class X01SetResultServiceImpl implements IX01SetResultService {
      * A list of object ids is created containing all players that have won the set. Multiple set winners
      * means a draw has occurred.
      *
-     * @param x01Set     {@link X01Set} The set for which the winners are being determined.
+     * @param set     {@link X01Set} The set for which the winners are being determined.
      * @param bestOfLegs int the best of setting for the legs
      * @param players    {@link List<X01MatchPlayer>} the list of match players
      * @return {@link List<ObjectId>} containing the IDs of players who won the set. multiple winners indicates a draw.
      */
     @Override
-    public List<ObjectId> getSetWinners(X01Set x01Set, int bestOfLegs, List<X01MatchPlayer> players) {
-        if (X01ValidationUtils.isLegsEmpty(x01Set) || X01ValidationUtils.isPlayersEmpty(players))
+    public List<ObjectId> getSetWinners(X01Set set, int bestOfLegs, List<X01MatchPlayer> players) {
+        if (X01ValidationUtils.isLegsEmpty(set) || X01ValidationUtils.isPlayersEmpty(players))
             return Collections.emptyList();
 
         // Get the standings for the set.
-        Map<ObjectId, Long> setStandings = getSetStandings(x01Set, players);
+        Map<ObjectId, Long> setStandings = getSetStandings(set, players);
 
         // Get the player(s) that have won the set
-        int remainingLegs = calcRemainingLegs(bestOfLegs, x01Set);
+        int remainingLegs = calcRemainingLegs(bestOfLegs, set);
         return StandingsUtils.determineWinners(setStandings, remainingLegs);
     }
 
@@ -159,15 +159,15 @@ public class X01SetResultServiceImpl implements IX01SetResultService {
      * Determine the number of legs that are yet to be played in a set
      *
      * @param bestOfLegs int the maximum number of legs going to be played
-     * @param x01Set     {@link X01Set} the set for which the remaining legs need to be determined
+     * @param set     {@link X01Set} the set for which the remaining legs need to be determined
      * @return int the number of legs can still be played
      */
-    private int calcRemainingLegs(int bestOfLegs, X01Set x01Set) {
+    private int calcRemainingLegs(int bestOfLegs, X01Set set) {
         // If the set or legs don't exist, the remaining legs are the maximum number of legs to be played
-        if (X01ValidationUtils.isLegsEmpty(x01Set)) return bestOfLegs;
+        if (X01ValidationUtils.isLegsEmpty(set)) return bestOfLegs;
 
         // Count the number of completed legs (legs with a winner)
-        long completedLegs = x01Set.getLegs().stream()
+        long completedLegs = set.getLegs().stream()
                 .filter(legProgressService::isLegConcluded)
                 .count();
 

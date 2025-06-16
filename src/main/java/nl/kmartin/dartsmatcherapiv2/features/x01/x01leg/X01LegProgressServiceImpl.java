@@ -45,16 +45,16 @@ public class X01LegProgressServiceImpl implements IX01LegProgressService {
      * Finds the lowest-numbered round which does not have a score for all players.
      *
      * @param leg          {@link X01Leg} representing the leg for which the current round needs to be found.
-     * @param matchPlayers {@link List<X01MatchPlayer>} representing the players of the match.
+     * @param players {@link List<X01MatchPlayer>} representing the players of the match.
      * @return {@link Optional<X01LegRound>} the lowest round in play, otherwise empty.
      */
     @Override
-    public Optional<X01LegRound> getCurrentLegRound(X01Leg leg, List<X01MatchPlayer> matchPlayers) {
-        if (X01ValidationUtils.isRoundsEmpty(leg) || X01ValidationUtils.isPlayersEmpty(matchPlayers)) return Optional.empty();
+    public Optional<X01LegRound> getCurrentLegRound(X01Leg leg, List<X01MatchPlayer> players) {
+        if (X01ValidationUtils.isRoundsEmpty(leg) || X01ValidationUtils.isPlayersEmpty(players)) return Optional.empty();
 
         // Filter rounds with missing player scores and get the lowest round number.
         return leg.getRounds().stream()
-                .filter(round -> matchPlayers.stream().anyMatch(matchPlayer -> round.getScores().get(matchPlayer.getPlayerId()) == null))
+                .filter(round -> players.stream().anyMatch(matchPlayer -> round.getScores().get(matchPlayer.getPlayerId()) == null))
                 .min(Comparator.comparingInt(X01LegRound::getRound));
     }
 
@@ -133,12 +133,12 @@ public class X01LegProgressServiceImpl implements IX01LegProgressService {
     /**
      * Determines if a leg is concluded by checking the winner property
      *
-     * @param x01Leg {@link X01Leg} the leg that needs to be checked
+     * @param leg {@link X01Leg} the leg that needs to be checked
      * @return boolean if the leg is concluded
      */
     @Override
-    public boolean isLegConcluded(X01Leg x01Leg) {
-        return x01Leg != null && x01Leg.getWinner() != null;
+    public boolean isLegConcluded(X01Leg leg) {
+        return leg != null && leg.getWinner() != null;
     }
 
 }

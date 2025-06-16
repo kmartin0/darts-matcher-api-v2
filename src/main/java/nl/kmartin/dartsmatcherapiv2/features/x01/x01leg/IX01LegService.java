@@ -11,11 +11,11 @@ import java.util.List;
 public interface IX01LegService {
     X01Leg createNewLeg(int legNumber, ObjectId throwsFirstInSet, List<X01MatchPlayer> players);
 
-    void addScore(int x01, X01Leg x01Leg, int roundNumber, X01LegRoundScore x01LegRoundScore, List<X01MatchPlayer> matchPlayers, ObjectId throwerId);
+    void addScore(int x01, X01Leg leg, int roundNumber, X01LegRoundScore roundScore, List<X01MatchPlayer> players, ObjectId throwerId);
 
-    void checkLegEditable(X01Leg x01Leg, ObjectId playerId);
+    void checkLegEditable(X01Leg leg, ObjectId playerId);
 
-    boolean isScoreCheckout(X01Leg x01Leg, X01LegRound x01LegRound, ObjectId playerId);
+    boolean isScoreCheckout(X01Leg leg, X01LegRound legRound, ObjectId playerId);
 
     boolean validateLegForPlayer(X01Leg leg, int x01, ObjectId throwerId);
 

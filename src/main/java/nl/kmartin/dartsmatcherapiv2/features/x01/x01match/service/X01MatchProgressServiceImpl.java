@@ -113,19 +113,19 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
      * Finds the current set in play of a match. If the set is not created yet. A new set will be made and added
      * to the match.
      *
-     * @param x01Match {@link X01Match} the match for which the current set needs to be determined
+     * @param match {@link X01Match} the match for which the current set needs to be determined
      * @return {@link Optional<X01Set>} the current set in play.
      */
     @Override
-    public Optional<X01Set> getCurrentSetOrCreate(X01Match x01Match) {
-        if (x01Match == null) return Optional.empty();
+    public Optional<X01Set> getCurrentSetOrCreate(X01Match match) {
+        if (match == null) return Optional.empty();
 
         // First find the current set in the active list of sets.
-        Optional<X01Set> curSet = getCurrentSet(x01Match);
+        Optional<X01Set> curSet = getCurrentSet(match);
 
         // If there is no current set and the match isn't concluded, create the next set.
-        return curSet.isEmpty() && !isMatchConcluded(x01Match)
-                ? createNextSet(x01Match)
+        return curSet.isEmpty() && !isMatchConcluded(match)
+                ? createNextSet(match)
                 : curSet;
     }
 
@@ -133,21 +133,21 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
      * Finds the current leg in play inside a set. If the leg is not created yet. A new leg will be made and
      * added to the current set.
      *
-     * @param x01Match   {@link X01Match}  the match for which the current leg needs to be determined
+     * @param match   {@link X01Match}  the match for which the current leg needs to be determined
      * @param currentSet {@link X01Set} the current set in play.
      * @return {@link Optional<X01Leg>} the current leg in play.
      */
     @Override
-    public Optional<X01Leg> getCurrentLegOrCreate(X01Match x01Match, X01Set currentSet) {
-        if (x01Match == null || currentSet == null) return Optional.empty();
+    public Optional<X01Leg> getCurrentLegOrCreate(X01Match match, X01Set currentSet) {
+        if (match == null || currentSet == null) return Optional.empty();
 
         // First find the current leg in the active list of legs from the current set.
-        int bestOfLegs = x01Match.getMatchSettings().getBestOf().getLegs();
+        int bestOfLegs = match.getMatchSettings().getBestOf().getLegs();
         Optional<X01Leg> curLeg = setProgressService.getCurrentLeg(currentSet);
 
         // If there is no current leg and the set isn't concluded, create the next leg.
-        return curLeg.isEmpty() && !setProgressService.isSetConcluded(currentSet, x01Match.getPlayers())
-                ? setProgressService.createNextLeg(currentSet, x01Match.getPlayers(), bestOfLegs, currentSet.getThrowsFirst())
+        return curLeg.isEmpty() && !setProgressService.isSetConcluded(currentSet, match.getPlayers())
+                ? setProgressService.createNextLeg(currentSet, match.getPlayers(), bestOfLegs, currentSet.getThrowsFirst())
                 : curLeg;
     }
 
@@ -155,16 +155,16 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
      * Finds the current leg round in play inside a leg. If the leg round is not created yet.
      * A new leg round will be made and added to the current leg.
      *
-     * @param x01Match   {@link X01Match}  the match for which the current leg round needs to be determined
+     * @param match   {@link X01Match}  the match for which the current leg round needs to be determined
      * @param currentLeg {@link X01Leg} the current leg in play.
      * @return {@link Optional<X01LegRound>} the current leg round in play.
      */
     @Override
-    public Optional<X01LegRound> getCurrentLegRoundOrCreate(X01Match x01Match, X01Leg currentLeg) {
-        if (x01Match == null || currentLeg == null) return Optional.empty();
+    public Optional<X01LegRound> getCurrentLegRoundOrCreate(X01Match match, X01Leg currentLeg) {
+        if (match == null || currentLeg == null) return Optional.empty();
 
         // First find the current leg round in the active list of rounds from the current leg.
-        Optional<X01LegRound> curLegRound = legProgressService.getCurrentLegRound(currentLeg, x01Match.getPlayers());
+        Optional<X01LegRound> curLegRound = legProgressService.getCurrentLegRound(currentLeg, match.getPlayers());
 
         // If there is no current leg round and the leg isn't concluded, create the next leg round.
         return curLegRound.isEmpty() && !legProgressService.isLegConcluded(currentLeg)
@@ -175,15 +175,15 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
     /**
      * Determines if a match is concluded by checking if all players have a match result.
      *
-     * @param x01Match {@link X01Match} the match
+     * @param match {@link X01Match} the match
      * @return boolean if the match is concluded
      */
     @Override
-    public boolean isMatchConcluded(X01Match x01Match) {
-        if (x01Match == null) return false;
+    public boolean isMatchConcluded(X01Match match) {
+        if (match == null) return false;
 
         // When all players have a result the match is concluded
-        return x01Match.getPlayers().stream().allMatch(player -> player.getResultType() != null);
+        return match.getPlayers().stream().allMatch(player -> player.getResultType() != null);
     }
 
     /**
@@ -224,23 +224,23 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
     /**
      * Update the calculated fields inside the {@link X01MatchProgress} field of a match.
      *
-     * @param x01Match {@link X01Match} the match to be updated
+     * @param match {@link X01Match} the match to be updated
      */
     @Override
-    public void updateMatchProgress(X01Match x01Match) {
-        if (x01Match == null) return;
+    public void updateMatchProgress(X01Match match) {
+        if (match == null) return;
 
         // Get the current set/leg/round
-        X01Set currentSet = getCurrentSetOrCreate(x01Match).orElse(null);
-        X01Leg currentLeg = getCurrentLegOrCreate(x01Match, currentSet).orElse(null);
-        X01LegRound currentLegRound = getCurrentLegRoundOrCreate(x01Match, currentLeg).orElse(null);
+        X01Set currentSet = getCurrentSetOrCreate(match).orElse(null);
+        X01Leg currentLeg = getCurrentLegOrCreate(match, currentSet).orElse(null);
+        X01LegRound currentLegRound = getCurrentLegRoundOrCreate(match, currentLeg).orElse(null);
 
         // Get the current thrower for the current round
         ObjectId throwsFirstInCurrentLeg = currentLeg != null ? currentLeg.getThrowsFirst() : null;
-        ObjectId currentThrower = legRoundService.getCurrentThrowerInRound(currentLegRound, throwsFirstInCurrentLeg, x01Match.getPlayers());
+        ObjectId currentThrower = legRoundService.getCurrentThrowerInRound(currentLegRound, throwsFirstInCurrentLeg, match.getPlayers());
 
         // Update the match progress with the new state of the match
-        x01Match.setMatchProgress(new X01MatchProgress(
+        match.setMatchProgress(new X01MatchProgress(
                 currentSet != null ? currentSet.getSet() : null,
                 currentLeg != null ? currentLeg.getLeg() : null,
                 currentLegRound != null ? currentLegRound.getRound() : null,

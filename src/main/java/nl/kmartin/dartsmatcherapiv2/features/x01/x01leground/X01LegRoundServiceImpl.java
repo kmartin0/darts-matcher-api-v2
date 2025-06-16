@@ -20,17 +20,17 @@ public class X01LegRoundServiceImpl implements IX01LegRoundService {
     /**
      * Find the player whose turn it is to throw in a round.
      *
-     * @param x01LegRound      {@link X01LegRound} the round to check.
+     * @param legRound      {@link X01LegRound} the round to check.
      * @param throwsFirstInLeg {@link ObjectId} the id of the player that started the leg.
      * @param players          {@link List<X01MatchPlayer>} list of all match players.
      * @return {@link ObjectId} the player whose turn it is.
      */
     @Override
-    public ObjectId getCurrentThrowerInRound(X01LegRound x01LegRound, ObjectId throwsFirstInLeg, List<X01MatchPlayer> players) {
-        if (x01LegRound == null || players == null) return null;
+    public ObjectId getCurrentThrowerInRound(X01LegRound legRound, ObjectId throwsFirstInLeg, List<X01MatchPlayer> players) {
+        if (legRound == null || players == null) return null;
 
         // Get the players who haven't scored yet in this round
-        List<X01MatchPlayer> playersToThrow = getPlayersToThrowInRound(x01LegRound, players);
+        List<X01MatchPlayer> playersToThrow = getPlayersToThrowInRound(legRound, players);
 
         // When all players have thrown, there is no current throws for this round.
         if (playersToThrow.isEmpty()) return null;
@@ -42,7 +42,7 @@ public class X01LegRoundServiceImpl implements IX01LegRoundService {
         // Find the first player in the order who hasn't scored yet.
         return orderedPlayers.stream()
                 .map(X01MatchPlayer::getPlayerId)
-                .filter(playerId -> !x01LegRound.getScores().containsKey(playerId))
+                .filter(playerId -> !legRound.getScores().containsKey(playerId))
                 .findFirst()
                 .orElse(null);
     }
@@ -50,17 +50,17 @@ public class X01LegRoundServiceImpl implements IX01LegRoundService {
     /**
      * Find all players that have yet to score in a round.
      *
-     * @param x01LegRound {@link X01LegRound} the round to check
+     * @param legRound {@link X01LegRound} the round to check
      * @param players     {@link List<X01MatchPlayer>} list of all match players.
      * @return {@link List<X01MatchPlayer>} list of players that have not scored in the round.
      */
     @Override
-    public List<X01MatchPlayer> getPlayersToThrowInRound(X01LegRound x01LegRound, List<X01MatchPlayer> players) {
-        if (x01LegRound == null || X01ValidationUtils.isPlayersEmpty(players)) return Collections.emptyList();
+    public List<X01MatchPlayer> getPlayersToThrowInRound(X01LegRound legRound, List<X01MatchPlayer> players) {
+        if (legRound == null || X01ValidationUtils.isPlayersEmpty(players)) return Collections.emptyList();
 
         // Find players that haven't scored and map to a list.
         return players.stream()
-                .filter(player -> !x01LegRound.getScores().containsKey(player.getPlayerId()))
+                .filter(player -> !legRound.getScores().containsKey(player.getPlayerId()))
                 .toList();
     }
 

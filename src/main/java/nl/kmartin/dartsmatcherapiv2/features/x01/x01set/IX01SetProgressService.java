@@ -17,5 +17,5 @@ public interface IX01SetProgressService {
 
     java.util.Set<Integer> getLegNumbers(X01Set set);
 
-    boolean isSetConcluded(X01Set x01Set, List<X01MatchPlayer> players);
+    boolean isSetConcluded(X01Set set, List<X01MatchPlayer> players);
 }

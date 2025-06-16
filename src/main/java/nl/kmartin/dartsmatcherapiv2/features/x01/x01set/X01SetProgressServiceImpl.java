@@ -105,15 +105,15 @@ public class X01SetProgressServiceImpl implements IX01SetProgressService {
     /**
      * Determines if a set is concluded by checking if all players have a result
      *
-     * @param x01Set  {@link X01Set} the set that needs to be checked
+     * @param set  {@link X01Set} the set that needs to be checked
      * @param players {@link List<X01MatchPlayer>} the list of match players
      * @return boolean if the set is concluded
      */
     @Override
-    public boolean isSetConcluded(X01Set x01Set, List<X01MatchPlayer> players) {
-        if (x01Set == null || x01Set.getResult() == null || X01ValidationUtils.isPlayersEmpty(players)) return false;
+    public boolean isSetConcluded(X01Set set, List<X01MatchPlayer> players) {
+        if (set == null || set.getResult() == null || X01ValidationUtils.isPlayersEmpty(players)) return false;
 
-        return players.stream().allMatch(player -> x01Set.getResult().get(player.getPlayerId()) != null);
+        return players.stream().allMatch(player -> set.getResult().get(player.getPlayerId()) != null);
     }
 
 }

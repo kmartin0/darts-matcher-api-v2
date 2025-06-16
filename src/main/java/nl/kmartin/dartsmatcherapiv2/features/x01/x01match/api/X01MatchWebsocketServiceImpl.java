@@ -19,16 +19,16 @@ public class X01MatchWebsocketServiceImpl implements IX01MatchWebsocketService {
      * This method will broadcast the given X01 match object to the appropriate destination
      * where all subscribed clients will receive the updated match information.
      *
-     * @param x01Match {@link X01Match} the match the subscribers will get
+     * @param match {@link X01Match} the match the subscribers will get
      */
     @Override
-    public void sendX01MatchUpdate(X01Match x01Match) {
-        if (x01Match == null) return;
+    public void sendX01MatchUpdate(X01Match match) {
+        if (match == null) return;
 
         // Create the broadcast destination url for the match
-        String destination = WebsocketDestinations.getX01MatchBroadcastDestination(x01Match.getId());
+        String destination = WebsocketDestinations.getX01MatchBroadcastDestination(match.getId());
 
         // Send the match to the subscribers of the match.
-        messagingTemplate.convertAndSend(destination, x01Match);
+        messagingTemplate.convertAndSend(destination, match);
     }
 }

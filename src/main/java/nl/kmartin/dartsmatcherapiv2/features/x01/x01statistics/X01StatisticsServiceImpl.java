@@ -30,77 +30,76 @@ public class X01StatisticsServiceImpl implements IX01StatisticsService {
     }
 
     /**
-     * Recalculates and sets the statistics for all match players
+     * Recalculates and sets the statistics for all match players from a match.
      *
-     * @param sets         {@link List<X01Set>} the list of sets containing the data for the statistics
-     * @param matchPlayers {@link List<X01MatchPlayer>} the players for which the statistics need to be updated
+     * @param match {@link X01Match} the match for which the player statistics need to be updated.
      */
     @Override
-    public void updatePlayerStatistics(List<X01Set> sets, List<X01MatchPlayer> matchPlayers) {
-        if (sets == null || matchPlayers == null) return;
+    public void updatePlayerStatistics(X01Match match) {
+        if (match == null) return;
 
         // Reset the statistics for all players
-        resetPlayerStatistics(matchPlayers);
+        resetPlayerStatistics(match.getPlayers());
 
         // Process and update the player statistics using the data of all the sets
-        processSets(sets, matchPlayers);
+        processSets(match.getSets(), match.getPlayers());
     }
 
     /**
      * Process and update the player statistics from the data of all the sets
      *
-     * @param sets   {@link List<X01Set>} the list of sets containing the player turns
-     * @param matchPlayers {@link List<X01MatchPlayer>} the players for which the statistics need to be updated
+     * @param sets         {@link List<X01Set>} the list of sets containing the player turns
+     * @param players {@link List<X01MatchPlayer>} the players for which the statistics need to be updated
      */
-    private void processSets(List<X01Set> sets, List<X01MatchPlayer> matchPlayers) {
-        if (sets == null || matchPlayers == null) return;
+    private void processSets(List<X01Set> sets, List<X01MatchPlayer> players) {
+        if (sets == null || players == null) return;
 
         // Process and update the player statistics using the data of all the legs
-        sets.forEach(x01Set -> processLegs(x01Set.getLegs(), matchPlayers));
+        sets.forEach(x01Set -> processLegs(x01Set.getLegs(), players));
     }
 
     /**
      * Process and update the player statistics using the data of all the legs
      *
-     * @param legs   {@link List<X01Leg>} the list of legs containing the player turns
-     * @param matchPlayers {@link List<X01MatchPlayer>} the players for which the statistics need to be updated
+     * @param legs         {@link List<X01Leg>} the list of legs containing the player turns
+     * @param players {@link List<X01MatchPlayer>} the players for which the statistics need to be updated
      */
-    private void processLegs(List<X01Leg> legs, List<X01MatchPlayer> matchPlayers) {
-        if (legs == null || matchPlayers == null) return;
+    private void processLegs(List<X01Leg> legs, List<X01MatchPlayer> players) {
+        if (legs == null || players == null) return;
 
         // Process and update the player statistics using the data of all the leg rounds
-        legs.forEach(x01Leg -> processLegRounds(x01Leg.getRounds(), x01Leg, matchPlayers));
+        legs.forEach(x01Leg -> processLegRounds(x01Leg.getRounds(), x01Leg, players));
     }
 
     /**
      * Process and update the player statistics using the data of all the leg rounds
      *
      * @param rounds       {@link List<X01LegRound>} the list of leg rounds containing the player turns
-     * @param x01Leg       {@link X01Leg} the leg from which the rounds originate
-     * @param matchPlayers {@link List<X01MatchPlayer>} the players for which the statistics need to be updated
+     * @param leg       {@link X01Leg} the leg from which the rounds originate
+     * @param players {@link List<X01MatchPlayer>} the players for which the statistics need to be updated
      */
-    private void processLegRounds(List<X01LegRound> rounds, X01Leg x01Leg, List<X01MatchPlayer> matchPlayers) {
-        if (rounds == null || x01Leg == null || matchPlayers == null) return;
+    private void processLegRounds(List<X01LegRound> rounds, X01Leg leg, List<X01MatchPlayer> players) {
+        if (rounds == null || leg == null || players == null) return;
 
         // Process and update player statistics based on the scores from all rounds
-        rounds.forEach(x01LegRound -> processRoundScores(x01LegRound.getScores(), x01Leg, x01LegRound, matchPlayers));
+        rounds.forEach(x01LegRound -> processRoundScores(x01LegRound.getScores(), leg, x01LegRound, players));
     }
 
     /**
      * Process and update player statistics based on the scores from a round
      *
      * @param roundScores  Map<ObjectId, X01LegRoundScore> the player scores made in a round
-     * @param x01Leg       {@link X01Leg} the leg from which the scores originate
-     * @param x01LegRound  {@link X01LegRound} the round from which the scores originate
-     * @param matchPlayers {@link List<X01MatchPlayer>} the players for which the statistics need to be updated
+     * @param leg       {@link X01Leg} the leg from which the scores originate
+     * @param legRound  {@link X01LegRound} the round from which the scores originate
+     * @param players {@link List<X01MatchPlayer>} the players for which the statistics need to be updated
      */
-    private void processRoundScores(Map<ObjectId, X01LegRoundScore> roundScores, X01Leg x01Leg, X01LegRound x01LegRound, List<X01MatchPlayer> matchPlayers) {
-        if (roundScores == null || x01Leg == null || x01LegRound == null || matchPlayers == null) return;
+    private void processRoundScores(Map<ObjectId, X01LegRoundScore> roundScores, X01Leg leg, X01LegRound legRound, List<X01MatchPlayer> players) {
+        if (roundScores == null || leg == null || legRound == null || players == null) return;
 
         // Update the player statistics for all players that scored in this round
         roundScores.forEach((playerId, roundScore) -> {
             // Find the player that scored this turn
-            Optional<X01MatchPlayer> playerOpt = findPlayerById(matchPlayers, playerId);
+            Optional<X01MatchPlayer> playerOpt = findPlayerById(players, playerId);
 
             // Check if the player from this turn exists.
             if (playerOpt.isPresent()) {
@@ -110,7 +109,7 @@ public class X01StatisticsServiceImpl implements IX01StatisticsService {
                 }
 
                 // Update the player statistics for the player that scored this turn
-                processPlayerScore(playerOpt.get(), x01Leg, x01LegRound, roundScore);
+                processPlayerScore(playerOpt.get(), leg, legRound, roundScore);
             }
         });
     }

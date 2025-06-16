@@ -10,7 +10,7 @@ public interface IX01MatchResultService {
 
     void updateSetResults(X01Match match);
 
-    List<ObjectId> getMatchWinners(X01Match x01Match);
+    List<ObjectId> getMatchWinners(X01Match match);
 
     java.util.Map<ObjectId, Long> getMatchStandings(X01Match match);
 

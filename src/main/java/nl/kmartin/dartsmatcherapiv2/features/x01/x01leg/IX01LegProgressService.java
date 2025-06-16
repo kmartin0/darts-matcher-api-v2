@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface IX01LegProgressService {
     Optional<X01LegRound> getLegRound(X01Leg leg, int roundNumber, boolean throwIfNotFound);
 
-    Optional<X01LegRound> getCurrentLegRound(X01Leg leg, List<X01MatchPlayer> matchPlayers);
+    Optional<X01LegRound> getCurrentLegRound(X01Leg leg, List<X01MatchPlayer> players);
 
     Optional<X01LegRound> createNextLegRound(X01Leg leg);
 
@@ -22,5 +22,5 @@ public interface IX01LegProgressService {
 
     Optional<X01LegRoundScore> getLastScoreForPlayer(X01Leg leg, ObjectId throwerId);
 
-    boolean isLegConcluded(X01Leg x01Leg);
+    boolean isLegConcluded(X01Leg leg);
 }
