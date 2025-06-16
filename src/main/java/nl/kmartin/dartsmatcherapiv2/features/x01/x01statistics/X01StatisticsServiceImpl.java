@@ -1,9 +1,9 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01statistics;
 
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01averagestatistics.IX01AverageStatisticsService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01checkoutstatistics.IX01CheckoutStatisticsService;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01scorestatistics.IX01ScoreStatisticsService;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;

@@ -1,5 +1,6 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01set;
 
+import nl.kmartin.dartsmatcherapiv2.features.x01.common.X01ValidationUtils;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Set;
 import org.bson.types.ObjectId;
@@ -35,7 +36,8 @@ public class X01SetServiceImpl implements IX01SetService {
      */
     @Override
     public ObjectId calcThrowsFirstInSet(int setNumber, List<X01MatchPlayer> players) {
-        if (players == null) return null;
+        if (X01ValidationUtils.isPlayersEmpty(players))
+            throw new IllegalArgumentException("Cannot calculate first thrower from a null or empty player list.");
 
         // Calculate the index of the player that starts the set
         int numOfPlayers = players.size();

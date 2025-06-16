@@ -3,7 +3,6 @@ package nl.kmartin.dartsmatcherapiv2.features.basematch.model;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import nl.kmartin.dartsmatcherapiv2.validators.noduplicatematchplayername.NoDuplicateMatchPlayerName;
@@ -14,7 +13,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public abstract class BaseMatch<PlayerType extends MatchPlayer> {
     @MongoId
@@ -30,7 +28,20 @@ public abstract class BaseMatch<PlayerType extends MatchPlayer> {
     @NotNull
     @Size(min = 1, max = 4)
     @NoDuplicateMatchPlayerName
-    private ArrayList<PlayerType> players;
+    private ArrayList<PlayerType> players = new ArrayList<>();
 
     private MatchType matchType;
+
+    public BaseMatch(ObjectId id, Instant startDate, Instant endDate, MatchStatus matchStatus, ArrayList<PlayerType> players, MatchType matchType) {
+        this.id = id;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.matchStatus = matchStatus;
+        this.setPlayers(players);
+        this.matchType = matchType;
+    }
+
+    public void setPlayers(@Valid @NotNull @Size(min = 1, max = 4) ArrayList<PlayerType> players) {
+        this.players = players != null ? players : new ArrayList<>();
+    }
 }

@@ -37,8 +37,6 @@ public class X01MatchSetupServiceImpl implements IX01MatchSetupService {
      * @param x01Match {@link X01Match} the match whose players need to be set up
      */
     private void setupMatchPlayers(X01Match x01Match) {
-        if (x01Match == null) return;
-
         // Generate a unique id for each player and set their statistics.
         x01Match.getPlayers().forEach(player -> {
             player.setPlayerId(new ObjectId());
@@ -52,8 +50,6 @@ public class X01MatchSetupServiceImpl implements IX01MatchSetupService {
      * @param x01Match {@link X01Match} the match whose type and status need to be set up
      */
     private void setMatchTypeAndStatus(X01Match x01Match) {
-        if (x01Match == null) return;
-
         // Set the match type to X01 and the status to IN_PLAY
         x01Match.setMatchType(MatchType.X01);
         x01Match.setMatchStatus(MatchStatus.IN_PLAY);
@@ -65,8 +61,6 @@ public class X01MatchSetupServiceImpl implements IX01MatchSetupService {
      * @param x01Match {@link X01Match} the match whose start and end date need to be initialized
      */
     private void setMatchDates(X01Match x01Match) {
-        if (x01Match == null) return;
-
         // Set the start date of the match to the current time in UTC and make sure the end date is not set.
         x01Match.setStartDate(Instant.now());
         x01Match.setEndDate(null);
@@ -79,8 +73,6 @@ public class X01MatchSetupServiceImpl implements IX01MatchSetupService {
      * @param x01Match {@link X01Match} the match whose progress needs to be set up
      */
     private void setupMatchProgress(X01Match x01Match) {
-        if (x01Match == null) return;
-
         // Initialize the sets list.
         x01Match.setSets(new ArrayList<>());
 

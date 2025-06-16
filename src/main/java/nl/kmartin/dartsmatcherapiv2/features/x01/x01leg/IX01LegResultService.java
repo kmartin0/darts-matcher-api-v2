@@ -1,7 +1,6 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01leg;
 
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Leg;
-import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01LegRound;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
 import org.bson.types.ObjectId;
 
@@ -14,5 +13,5 @@ public interface IX01LegResultService {
 
     int calculateRemainingScore(X01Leg leg, int x01, ObjectId playerId);
 
-    int calculateDartsUsed(List<X01LegRound> rounds, ObjectId playerId);
+    int calculateDartsUsed(X01Leg leg, ObjectId playerId);
 }

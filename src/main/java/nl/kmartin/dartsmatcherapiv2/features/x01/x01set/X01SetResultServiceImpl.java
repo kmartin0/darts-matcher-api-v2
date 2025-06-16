@@ -2,6 +2,7 @@ package nl.kmartin.dartsmatcherapiv2.features.x01.x01set;
 
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.MatchPlayer;
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.ResultType;
+import nl.kmartin.dartsmatcherapiv2.features.x01.common.X01ValidationUtils;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Leg;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Set;
@@ -10,6 +11,7 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegResultService;
 import nl.kmartin.dartsmatcherapiv2.utils.StandingsUtils;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,7 +39,12 @@ public class X01SetResultServiceImpl implements IX01SetResultService {
      */
     @Override
     public void updateSetResult(X01Set x01Set, int bestOfLegs, List<X01MatchPlayer> players, int x01) {
-        if (x01Set == null || players == null) return;
+        // If the set is null exit early, if the players are null clear the set result and exit early.
+        if (x01Set == null) return;
+        if (X01ValidationUtils.isPlayersEmpty(players)) {
+            x01Set.setResult(null);
+            return;
+        }
 
         updateLegResults(x01Set, players, x01);
 
@@ -72,7 +79,7 @@ public class X01SetResultServiceImpl implements IX01SetResultService {
      */
     @Override
     public void updateLegResults(X01Set set, List<X01MatchPlayer> players, int x01) {
-        if (set == null || players == null) return;
+        if (X01ValidationUtils.isLegsEmpty(set)) return;
 
         // For each leg update the leg result.
         set.getLegs().forEach(x01Leg -> legResultService.updateLegResult(x01Leg, players, x01));
@@ -89,6 +96,9 @@ public class X01SetResultServiceImpl implements IX01SetResultService {
      */
     @Override
     public List<ObjectId> getSetWinners(X01Set x01Set, int bestOfLegs, List<X01MatchPlayer> players) {
+        if (X01ValidationUtils.isLegsEmpty(x01Set) || X01ValidationUtils.isPlayersEmpty(players))
+            return Collections.emptyList();
+
         // Get the standings for the set.
         Map<ObjectId, Long> setStandings = getSetStandings(x01Set, players);
 
@@ -106,7 +116,7 @@ public class X01SetResultServiceImpl implements IX01SetResultService {
      */
     @Override
     public Map<ObjectId, Long> getSetStandings(X01Set set, List<X01MatchPlayer> players) {
-        if (set == null || players == null) return null;
+        if (set == null || X01ValidationUtils.isPlayersEmpty(players)) return Collections.emptyMap();
 
         // Initialize standings map with all players and 0 wins
         Map<ObjectId, Long> standings = players.stream()
@@ -128,12 +138,12 @@ public class X01SetResultServiceImpl implements IX01SetResultService {
      * This is useful for cleaning up any trailing legs after a set winner has
      * already been decided, which may happen after score edits or corrections.
      *
-     * @param legs       {@link List<X01Leg>} the list of legs to be potentially modified
+     * @param set        {@link List<X01Leg>} the set to be potentially modified
      * @param setWinners {@link List<ObjectId>} the list of player IDs who have won (or drawn) the set
      */
     @Override
     public void removeLegsAfterSetWinner(X01Set set, List<ObjectId> setWinners) {
-        if (set == null || set.getLegs().isEmpty() || setWinners == null || setWinners.isEmpty()) return;
+        if (X01ValidationUtils.isLegsEmpty(set) || CollectionUtils.isEmpty(setWinners)) return;
 
         List<X01Leg> reverseLegs = new ArrayList<>(set.getLegs());
         Collections.reverse(reverseLegs);
@@ -154,7 +164,7 @@ public class X01SetResultServiceImpl implements IX01SetResultService {
      */
     private int calcRemainingLegs(int bestOfLegs, X01Set x01Set) {
         // If the set or legs don't exist, the remaining legs are the maximum number of legs to be played
-        if (x01Set == null || x01Set.getLegs() == null) return bestOfLegs;
+        if (X01ValidationUtils.isLegsEmpty(x01Set)) return bestOfLegs;
 
         // Count the number of completed legs (legs with a winner)
         long completedLegs = x01Set.getLegs().stream()

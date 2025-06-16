@@ -1,6 +1,7 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service;
 
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceNotFoundException;
+import nl.kmartin.dartsmatcherapiv2.features.x01.common.X01ValidationUtils;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegProgressService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leground.IX01LegRoundService;
@@ -42,7 +43,7 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
     public Optional<X01Set> getSet(X01Match match, int setNumber, boolean throwIfNotFound) {
         ResourceNotFoundException notFoundException = new ResourceNotFoundException(X01Set.class, setNumber);
 
-        if (match == null || match.getSets() == null || setNumber < 1) {
+        if (X01ValidationUtils.isSetsEmpty(match) || setNumber < 1) {
             if (throwIfNotFound) throw notFoundException;
             else return Optional.empty();
         }
@@ -62,7 +63,7 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
      */
     @Override
     public Optional<X01Set> getCurrentSet(X01Match match) {
-        if (match == null) return Optional.empty();
+        if (X01ValidationUtils.isSetsEmpty(match)) return Optional.empty();
 
         return match.getSets().stream()
                 .filter(set -> set.getResult() == null || set.getResult().isEmpty()) // Set without result
@@ -100,7 +101,7 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
      */
     @Override
     public Set<Integer> getSetNumbers(X01Match match) {
-        if (match == null) return null;
+        if (X01ValidationUtils.isSetsEmpty(match)) return Collections.emptySet();
 
         // Map the set numbers and collect to an set of integers
         return match.getSets().stream()
@@ -120,7 +121,6 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
         if (x01Match == null) return Optional.empty();
 
         // First find the current set in the active list of sets.
-        int bestOfSets = x01Match.getMatchSettings().getBestOf().getSets();
         Optional<X01Set> curSet = getCurrentSet(x01Match);
 
         // If there is no current set and the match isn't concluded, create the next set.
@@ -184,6 +184,41 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
 
         // When all players have a result the match is concluded
         return x01Match.getPlayers().stream().allMatch(player -> player.getResultType() != null);
+    }
+
+    /**
+     * Removes the most last added score from a list of sets.
+     * While traversing also cleans up empty rounds, legs or sets.
+     *
+     * @param sets {@link X01Set} The list of sets to remove the last score from.
+     */
+    @Override
+    public void deleteLastScore(X01Match match) {
+        if (match == null) return;
+
+        List<X01Set> setsReverse = new ArrayList<>(match.getSets());
+        Collections.reverse(setsReverse);
+
+        // Iterate the sets, legs and rounds in reverse order to remove the last score and empty rounds, legs or sets.
+        // Stops after the first removal of a score.
+        outer:
+        for (X01Set set : setsReverse) {
+            List<X01Leg> legsReverse = new ArrayList<>(set.getLegs());
+            Collections.reverse(legsReverse);
+
+            for (X01Leg leg : legsReverse) {
+                List<X01LegRound> legRoundsReverse = new ArrayList<>(leg.getRounds());
+                Collections.reverse(legRoundsReverse);
+
+                for (X01LegRound legRound : legRoundsReverse) {
+                    boolean removed = legRoundService.removeLastScoreFromRound(legRound);
+                    if (legRound.getScores().isEmpty()) leg.getRounds().remove(legRound);
+                    if (leg.getRounds().isEmpty()) set.getLegs().remove(leg);
+                    if (set.getLegs().isEmpty()) match.getSets().remove(set);
+                    if (removed) break outer;
+                }
+            }
+        }
     }
 
     /**

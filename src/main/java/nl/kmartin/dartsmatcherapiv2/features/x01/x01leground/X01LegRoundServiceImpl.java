@@ -1,5 +1,6 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01leground;
 
+import nl.kmartin.dartsmatcherapiv2.features.x01.common.X01ValidationUtils;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01LegRound;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01LegRoundScore;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
@@ -26,7 +27,7 @@ public class X01LegRoundServiceImpl implements IX01LegRoundService {
      */
     @Override
     public ObjectId getCurrentThrowerInRound(X01LegRound x01LegRound, ObjectId throwsFirstInLeg, List<X01MatchPlayer> players) {
-        if (x01LegRound == null || x01LegRound.getScores() == null || players == null) return null;
+        if (x01LegRound == null || players == null) return null;
 
         // Get the players who haven't scored yet in this round
         List<X01MatchPlayer> playersToThrow = getPlayersToThrowInRound(x01LegRound, players);
@@ -55,7 +56,7 @@ public class X01LegRoundServiceImpl implements IX01LegRoundService {
      */
     @Override
     public List<X01MatchPlayer> getPlayersToThrowInRound(X01LegRound x01LegRound, List<X01MatchPlayer> players) {
-        if (x01LegRound == null || x01LegRound.getScores() == null || players == null) return null;
+        if (x01LegRound == null || X01ValidationUtils.isPlayersEmpty(players)) return Collections.emptyList();
 
         // Find players that haven't scored and map to a list.
         return players.stream()
@@ -97,6 +98,8 @@ public class X01LegRoundServiceImpl implements IX01LegRoundService {
      */
     @Override
     public boolean removeLastScoreFromRound(X01LegRound legRound) {
+        if (X01ValidationUtils.isScoresEmpty(legRound)) return false;
+
         // Create a list of the score keys and reverse it to have the last score first.
         Map<ObjectId, X01LegRoundScore> scores = legRound.getScores();
         List<ObjectId> reverseKeys = new ArrayList<>(scores.keySet());

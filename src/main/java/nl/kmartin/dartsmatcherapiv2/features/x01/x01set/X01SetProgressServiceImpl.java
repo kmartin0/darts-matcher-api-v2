@@ -1,6 +1,7 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01set;
 
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceNotFoundException;
+import nl.kmartin.dartsmatcherapiv2.features.x01.common.X01ValidationUtils;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Leg;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Set;
@@ -32,7 +33,7 @@ public class X01SetProgressServiceImpl implements IX01SetProgressService {
     public Optional<X01Leg> getLeg(X01Set set, int legNumber, boolean throwIfNotFound) {
         ResourceNotFoundException notFoundException = new ResourceNotFoundException(X01Leg.class, legNumber);
 
-        if (set == null || legNumber < 0) {
+        if (X01ValidationUtils.isLegsEmpty(set) || legNumber < 1) {
             if (throwIfNotFound) throw notFoundException;
             else return Optional.empty();
         }
@@ -52,7 +53,7 @@ public class X01SetProgressServiceImpl implements IX01SetProgressService {
      */
     @Override
     public Optional<X01Leg> getCurrentLeg(X01Set set) {
-        if (set == null) return Optional.empty();
+        if (X01ValidationUtils.isLegsEmpty(set)) return Optional.empty();
 
         return set.getLegs().stream()
                 .filter(leg -> leg.getWinner() == null) // get legs without result
@@ -70,7 +71,7 @@ public class X01SetProgressServiceImpl implements IX01SetProgressService {
      */
     @Override
     public Optional<X01Leg> createNextLeg(X01Set set, List<X01MatchPlayer> players, int bestOfLegs, ObjectId throwsFirstInSet) {
-        if (set == null || set.getLegs() == null) return Optional.empty();
+        if (set == null) return Optional.empty();
 
         // Get existing leg numbers
         Set<Integer> existingLetNumbers = getLegNumbers(set);
@@ -93,7 +94,7 @@ public class X01SetProgressServiceImpl implements IX01SetProgressService {
      */
     @Override
     public Set<Integer> getLegNumbers(X01Set set) {
-        if (set == null) return null;
+        if (X01ValidationUtils.isLegsEmpty(set)) return Collections.emptySet();
 
         // Map the leg numbers and collect to an integer set
         return set.getLegs().stream()
@@ -110,7 +111,7 @@ public class X01SetProgressServiceImpl implements IX01SetProgressService {
      */
     @Override
     public boolean isSetConcluded(X01Set x01Set, List<X01MatchPlayer> players) {
-        if (x01Set == null || x01Set.getResult() == null) return false;
+        if (x01Set == null || x01Set.getResult() == null || X01ValidationUtils.isPlayersEmpty(players)) return false;
 
         return players.stream().allMatch(player -> x01Set.getResult().get(player.getPlayerId()) != null);
     }

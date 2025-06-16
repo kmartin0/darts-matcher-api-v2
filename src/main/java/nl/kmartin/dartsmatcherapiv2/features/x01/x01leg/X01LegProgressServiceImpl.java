@@ -1,6 +1,7 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01leg;
 
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceNotFoundException;
+import nl.kmartin.dartsmatcherapiv2.features.x01.common.X01ValidationUtils;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Leg;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01LegRound;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01LegRoundScore;
@@ -27,7 +28,7 @@ public class X01LegProgressServiceImpl implements IX01LegProgressService {
         ResourceNotFoundException notFoundException = new ResourceNotFoundException(X01LegRound.class, roundNumber);
 
         // If the round can't exist. Early exit.
-        if (leg == null || leg.getRounds() == null || roundNumber < 0) {
+        if (X01ValidationUtils.isRoundsEmpty(leg) || roundNumber < 1) {
             if (throwIfNotFound) throw notFoundException;
             else return Optional.empty();
         }
@@ -40,7 +41,6 @@ public class X01LegProgressServiceImpl implements IX01LegProgressService {
         return round;
     }
 
-    @Override
     /**
      * Finds the lowest-numbered round which does not have a score for all players.
      *
@@ -48,8 +48,9 @@ public class X01LegProgressServiceImpl implements IX01LegProgressService {
      * @param matchPlayers {@link List<X01MatchPlayer>} representing the players of the match.
      * @return {@link Optional<X01LegRound>} the lowest round in play, otherwise empty.
      */
+    @Override
     public Optional<X01LegRound> getCurrentLegRound(X01Leg leg, List<X01MatchPlayer> matchPlayers) {
-        if (leg == null || matchPlayers == null) return Optional.empty();
+        if (X01ValidationUtils.isRoundsEmpty(leg) || X01ValidationUtils.isPlayersEmpty(matchPlayers)) return Optional.empty();
 
         // Filter rounds with missing player scores and get the lowest round number.
         return leg.getRounds().stream()
@@ -88,7 +89,7 @@ public class X01LegProgressServiceImpl implements IX01LegProgressService {
      */
     @Override
     public Set<Integer> getLegRoundNumbers(X01Leg leg) {
-        if (leg == null) return null;
+        if (X01ValidationUtils.isRoundsEmpty(leg)) return Collections.emptySet();
 
         // Map all round numbers to a set of integers.
         return leg.getRounds().stream()
@@ -104,7 +105,7 @@ public class X01LegProgressServiceImpl implements IX01LegProgressService {
      */
     @Override
     public Optional<X01LegRound> getLastRound(X01Leg leg) {
-        if (leg == null) return Optional.empty();
+        if (X01ValidationUtils.isRoundsEmpty(leg)) return Optional.empty();
 
         return leg.getRounds().stream().max(Comparator.comparingInt(X01LegRound::getRound));
     }
@@ -118,6 +119,8 @@ public class X01LegProgressServiceImpl implements IX01LegProgressService {
      */
     @Override
     public Optional<X01LegRoundScore> getLastScoreForPlayer(X01Leg leg, ObjectId throwerId) {
+        if(X01ValidationUtils.isRoundsEmpty(leg) || throwerId == null) return Optional.empty();
+
         // Find the rounds containing a score for the player
         List<X01LegRound> playerRounds = leg.getRounds().stream().filter(round -> round.getScores().containsKey(throwerId)).toList();
 

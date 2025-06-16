@@ -7,8 +7,6 @@ import nl.kmartin.dartsmatcherapiv2.features.basematch.model.PlayerType;
 import nl.kmartin.dartsmatcherapiv2.features.dartboard.model.DartThrow;
 import nl.kmartin.dartsmatcherapiv2.features.dartboard.model.DartboardSectionArea;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
-
-
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegResultService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service.IX01MatchProgressService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service.IX01MatchService;
@@ -110,7 +108,7 @@ public class X01DartBotServiceImpl implements IX01DartBotService {
         int legScored = x01 - legResultService.calculateRemainingScore(currentLeg, x01, dartBotPlayer.getPlayerId());
 
         // Calculate the number of darts used by the dart bot in the current leg
-        int dartsUsed = legResultService.calculateDartsUsed(currentLeg.getRounds(), dartBotPlayer.getPlayerId());
+        int dartsUsed = legResultService.calculateDartsUsed(currentLeg, dartBotPlayer.getPlayerId());
 
         // Calculate the 1-dart average of the dart bot in the current leg
         double targetOneDartAvg = (double) dartBotPlayer.getX01DartBotSettings().getThreeDartAverage() / Constants.NUM_OF_DARTS_IN_A_ROUND;

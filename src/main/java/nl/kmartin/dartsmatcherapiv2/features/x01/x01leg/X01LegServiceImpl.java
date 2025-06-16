@@ -2,6 +2,7 @@ package nl.kmartin.dartsmatcherapiv2.features.x01.x01leg;
 
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.InvalidArgumentsException;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.response.TargetError;
+import nl.kmartin.dartsmatcherapiv2.features.x01.common.X01ValidationUtils;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Leg;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01LegRound;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01LegRoundScore;
@@ -95,6 +96,8 @@ public class X01LegServiceImpl implements IX01LegService {
      */
     @Override
     public void checkLegEditable(X01Leg x01Leg, ObjectId playerId) {
+        if (x01Leg == null) return;
+
         // If the leg is already won by another player the turn cannot be modified.
         if (legProgressService.isLegConcluded(x01Leg) && !Objects.equals(x01Leg.getWinner(), playerId)) {
             throw new InvalidArgumentsException(new TargetError("score", messageResolver.getMessage(MessageKeys.MESSAGE_LEG_ALREADY_WON)));
@@ -155,17 +158,19 @@ public class X01LegServiceImpl implements IX01LegService {
      */
     @Override
     public ObjectId calcThrowsFirstInLeg(int legNumber, ObjectId throwsFirstInSet, List<X01MatchPlayer> players) {
-        if (players == null) return null;
+        if (X01ValidationUtils.isPlayersEmpty(players)) {
+            throw new IllegalArgumentException("Cannot calculate first thrower from a null or empty player list.");
+        }
 
         // Get the index of the player that starts the set
         int numOfPlayers = players.size();
-        int startingIndexOfSet = IntStream.range(0, numOfPlayers)
+        int startingIndexForSet = IntStream.range(0, numOfPlayers)
                 .filter(i -> players.get(i).getPlayerId().equals(throwsFirstInSet))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Set starter not found in player list."));
 
         // Calculate the first thrower for this leg
-        int throwsFirstIndex = (startingIndexOfSet + (legNumber - 1)) % numOfPlayers;
+        int throwsFirstIndex = (startingIndexForSet + (legNumber - 1)) % numOfPlayers;
         return players.get(throwsFirstIndex).getPlayerId();
     }
 

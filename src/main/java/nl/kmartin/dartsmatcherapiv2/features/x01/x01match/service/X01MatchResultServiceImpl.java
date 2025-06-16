@@ -3,6 +3,7 @@ package nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service;
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.MatchPlayer;
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.MatchStatus;
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.ResultType;
+import nl.kmartin.dartsmatcherapiv2.features.x01.common.X01ValidationUtils;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Match;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Set;
@@ -11,6 +12,7 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.x01set.IX01SetResultService;
 import nl.kmartin.dartsmatcherapiv2.utils.StandingsUtils;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -63,7 +65,7 @@ public class X01MatchResultServiceImpl implements IX01MatchResultService {
      */
     @Override
     public void updateSetResults(X01Match match) {
-        if (match == null || match.getSets() == null || match.getPlayers() == null) return;
+        if (X01ValidationUtils.isSetsEmpty(match)) return;
 
         List<X01MatchPlayer> players = match.getPlayers();
         int x01 = match.getMatchSettings().getX01();
@@ -82,10 +84,10 @@ public class X01MatchResultServiceImpl implements IX01MatchResultService {
      */
     @Override
     public List<ObjectId> getMatchWinners(X01Match x01Match) {
-        if (x01Match == null) return new ArrayList<>();
+        if (x01Match == null) return Collections.emptyList();
 
         // Get the standings for the match.
-        Map<ObjectId, Long> matchStandings = getMatchStandings(x01Match, x01Match.getPlayers());
+        Map<ObjectId, Long> matchStandings = getMatchStandings(x01Match);
 
         // Get the player(s) that have won the match
         int remainingSets = calcRemainingSets(x01Match);
@@ -96,15 +98,14 @@ public class X01MatchResultServiceImpl implements IX01MatchResultService {
      * Determines the number of sets each player has won for a given match
      *
      * @param match   {@link X01Match} the match for which standings need to be calculated
-     * @param players {@link List<X01MatchPlayer>} the list of match players
      * @return Map<ObjectId, Long> containing the number of sets each player has won
      */
     @Override
-    public Map<ObjectId, Long> getMatchStandings(X01Match match, List<X01MatchPlayer> players) {
-        if (match == null || match.getSets() == null || players == null) return new HashMap<>();
+    public Map<ObjectId, Long> getMatchStandings(X01Match match) {
+        if (match == null) return new HashMap<>();
 
         // Initialize standings map with all players and 0 wins
-        Map<ObjectId, Long> standings = players.stream()
+        Map<ObjectId, Long> standings = match.getPlayers().stream()
                 .collect(Collectors.toMap(MatchPlayer::getPlayerId, player -> 0L));
 
         // Update the map with the number of wins from the sets for each player
@@ -130,7 +131,7 @@ public class X01MatchResultServiceImpl implements IX01MatchResultService {
      */
     @Override
     public void removeSetsAfterWinner(X01Match match, List<ObjectId> matchWinners) {
-        if (match == null || match.getSets().isEmpty() || matchWinners == null || matchWinners.isEmpty()) return;
+        if (X01ValidationUtils.isSetsEmpty(match) || CollectionUtils.isEmpty(matchWinners)) return;
 
         List<X01Set> setsReverse = new ArrayList<>(match.getSets());
         Collections.reverse(setsReverse);
@@ -153,9 +154,7 @@ public class X01MatchResultServiceImpl implements IX01MatchResultService {
      * @return int the maximum number of sets that can still be played
      */
     private int calcRemainingSets(X01Match match) {
-        // If the match or its sets are null, return the current best-of sets value.
-        int bestOfSets = match.getMatchSettings().getBestOf().getSets();
-        if (match == null || match.getSets() == null) return bestOfSets;
+        if (match == null) return 0;
 
         // Count the number of concluded sets
         long completedSets = match.getSets().stream()
@@ -163,6 +162,7 @@ public class X01MatchResultServiceImpl implements IX01MatchResultService {
                 .count();
 
         // Determine the number of remaining sets and return them. Ensuring they are not negative.
+        int bestOfSets = match.getMatchSettings().getBestOf().getSets();
         int remainingSets = bestOfSets - (int) completedSets;
         return Math.max(remainingSets, 0);
     }

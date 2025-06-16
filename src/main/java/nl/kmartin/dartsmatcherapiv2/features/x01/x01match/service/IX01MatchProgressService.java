@@ -24,5 +24,7 @@ public interface IX01MatchProgressService {
 
     boolean isMatchConcluded(X01Match x01Match);
 
+    void deleteLastScore(X01Match match);
+
     void updateMatchProgress(X01Match x01Match);
 }

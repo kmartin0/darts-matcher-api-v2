@@ -6,17 +6,14 @@ import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceNotFoundE
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leground.IX01LegRoundService;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01set.IX01SetProgressService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.api.IX01MatchRepository;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01matchsetup.IX01MatchSetupService;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01set.IX01SetProgressService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01statistics.IX01StatisticsService;
 import org.bson.types.ObjectId;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -137,7 +134,7 @@ public class X01MatchServiceImpl implements IX01MatchService {
         X01Match x01Match = this.getMatch(x01DeleteLastTurn.getMatchId());
 
         // Delete the last round score
-        deleteLastScore(x01Match);
+        matchProgressService.deleteLastScore(x01Match);
 
         // Save the updated match to the repository.
         return saveMatch(x01Match);
@@ -161,40 +158,6 @@ public class X01MatchServiceImpl implements IX01MatchService {
 
         // Validate and add the score to the round.
         legService.addScore(x01Match.getMatchSettings().getX01(), x01Leg, roundNumber, roundScore, x01Match.getPlayers(), throwerId);
-    }
-
-    /**
-     * Removes the most last added score from a list of sets.
-     * While traversing also cleans up empty rounds, legs or sets.
-     *
-     * @param sets {@link X01Set} The list of sets to remove the last score from.
-     */
-    private void deleteLastScore(X01Match match) {
-        if (match == null) return;
-
-        List<X01Set> setsReverse = new ArrayList<>(match.getSets());
-        Collections.reverse(setsReverse);
-
-        // Iterate the sets, legs and rounds in reverse order to remove the last score and empty rounds, legs or sets.
-        // Stops after the first removal of a score.
-        outer:
-        for (X01Set set : setsReverse) {
-            List<X01Leg> legsReverse = new ArrayList<>(set.getLegs());
-            Collections.reverse(legsReverse);
-
-            for (X01Leg leg : legsReverse) {
-                List<X01LegRound> legRoundsReverse = new ArrayList<>(leg.getRounds());
-                Collections.reverse(legRoundsReverse);
-
-                for (X01LegRound legRound : legRoundsReverse) {
-                    boolean removed = legRoundService.removeLastScoreFromRound(legRound);
-                    if (legRound.getScores().isEmpty()) leg.getRounds().remove(legRound);
-                    if (leg.getRounds().isEmpty()) set.getLegs().remove(leg);
-                    if (set.getLegs().isEmpty()) match.getSets().remove(set);
-                    if (removed) break outer;
-                }
-            }
-        }
     }
 
     /**
