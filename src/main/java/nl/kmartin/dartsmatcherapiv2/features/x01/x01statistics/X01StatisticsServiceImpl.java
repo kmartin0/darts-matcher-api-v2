@@ -1,9 +1,9 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01statistics;
 
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01averagestatistics.IX01AverageStatisticsService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01checkoutstatistics.IX01CheckoutStatisticsService;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01scorestatistics.IX01ScoreStatisticsService;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
@@ -50,7 +50,7 @@ public class X01StatisticsServiceImpl implements IX01StatisticsService {
      * Process and update the player statistics from the data of all the sets
      *
      * @param sets   {@link List<X01Set>} the list of sets containing the player turns
-     * @param {@link List<X01MatchPlayer>} the players for which the statistics need to be updated
+     * @param matchPlayers {@link List<X01MatchPlayer>} the players for which the statistics need to be updated
      */
     private void processSets(List<X01Set> sets, List<X01MatchPlayer> matchPlayers) {
         if (sets == null || matchPlayers == null) return;
@@ -62,8 +62,8 @@ public class X01StatisticsServiceImpl implements IX01StatisticsService {
     /**
      * Process and update the player statistics using the data of all the legs
      *
-     * @param sets   {@link List<X01Leg>} the list of legs containing the player turns
-     * @param {@link List<X01MatchPlayer>} the players for which the statistics need to be updated
+     * @param legs   {@link List<X01Leg>} the list of legs containing the player turns
+     * @param matchPlayers {@link List<X01MatchPlayer>} the players for which the statistics need to be updated
      */
     private void processLegs(List<X01Leg> legs, List<X01MatchPlayer> matchPlayers) {
         if (legs == null || matchPlayers == null) return;

@@ -7,9 +7,11 @@ import nl.kmartin.dartsmatcherapiv2.features.basematch.model.PlayerType;
 import nl.kmartin.dartsmatcherapiv2.features.dartboard.model.DartThrow;
 import nl.kmartin.dartsmatcherapiv2.features.dartboard.model.DartboardSectionArea;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01leground.IX01LegRoundService;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.IX01MatchService;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01matchprogress.IX01MatchProgressService;
+
+
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegResultService;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service.IX01MatchProgressService;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service.IX01MatchService;
 import nl.kmartin.dartsmatcherapiv2.utils.Constants;
 import nl.kmartin.dartsmatcherapiv2.utils.MessageKeys;
 import nl.kmartin.dartsmatcherapiv2.utils.MessageResolver;
@@ -22,21 +24,20 @@ import java.util.concurrent.ThreadLocalRandom;
 @Service
 public class X01DartBotServiceImpl implements IX01DartBotService {
 
-    private final IX01MatchService x01MatchService;
-    private final IX01MatchProgressService x01MatchProgressService;
-    private final IX01LegRoundService x01LegRoundService;
+    private final IX01MatchService matchService;
+    private final IX01MatchProgressService matchProgressService;
     private final IX01DartBotThrowSimulator dartBotThrowSimulatorService;
     private final MessageResolver messageResolver;
+    private final IX01LegResultService legResultService;
 
-    public X01DartBotServiceImpl(IX01MatchService x01MatchService,
-                                 IX01MatchProgressService x01MatchProgressService,
-                                 IX01LegRoundService x01LegRoundService,
-                                 IX01DartBotThrowSimulator dartBotThrowSimulatorService, MessageResolver messageResolver) {
-        this.x01MatchService = x01MatchService;
-        this.x01MatchProgressService = x01MatchProgressService;
-        this.x01LegRoundService = x01LegRoundService;
+    public X01DartBotServiceImpl(IX01MatchService matchService,
+                                 IX01MatchProgressService matchProgressService,
+                                 IX01DartBotThrowSimulator dartBotThrowSimulatorService, MessageResolver messageResolver, IX01LegResultService legResultService) {
+        this.matchService = matchService;
+        this.matchProgressService = matchProgressService;
         this.dartBotThrowSimulatorService = dartBotThrowSimulatorService;
         this.messageResolver = messageResolver;
+        this.legResultService = legResultService;
     }
 
     /**
@@ -53,12 +54,12 @@ public class X01DartBotServiceImpl implements IX01DartBotService {
     @Override
     public X01Turn createDartBotTurn(@NotNull ObjectId matchId) {
         // Get the match and dart bot for this turn.
-        X01Match match = x01MatchService.getMatch(matchId);
+        X01Match match = matchService.getMatch(matchId);
         X01MatchPlayer dartBotPlayer = getCurrentDartBotPlayer(match);
 
         // Get the current leg for the match.
-        X01Set currentSet = x01MatchProgressService.getCurrentSetOrCreate(match).orElse(null);
-        X01Leg currentLeg = x01MatchProgressService.getCurrentLegOrCreate(match, currentSet)
+        X01Set currentSet = matchProgressService.getCurrentSetOrCreate(match).orElse(null);
+        X01Leg currentLeg = matchProgressService.getCurrentLegOrCreate(match, currentSet)
                 .orElseThrow(() -> new InvalidArgumentsException(new TargetError("currentLeg", messageResolver.getMessage(MessageKeys.EXCEPTION_INVALID_ARGUMENTS))));
 
         // Create the round score object for this turn.
@@ -106,10 +107,10 @@ public class X01DartBotServiceImpl implements IX01DartBotService {
         int x01 = match.getMatchSettings().getX01();
 
         // Calculate the score already score by the dart bot in the current leg
-        int legScored = x01 - x01LegRoundService.calculateRemainingScore(x01, currentLeg.getRounds(), dartBotPlayer.getPlayerId());
+        int legScored = x01 - legResultService.calculateRemainingScore(currentLeg, x01, dartBotPlayer.getPlayerId());
 
         // Calculate the number of darts used by the dart bot in the current leg
-        int dartsUsed = x01LegRoundService.calculateDartsUsed(currentLeg.getRounds(), dartBotPlayer.getPlayerId());
+        int dartsUsed = legResultService.calculateDartsUsed(currentLeg.getRounds(), dartBotPlayer.getPlayerId());
 
         // Calculate the 1-dart average of the dart bot in the current leg
         double targetOneDartAvg = (double) dartBotPlayer.getX01DartBotSettings().getThreeDartAverage() / Constants.NUM_OF_DARTS_IN_A_ROUND;

@@ -7,34 +7,17 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
 import org.bson.types.ObjectId;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 public interface IX01LegService {
+    X01Leg createNewLeg(int legNumber, ObjectId throwsFirstInSet, List<X01MatchPlayer> players);
 
     void addScore(int x01, X01Leg x01Leg, int roundNumber, X01LegRoundScore x01LegRoundScore, List<X01MatchPlayer> matchPlayers, ObjectId throwerId);
 
-    Optional<X01Leg> getCurrentLeg(List<X01Leg> legs);
-
-    Optional<X01Leg> createNextLeg(List<X01Leg> legs, List<X01MatchPlayer> players, int bestOfLegs, ObjectId throwsFirstInSet);
-
-    X01Leg createNewLeg(int legNumber, ObjectId throwsFirstInSet, List<X01MatchPlayer> players);
-
-    Set<Integer> getLegNumbers(List<X01Leg> legs);
-
-    ObjectId calcThrowsFirstInLeg(int legNumber, ObjectId throwsFirstInSet, List<X01MatchPlayer> players);
-
-    boolean isLegConcluded(X01Leg x01Leg);
-
-    Optional<X01Leg> getLeg(List<X01Leg> legs, int legNumber, boolean throwIfNotFound);
-
     void checkLegEditable(X01Leg x01Leg, ObjectId playerId);
-
-    void updateLegResults(List<X01Leg> legs, List<X01MatchPlayer> players, int x01);
-
-    void updateLegResult(X01Leg leg, List<X01MatchPlayer> players, int x01);
 
     boolean isScoreCheckout(X01Leg x01Leg, X01LegRound x01LegRound, ObjectId playerId);
 
-    void removeLegsAfterSetWinner(List<X01Leg> legs, List<ObjectId> setWinners);
+    boolean validateLegForPlayer(X01Leg leg, int x01, ObjectId throwerId);
+
+    ObjectId calcThrowsFirstInLeg(int legNumber, ObjectId throwsFirstInSet, List<X01MatchPlayer> players);
 }

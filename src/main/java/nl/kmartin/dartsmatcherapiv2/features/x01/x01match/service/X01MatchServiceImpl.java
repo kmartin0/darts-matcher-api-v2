@@ -1,4 +1,4 @@
-package nl.kmartin.dartsmatcherapiv2.features.x01.x01match;
+package nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -6,35 +6,44 @@ import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceNotFoundE
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leground.IX01LegRoundService;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01matchprogress.IX01MatchProgressService;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01set.IX01SetProgressService;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.api.IX01MatchRepository;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01matchsetup.IX01MatchSetupService;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01set.IX01SetService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01statistics.IX01StatisticsService;
 import org.bson.types.ObjectId;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Service
+@Primary
 public class X01MatchServiceImpl implements IX01MatchService {
+
     private final IX01MatchRepository x01matchRepository;
     private final IX01MatchSetupService matchSetupService;
-    private final IX01LegService legService;
-    private final IX01SetService setService;
-    private final IX01LegRoundService legRoundService;
-    private final IX01StatisticsService statisticsService;
+    private final IX01MatchResultService matchResultService;
     private final IX01MatchProgressService matchProgressService;
+    private final IX01StatisticsService statisticsService;
+    private final IX01SetProgressService setProgressService;
+    private final IX01LegService legService;
+    private final IX01LegRoundService legRoundService;
 
     public X01MatchServiceImpl(IX01MatchRepository x01matchRepository, IX01MatchSetupService matchSetupService,
-                               IX01SetService setService, IX01LegService legService, IX01LegRoundService legRoundService,
-                               IX01StatisticsService statisticsService, IX01MatchProgressService matchProgressService) {
+                               IX01MatchResultService matchResultService, IX01MatchProgressService matchProgressService,
+                               IX01StatisticsService statisticsService, IX01SetProgressService setProgressService,
+                               IX01LegService legService, IX01LegRoundService legRoundService) {
         this.x01matchRepository = x01matchRepository;
         this.matchSetupService = matchSetupService;
-        this.setService = setService;
+        this.matchResultService = matchResultService;
+        this.matchProgressService = matchProgressService;
+        this.statisticsService = statisticsService;
+        this.setProgressService = setProgressService;
         this.legService = legService;
         this.legRoundService = legRoundService;
-        this.statisticsService = statisticsService;
-        this.matchProgressService = matchProgressService;
     }
 
     /**
@@ -104,13 +113,11 @@ public class X01MatchServiceImpl implements IX01MatchService {
         X01Match x01Match = this.getMatch(x01EditTurn.getMatchId());
 
         // Get the leg that contains the round.
-        Optional<X01Leg> legOpt = setService.getSet(x01Match.getSets(), x01EditTurn.getSet(), true)
-                .flatMap(set -> legService.getLeg(set.getLegs(), x01EditTurn.getLeg(), true));
+        Optional<X01Leg> legOpt = matchProgressService.getSet(x01Match, x01EditTurn.getSet(), true)
+                .flatMap(set -> setProgressService.getLeg(set, x01EditTurn.getLeg(), true));
 
         // Replace the current score with the updated turn
-        if (legOpt.isPresent()) {
-            addTurnToRound(x01Match, legOpt.get(), x01EditTurn.getRound(), x01EditTurn, x01EditTurn.getPlayerId());
-        }
+        legOpt.ifPresent(x01Leg -> addTurnToRound(x01Match, x01Leg, x01EditTurn.getRound(), x01EditTurn, x01EditTurn.getPlayerId()));
 
         // Save the updated match to the repository.
         return saveMatch(x01Match);
@@ -130,7 +137,7 @@ public class X01MatchServiceImpl implements IX01MatchService {
         X01Match x01Match = this.getMatch(x01DeleteLastTurn.getMatchId());
 
         // Delete the last round score
-        setService.deleteLastScore(x01Match.getSets());
+        deleteLastScore(x01Match);
 
         // Save the updated match to the repository.
         return saveMatch(x01Match);
@@ -157,19 +164,37 @@ public class X01MatchServiceImpl implements IX01MatchService {
     }
 
     /**
-     * Updates the set results, leg results and match progress fields for a given match
+     * Removes the most last added score from a list of sets.
+     * While traversing also cleans up empty rounds, legs or sets.
      *
-     * @param x01Match {@link X01Match} the match for which the state needs to be updated
+     * @param sets {@link X01Set} The list of sets to remove the last score from.
      */
-    private void updateMatchState(X01Match x01Match) {
-        // Update match results
-        matchProgressService.updateMatchResult(x01Match);
+    private void deleteLastScore(X01Match match) {
+        if (match == null) return;
 
-        // Update match statistics
-        statisticsService.updatePlayerStatistics(x01Match.getSets(), x01Match.getPlayers());
+        List<X01Set> setsReverse = new ArrayList<>(match.getSets());
+        Collections.reverse(setsReverse);
 
-        // Update Match Progress
-        matchProgressService.updateMatchProgress(x01Match);
+        // Iterate the sets, legs and rounds in reverse order to remove the last score and empty rounds, legs or sets.
+        // Stops after the first removal of a score.
+        outer:
+        for (X01Set set : setsReverse) {
+            List<X01Leg> legsReverse = new ArrayList<>(set.getLegs());
+            Collections.reverse(legsReverse);
+
+            for (X01Leg leg : legsReverse) {
+                List<X01LegRound> legRoundsReverse = new ArrayList<>(leg.getRounds());
+                Collections.reverse(legRoundsReverse);
+
+                for (X01LegRound legRound : legRoundsReverse) {
+                    boolean removed = legRoundService.removeLastScoreFromRound(legRound);
+                    if (legRound.getScores().isEmpty()) leg.getRounds().remove(legRound);
+                    if (leg.getRounds().isEmpty()) set.getLegs().remove(leg);
+                    if (set.getLegs().isEmpty()) match.getSets().remove(set);
+                    if (removed) break outer;
+                }
+            }
+        }
     }
 
     /**
@@ -179,10 +204,17 @@ public class X01MatchServiceImpl implements IX01MatchService {
      * @return {@link X01Match} the saved match with updated match progress
      */
     private X01Match saveMatch(@Valid @NotNull X01Match x01Match) {
-        // Sync match progress.
-        updateMatchState(x01Match);
+        // Update match results
+        matchResultService.updateMatchResult(x01Match);
+
+        // Update match statistics
+        statisticsService.updatePlayerStatistics(x01Match.getSets(), x01Match.getPlayers());
+
+        // Update Match Progress
+        matchProgressService.updateMatchProgress(x01Match);
 
         // Save and return the saved match
         return x01matchRepository.save(x01Match);
     }
+
 }

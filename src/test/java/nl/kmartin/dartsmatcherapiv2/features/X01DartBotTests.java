@@ -1,34 +1,10 @@
 package nl.kmartin.dartsmatcherapiv2.features;
 
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.PlayerType;
-import nl.kmartin.dartsmatcherapiv2.features.dartboard.DartboardServiceImpl;
-import nl.kmartin.dartsmatcherapiv2.features.dartboard.IDartboardService;
-import nl.kmartin.dartsmatcherapiv2.features.dartboard.model.Dartboard;
+import nl.kmartin.dartsmatcherapiv2.features.testutils.X01FeatureTestFactory;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01averagestatistics.IX01AverageStatisticsService;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01averagestatistics.X01AverageStatisticsServiceImpl;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01checkout.IX01CheckoutService;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01checkout.X01CheckoutServiceImpl;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01checkoutstatistics.IX01CheckoutStatisticsService;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01checkoutstatistics.X01CheckoutStatisticsServiceImplService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01dartbot.*;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegService;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.X01LegServiceImpl;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01leground.IX01LegRoundService;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01leground.X01LegRoundServiceImpl;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.IX01MatchRepository;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.IX01MatchService;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.X01MatchServiceImpl;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01matchprogress.IX01MatchProgressService;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01matchprogress.X01MatchProgressServiceImpl;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01matchsetup.IX01MatchSetupService;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01matchsetup.X01MatchSetupServiceImpl;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01scorestatistics.IX01ScoreStatisticsService;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01scorestatistics.X01ScoreStatisticsServiceImpl;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01set.IX01SetService;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01set.X01SetServiceImpl;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01statistics.IX01StatisticsService;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01statistics.X01StatisticsServiceImpl;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.api.IX01MatchRepository;
 import nl.kmartin.dartsmatcherapiv2.utils.MessageResolver;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Assertions;
@@ -38,8 +14,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 
 import java.util.*;
 
@@ -60,7 +34,13 @@ public class X01DartBotTests {
 
     @BeforeEach
     void setUp() {
-        dartBotService = createDartBotService();
+        X01FeatureTestFactory featureTestFactory = new X01FeatureTestFactory(matchRepository, messageResolver);
+        dartBotService = featureTestFactory.createDartBotService();
+    }
+
+    @Test
+    void isMatchServiceOk() {
+        Assertions.assertNotNull(dartBotService);
     }
 
     @Test
@@ -135,51 +115,6 @@ public class X01DartBotTests {
                 dartsUsed <= targetDartsBoundaries.upperTargetNumOfDarts,
                 "exp: <= " + targetDartsBoundaries.upperTargetNumOfDarts + ", act: " + dartsUsed + ")"
         );
-    }
-
-    private IX01DartBotService createDartBotService() {
-        IX01CheckoutService checkoutService = createCheckoutService();
-        IX01LegRoundService legRoundService = new X01LegRoundServiceImpl(checkoutService);
-        IX01LegService legService = new X01LegServiceImpl(messageResolver, legRoundService);
-        IX01SetService setService = new X01SetServiceImpl(legService, legRoundService);
-
-        IX01MatchProgressService matchProgressService = new X01MatchProgressServiceImpl(setService, legService, legRoundService);
-
-        return new X01DartBotServiceImpl(createMatchService(), matchProgressService, legRoundService, createDartBotThrowSimulator(), messageResolver);
-    }
-
-    private IX01CheckoutService createCheckoutService() {
-        Resource checkoutsResource = new ClassPathResource("data/checkouts.json");
-        IX01CheckoutService checkoutService = new X01CheckoutServiceImpl(checkoutsResource, messageResolver);
-
-        return checkoutService;
-    }
-
-    private IX01MatchService createMatchService() {
-        IX01MatchSetupService matchSetupService = new X01MatchSetupServiceImpl();
-        IX01CheckoutService checkoutService = createCheckoutService();
-        IX01LegRoundService legRoundService = new X01LegRoundServiceImpl(checkoutService);
-        IX01LegService legService = new X01LegServiceImpl(messageResolver, legRoundService);
-        IX01SetService setService = new X01SetServiceImpl(legService, legRoundService);
-
-        IX01ScoreStatisticsService scoreStatisticsService = new X01ScoreStatisticsServiceImpl();
-        IX01AverageStatisticsService averageStatisticsService = new X01AverageStatisticsServiceImpl();
-        IX01CheckoutStatisticsService checkoutStatisticsService = new X01CheckoutStatisticsServiceImplService();
-        IX01StatisticsService statisticsService = new X01StatisticsServiceImpl(scoreStatisticsService, checkoutStatisticsService, averageStatisticsService, legService);
-
-        IX01MatchProgressService matchProgressService = new X01MatchProgressServiceImpl(setService, legService, legRoundService);
-
-        return new X01MatchServiceImpl(matchRepository, matchSetupService, setService, legService, legRoundService, statisticsService, matchProgressService);
-    }
-
-    private IX01DartBotThrowSimulator createDartBotThrowSimulator() {
-        IDartboardService dartboardService = new DartboardServiceImpl(new Dartboard());
-        IX01CheckoutService checkoutService = createCheckoutService();
-        IX01DartBotCheckoutPolicy dartBotCheckoutPolicy = new X01DartBotCheckoutPolicyImpl(checkoutService);
-        IX01DartBotAccuracyCalculator dartBotAccuracyCalculator = new X01DartBotAccuracyCalculatorImpl();
-        IX01DartBotScoringStrategy dartBotScoringStrategy = new X01DartBotScoringStrategyImpl();
-
-        return new X01DartBotThrowSimulatorImpl(dartboardService, checkoutService, dartBotCheckoutPolicy, dartBotAccuracyCalculator, dartBotScoringStrategy);
     }
 
     private X01Match createTestMatch(ObjectId starter) {

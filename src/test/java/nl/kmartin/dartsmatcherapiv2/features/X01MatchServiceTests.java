@@ -2,14 +2,16 @@ package nl.kmartin.dartsmatcherapiv2.features;
 
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.PlayerType;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
+
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leground.IX01LegRoundService;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.IX01MatchRepository;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.IX01MatchService;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.X01MatchServiceImpl;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01matchprogress.IX01MatchProgressService;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service.IX01MatchProgressService;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service.IX01MatchResultService;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service.IX01MatchService;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service.X01MatchServiceImpl;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01set.IX01SetProgressService;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.api.IX01MatchRepository;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01matchsetup.IX01MatchSetupService;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01set.IX01SetService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01statistics.IX01StatisticsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,7 +36,16 @@ public class X01MatchServiceTests {
     IX01MatchSetupService matchSetupService;
 
     @Mock
-    IX01SetService setService;
+    IX01MatchResultService matchResultService;
+
+    @Mock
+    IX01MatchProgressService matchProgressService;
+
+    @Mock
+    IX01StatisticsService statisticsService;
+
+    @Mock
+    IX01SetProgressService setProgressService;
 
     @Mock
     IX01LegService legService;
@@ -42,15 +53,9 @@ public class X01MatchServiceTests {
     @Mock
     IX01LegRoundService legRoundService;
 
-    @Mock
-    IX01StatisticsService statisticsService;
-
-    @Mock
-    IX01MatchProgressService matchProgressService;
-
     @BeforeEach
     void setUp() {
-        this.x01MatchService = new X01MatchServiceImpl(x01MatchRepository, matchSetupService, setService, legService, legRoundService, statisticsService, matchProgressService);
+        this.x01MatchService = new X01MatchServiceImpl(x01MatchRepository, matchSetupService, matchResultService, matchProgressService, statisticsService, setProgressService, legService, legRoundService);
     }
 
     @Test
@@ -83,6 +88,5 @@ public class X01MatchServiceTests {
         // Then
         System.out.println(createdMatch);
     }
-
 
 }

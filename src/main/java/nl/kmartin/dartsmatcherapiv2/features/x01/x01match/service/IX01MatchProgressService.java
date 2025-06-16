@@ -1,4 +1,4 @@
-package nl.kmartin.dartsmatcherapiv2.features.x01.x01matchprogress;
+package nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service;
 
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Leg;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01LegRound;
@@ -8,13 +8,21 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Set;
 import java.util.Optional;
 
 public interface IX01MatchProgressService {
-    void updateMatchResult(X01Match x01Match);
+    Optional<X01Set> getSet(X01Match match, int setNumber, boolean throwIfNotFound);
 
-    void updateMatchProgress(X01Match x01Match);
+    Optional<X01Set> getCurrentSet(X01Match match);
+
+    Optional<X01Set> createNextSet(X01Match match);
+
+    java.util.Set<Integer> getSetNumbers(X01Match match);
 
     Optional<X01Set> getCurrentSetOrCreate(X01Match x01Match);
 
     Optional<X01Leg> getCurrentLegOrCreate(X01Match x01Match, X01Set currentSet);
 
     Optional<X01LegRound> getCurrentLegRoundOrCreate(X01Match x01Match, X01Leg currentLeg);
+
+    boolean isMatchConcluded(X01Match x01Match);
+
+    void updateMatchProgress(X01Match x01Match);
 }

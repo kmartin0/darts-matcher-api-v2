@@ -1,4 +1,4 @@
-package nl.kmartin.dartsmatcherapiv2.features.x01.x01match;
+package nl.kmartin.dartsmatcherapiv2.features.x01.x01match.api;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -7,6 +7,7 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01EditTurn;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Match;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Turn;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01dartbot.IX01DartBotService;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service.X01MatchServiceImpl;
 import nl.kmartin.dartsmatcherapiv2.utils.RestEndpoints;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
@@ -15,11 +16,21 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class X01MatchRestController {
-    private final IX01MatchService x01MatchService;
+//    private final IX01MatchService x01MatchService;
+//    private final IX01MatchWebsocketService x01MatchWebsocketService;
+//    private final IX01DartBotService x01DartBotService;
+//
+//    public X01MatchRestController(IX01MatchService x01MatchService, IX01MatchWebsocketService x01MatchWebsocketService, IX01DartBotService x01DartBotService) {
+//        this.x01MatchService = x01MatchService;
+//        this.x01MatchWebsocketService = x01MatchWebsocketService;
+//        this.x01DartBotService = x01DartBotService;
+//    }
+
+    private final X01MatchServiceImpl x01MatchService;
     private final IX01MatchWebsocketService x01MatchWebsocketService;
     private final IX01DartBotService x01DartBotService;
 
-    public X01MatchRestController(final IX01MatchService x01MatchService, IX01MatchWebsocketService x01MatchWebsocketService, IX01DartBotService x01DartBotService) {
+    public X01MatchRestController(X01MatchServiceImpl x01MatchService, IX01MatchWebsocketService x01MatchWebsocketService, IX01DartBotService x01DartBotService) {
         this.x01MatchService = x01MatchService;
         this.x01MatchWebsocketService = x01MatchWebsocketService;
         this.x01DartBotService = x01DartBotService;

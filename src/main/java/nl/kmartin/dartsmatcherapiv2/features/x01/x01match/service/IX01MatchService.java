@@ -1,4 +1,4 @@
-package nl.kmartin.dartsmatcherapiv2.features.x01.x01match;
+package nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -10,11 +10,11 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Turn;
 import org.bson.types.ObjectId;
 
 public interface IX01MatchService {
-    X01Match createMatch(@Valid @NotNull X01Match x01Match);
+    X01Match createMatch(@NotNull @Valid X01Match x01Match);
 
     X01Match getMatch(@NotNull ObjectId matchId) throws ResourceNotFoundException;
 
-    X01Match addTurn(X01Turn x01Turn);
+    X01Match addTurn(@NotNull @Valid X01Turn x01Turn);
 
     X01Match editTurn(@NotNull @Valid X01EditTurn x01EditTurn);
 
