@@ -6,9 +6,9 @@ import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.InvalidArgumentsE
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.response.TargetError;
 import nl.kmartin.dartsmatcherapiv2.features.dartboard.model.Dart;
 import nl.kmartin.dartsmatcherapiv2.features.dartboard.model.DartboardSectionArea;
-import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Checkout;
 import nl.kmartin.dartsmatcherapiv2.features.x01.common.MessageKeys;
 import nl.kmartin.dartsmatcherapiv2.features.x01.common.MessageResolver;
+import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Checkout;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;

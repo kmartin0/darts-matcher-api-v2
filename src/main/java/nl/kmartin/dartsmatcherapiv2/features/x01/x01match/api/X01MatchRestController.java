@@ -1,17 +1,15 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01match.api;
 
 import jakarta.validation.Valid;
-import nl.kmartin.dartsmatcherapiv2.features.x01.common.WebsocketDestinations;
+import nl.kmartin.dartsmatcherapiv2.features.x01.common.RestEndpoints;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01EditTurn;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Match;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Turn;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01dartbot.IX01DartBotService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service.IX01MatchService;
-import nl.kmartin.dartsmatcherapiv2.features.x01.common.RestEndpoints;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

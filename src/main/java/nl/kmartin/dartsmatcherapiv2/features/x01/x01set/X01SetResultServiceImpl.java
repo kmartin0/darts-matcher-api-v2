@@ -2,13 +2,13 @@ package nl.kmartin.dartsmatcherapiv2.features.x01.x01set;
 
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.MatchPlayer;
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.ResultType;
+import nl.kmartin.dartsmatcherapiv2.features.x01.common.StandingsUtils;
 import nl.kmartin.dartsmatcherapiv2.features.x01.common.X01ValidationUtils;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Leg;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Set;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegProgressService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegResultService;
-import nl.kmartin.dartsmatcherapiv2.features.x01.common.StandingsUtils;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;

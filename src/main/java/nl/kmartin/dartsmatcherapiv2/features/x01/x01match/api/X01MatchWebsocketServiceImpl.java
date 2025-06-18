@@ -1,7 +1,7 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01match.api;
 
-import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Match;
 import nl.kmartin.dartsmatcherapiv2.features.x01.common.WebsocketDestinations;
+import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Match;
 import org.bson.types.ObjectId;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -51,7 +51,7 @@ public class X01MatchWebsocketServiceImpl implements IX01MatchWebsocketService {
         // Create the broadcast destination url for the match
         String destination = WebsocketDestinations.getX01MatchBroadcastDestination(match.getId());
 
-        // Send the match to the subscribers of the match.
+        // Broadcast the match to the subscribers of the match.
         messagingTemplate.convertAndSend(destination, event);
     }
 
@@ -70,7 +70,7 @@ public class X01MatchWebsocketServiceImpl implements IX01MatchWebsocketService {
         // Create the broadcast destination url
         String destination = WebsocketDestinations.getX01MatchBroadcastDestination(deletedMatchId);
 
-        // Send the match to the subscribers of the match.
+        // Broadcast the match to the subscribers of the match.
         messagingTemplate.convertAndSend(destination, event);
     }
 }

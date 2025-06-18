@@ -19,7 +19,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
  * STOMP subscribe destination (Single Response):       /app/matches/x01/67dd4a0746cdab5415620e01
  * STOMP subscribe destination (Broadcast Response):    /topic/matches/x01/67dd4a0746cdab5415620e01
  * STOMP subscribe error queue destination:             /user/queue/errors
- * STOMP send destination:                              /app/matches/x01/turn:add
+ * STOMP publish destination:                           /app/matches/x01/67dd4a0746cdab5415620e01/turn/add
  * STOMP message content (add turn):                    {"matchId": "67dd4a0746cdab5415620e01", "score": 60, "dartsUsed": 3, "doublesMissed": 0}
  * =
  * Websocket Debug Tool: https://jiangxy.github.io/websocket-debug-tool/

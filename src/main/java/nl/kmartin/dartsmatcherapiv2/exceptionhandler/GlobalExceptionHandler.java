@@ -8,8 +8,8 @@ import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceNotFoundE
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.response.ApiErrorCode;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.response.ErrorResponse;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.response.TargetError;
-import nl.kmartin.dartsmatcherapiv2.utils.ErrorUtil;
 import nl.kmartin.dartsmatcherapiv2.features.x01.common.MessageResolver;
+import nl.kmartin.dartsmatcherapiv2.utils.ErrorUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.dao.DataAccessResourceFailureException;

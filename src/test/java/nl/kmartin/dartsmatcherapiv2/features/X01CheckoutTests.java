@@ -1,9 +1,9 @@
 package nl.kmartin.dartsmatcherapiv2.features;
 
+import nl.kmartin.dartsmatcherapiv2.features.x01.common.MessageResolver;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Checkout;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01checkout.IX01CheckoutService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01checkout.X01CheckoutServiceImpl;
-import nl.kmartin.dartsmatcherapiv2.features.x01.common.MessageResolver;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
