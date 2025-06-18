@@ -5,7 +5,7 @@ import nl.kmartin.dartsmatcherapiv2.features.testutils.X01FeatureTestFactory;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01dartbot.IX01DartBotService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.api.IX01MatchRepository;
-import nl.kmartin.dartsmatcherapiv2.utils.MessageResolver;
+import nl.kmartin.dartsmatcherapiv2.features.x01.common.MessageResolver;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -62,7 +62,7 @@ public class X01DartBotTests {
         X01Set x01Set = new X01Set(1, new ArrayList<>(Collections.singletonList(x01Leg)), dartBotId, null);
 
         X01DartBotSettings dartBotSettings = new X01DartBotSettings(targetAvg);
-        X01MatchPlayer dartBotPlayer = new X01MatchPlayer(dartBotId, "Dart Bot", PlayerType.DART_BOT, null, 0, 0, dartBotSettings, null);
+        X01MatchPlayer dartBotPlayer = new X01MatchPlayer(dartBotId, "Dart Bot", PlayerType.DART_BOT, null, dartBotSettings, null);
 
         match.setSets(new ArrayList<>(Collections.singletonList(x01Set)));
         match.setPlayers(new ArrayList<>(Collections.singletonList(dartBotPlayer)));

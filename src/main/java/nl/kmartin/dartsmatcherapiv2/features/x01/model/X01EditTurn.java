@@ -13,8 +13,8 @@ import org.bson.types.ObjectId;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class X01EditTurn extends X01Turn {
-    public X01EditTurn(ObjectId matchId, int score, int dartsUsed, int doublesMissed, ObjectId playerId, int set, int leg, int round) {
-        super(matchId, score, dartsUsed, doublesMissed);
+    public X01EditTurn(int score, int dartsUsed, int doublesMissed, ObjectId playerId, int set, int leg, int round) {
+        super(score, dartsUsed, doublesMissed);
         this.playerId = playerId;
         this.set = set;
         this.leg = leg;

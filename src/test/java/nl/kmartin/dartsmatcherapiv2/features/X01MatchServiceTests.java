@@ -52,6 +52,7 @@ public class X01MatchServiceTests {
     @Mock
     IX01LegRoundService legRoundService;
 
+
     @BeforeEach
     void setUp() {
         this.x01MatchService = new X01MatchServiceImpl(x01MatchRepository, matchSetupService, matchResultService, matchProgressService, statisticsService, setProgressService, legService, legRoundService);
@@ -80,9 +81,9 @@ public class X01MatchServiceTests {
         X01Match createdMatch = x01MatchService.createMatch(x01Match);
         Mockito.when(x01MatchRepository.findById(createdMatch.getId())).thenReturn(Optional.of(createdMatch));
 
-        X01Turn x01Turn = new X01Turn(createdMatch.getId(), 60, 3, 0);
+        X01Turn x01Turn = new X01Turn(60, 3, 0);
 
-        x01MatchService.addTurn(x01Turn);
+        x01MatchService.addTurn(createdMatch.getId(), x01Turn);
 
         // Then
         System.out.println(createdMatch);

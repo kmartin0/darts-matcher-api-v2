@@ -22,7 +22,7 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.x01scorestatistics.X01ScoreStat
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01set.*;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01statistics.IX01StatisticsService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01statistics.X01StatisticsServiceImpl;
-import nl.kmartin.dartsmatcherapiv2.utils.MessageResolver;
+import nl.kmartin.dartsmatcherapiv2.features.x01.common.MessageResolver;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 

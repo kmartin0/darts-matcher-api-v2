@@ -1,7 +1,7 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01dartbot;
 
 import nl.kmartin.dartsmatcherapiv2.features.dartboard.model.PolarCoordinate;
-import nl.kmartin.dartsmatcherapiv2.utils.PiecewiseLinearGraph;
+import nl.kmartin.dartsmatcherapiv2.features.x01.common.PiecewiseLinearGraph;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;

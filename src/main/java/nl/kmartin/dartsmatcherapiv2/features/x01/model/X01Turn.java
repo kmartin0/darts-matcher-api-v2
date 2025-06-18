@@ -13,9 +13,6 @@ import org.bson.types.ObjectId;
 @AllArgsConstructor
 @NoArgsConstructor
 public class X01Turn {
-    @NotNull
-    private ObjectId matchId;
-
     @ValidDartScore
     int score;
 

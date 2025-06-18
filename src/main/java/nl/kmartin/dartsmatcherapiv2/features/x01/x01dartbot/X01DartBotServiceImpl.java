@@ -10,9 +10,9 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegResultService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service.IX01MatchProgressService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service.IX01MatchService;
-import nl.kmartin.dartsmatcherapiv2.utils.Constants;
-import nl.kmartin.dartsmatcherapiv2.utils.MessageKeys;
-import nl.kmartin.dartsmatcherapiv2.utils.MessageResolver;
+import nl.kmartin.dartsmatcherapiv2.common.Constants;
+import nl.kmartin.dartsmatcherapiv2.features.x01.common.MessageKeys;
+import nl.kmartin.dartsmatcherapiv2.features.x01.common.MessageResolver;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
@@ -65,7 +65,7 @@ public class X01DartBotServiceImpl implements IX01DartBotService {
         X01LegRoundScore roundScore = createRoundScore(createDartBotLegState(match, dartBotPlayer, currentLeg));
 
         // Create and return an X01Turn object using the values from the created round score for this turn
-        return new X01Turn(match.getId(), roundScore.getScore(), roundScore.getDartsUsed(), roundScore.getDoublesMissed());
+        return new X01Turn(roundScore.getScore(), roundScore.getDartsUsed(), roundScore.getDoublesMissed());
     }
 
     /**

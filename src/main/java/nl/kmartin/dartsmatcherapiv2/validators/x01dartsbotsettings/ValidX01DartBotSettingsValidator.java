@@ -5,7 +5,7 @@ import jakarta.validation.ConstraintValidatorContext;
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.PlayerType;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01DartBotSettings;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
-import nl.kmartin.dartsmatcherapiv2.utils.MessageKeys;
+import nl.kmartin.dartsmatcherapiv2.features.x01.common.MessageKeys;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 
 public class ValidX01DartBotSettingsValidator implements ConstraintValidator<ValidX01DartBotSettings, X01MatchPlayer> {

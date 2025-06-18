@@ -1,17 +1,17 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01match.api;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01DeleteLastTurn;
+import nl.kmartin.dartsmatcherapiv2.features.x01.common.WebsocketDestinations;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01EditTurn;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Match;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Turn;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01dartbot.IX01DartBotService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service.IX01MatchService;
-import nl.kmartin.dartsmatcherapiv2.utils.RestEndpoints;
+import nl.kmartin.dartsmatcherapiv2.features.x01.common.RestEndpoints;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -33,47 +33,63 @@ public class X01MatchRestController {
     @ResponseStatus(HttpStatus.CREATED)
     public X01Match createMatch(@Valid @RequestBody X01Match match) {
         X01Match createdMatch = matchService.createMatch(match);
-        matchWebsocketService.sendX01MatchUpdate(createdMatch);
+        matchWebsocketService.broadcastX01MatchUpdate(createdMatch);
         return createdMatch;
     }
 
     @GetMapping(path = RestEndpoints.X01_GET_MATCH, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public X01Match getMatch(@PathVariable @NotNull ObjectId matchId) {
+    public X01Match getMatch(@PathVariable ObjectId matchId) {
 
         return matchService.getMatch(matchId);
     }
 
     @PostMapping(path = RestEndpoints.X01_ADD_TURN, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public X01Match addTurn(@Valid @RequestBody X01Turn turn) {
-        X01Match updatedMatch = matchService.addTurn(turn);
-        matchWebsocketService.sendX01MatchUpdate(updatedMatch);
+    public X01Match addTurn(@PathVariable ObjectId matchId, @Valid @RequestBody X01Turn turn) {
+        X01Match updatedMatch = matchService.addTurn(matchId, turn);
+        matchWebsocketService.broadcastX01MatchUpdate(updatedMatch);
         return updatedMatch;
     }
 
     @PostMapping(path = RestEndpoints.X01_EDIT_TURN, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public X01Match editTurn(@Valid @RequestBody X01EditTurn editTurn) {
-        X01Match updatedMatch = matchService.addTurn(editTurn);
-        matchWebsocketService.sendX01MatchUpdate(updatedMatch);
+    public X01Match editTurn(@PathVariable ObjectId matchId, @Valid @RequestBody X01EditTurn editTurn) {
+        X01Match updatedMatch = matchService.addTurn(matchId, editTurn);
+        matchWebsocketService.broadcastX01MatchUpdate(updatedMatch);
         return updatedMatch;
     }
 
     @PostMapping(path = RestEndpoints.X01_DELETE_LAST_TURN, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public X01Match deleteLastTurn(@Valid @RequestBody X01DeleteLastTurn deleteLastTurn) {
-        X01Match updatedMatch = matchService.deleteLastTurn(deleteLastTurn);
-        matchWebsocketService.sendX01MatchUpdate(updatedMatch);
+    public X01Match deleteLastTurn(@PathVariable ObjectId matchId) {
+        X01Match updatedMatch = matchService.deleteLastTurn(matchId);
+        matchWebsocketService.broadcastX01MatchUpdate(updatedMatch);
         return updatedMatch;
     }
 
     @PostMapping(path = RestEndpoints.X01_TURN_DART_BOT, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public X01Match addDartBotTurn(@RequestBody @NotNull ObjectId matchId) {
+    public X01Match addDartBotTurn(@PathVariable ObjectId matchId) {
         X01Turn dartBotTurn = dartBotService.createDartBotTurn(matchId);
-        X01Match updatedMatch = matchService.addTurn(dartBotTurn);
-        matchWebsocketService.sendX01MatchUpdate(updatedMatch);
+        X01Match updatedMatch = matchService.addTurn(matchId, dartBotTurn);
+        matchWebsocketService.broadcastX01MatchUpdate(updatedMatch);
         return updatedMatch;
+    }
+
+    @PostMapping(path = RestEndpoints.X01_DELETE_MATCH, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public X01MatchWebsocketEvent<ObjectId> deleteMatch(@PathVariable ObjectId matchId) {
+        matchService.deleteMatch(matchId);
+        matchWebsocketService.broadcastX01MatchDelete(matchId);
+        return matchWebsocketService.createDeleteMatchEvent(matchId);
+    }
+
+    @PostMapping(path = RestEndpoints.X01_RESET_MATCH, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public X01MatchWebsocketEvent<X01Match> resetMatch(@PathVariable ObjectId matchId) {
+        X01Match resetMatch = matchService.resetMatch(matchId);
+        matchWebsocketService.broadcastX01MatchUpdate(resetMatch);
+        return matchWebsocketService.createUpdateMatchEvent(resetMatch);
     }
 }

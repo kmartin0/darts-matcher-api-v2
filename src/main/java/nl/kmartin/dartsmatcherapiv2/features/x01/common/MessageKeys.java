@@ -1,4 +1,4 @@
-package nl.kmartin.dartsmatcherapiv2.utils;
+package nl.kmartin.dartsmatcherapiv2.features.x01.common;
 
 public class MessageKeys {
     private MessageKeys() {

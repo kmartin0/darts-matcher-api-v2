@@ -1,4 +1,4 @@
-package nl.kmartin.dartsmatcherapiv2.utils;
+package nl.kmartin.dartsmatcherapiv2.features.x01.common;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.NoSuchMessageException;

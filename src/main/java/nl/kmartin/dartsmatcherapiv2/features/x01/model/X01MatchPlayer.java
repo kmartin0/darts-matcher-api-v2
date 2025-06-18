@@ -17,19 +17,11 @@ import org.bson.types.ObjectId;
 @ValidX01DartBotSettings
 public class X01MatchPlayer extends MatchPlayer {
     public X01MatchPlayer(ObjectId playerId, String playerName, PlayerType playerType, ResultType resultType,
-                          int legsWon, int setsWon, X01DartBotSettings x01DartBotSettings, X01Statistics statistics) {
+                          X01DartBotSettings x01DartBotSettings, X01Statistics statistics) {
         super(playerId, playerName, playerType, resultType);
-        this.legsWon = legsWon;
-        this.setsWon = setsWon;
         this.x01DartBotSettings = x01DartBotSettings;
         this.statistics = statistics;
     }
-
-    @Min(0)
-    private int legsWon;
-
-    @Min(0)
-    private int setsWon;
 
     @Valid
     private X01DartBotSettings x01DartBotSettings;

@@ -8,7 +8,7 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Set;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegProgressService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegResultService;
-import nl.kmartin.dartsmatcherapiv2.utils.StandingsUtils;
+import nl.kmartin.dartsmatcherapiv2.features.x01.common.StandingsUtils;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;

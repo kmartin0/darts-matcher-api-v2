@@ -16,13 +16,13 @@ import java.util.ArrayList;
 public class X01MatchSetupServiceImpl implements IX01MatchSetupService {
 
     /**
-     * Sets up an X01 match by setting up players, match type and status,
+     * Sets up an X01 to a match ready starting state by setting up players, match type and status,
      * start and end dates, and initial match progress.
      *
      * @param match the {@link X01Match} instance to set up
      */
     @Override
-    public void setupNewMatch(@Valid X01Match match) {
+    public void setupMatch(@Valid X01Match match) {
         if (match == null) return;
 
         setupMatchPlayers(match);
@@ -40,6 +40,7 @@ public class X01MatchSetupServiceImpl implements IX01MatchSetupService {
         // Generate a unique id for each player and set their statistics.
         match.getPlayers().forEach(player -> {
             player.setPlayerId(new ObjectId());
+            player.setResultType(null);
             player.setStatistics(new X01Statistics());
         });
     }

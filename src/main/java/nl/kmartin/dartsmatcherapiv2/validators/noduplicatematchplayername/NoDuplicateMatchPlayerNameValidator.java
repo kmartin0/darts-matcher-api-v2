@@ -3,7 +3,7 @@ package nl.kmartin.dartsmatcherapiv2.validators.noduplicatematchplayername;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.MatchPlayer;
-import nl.kmartin.dartsmatcherapiv2.utils.MessageKeys;
+import nl.kmartin.dartsmatcherapiv2.features.x01.common.MessageKeys;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 
 import java.util.HashSet;
