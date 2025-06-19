@@ -71,6 +71,17 @@ public class X01MatchServiceImpl implements IX01MatchService {
     }
 
     /**
+     * Determines whether a match exists in the repository by using the id, throwing a
+     * ResourceNotFoundException if not found.
+     *
+     * @param matchId ObjectId the id of the X01Match to be checked
+     */
+    @Override
+    public void checkMatchExists(ObjectId matchId) {
+        if (!matchRepository.existsById(matchId)) throw new ResourceNotFoundException(X01Match.class, matchId);
+    }
+
+    /**
      * Verifies and adds the current player's turn to the current round of the match.
      * After adding the turn, the match progress and state are recalculated.
      *

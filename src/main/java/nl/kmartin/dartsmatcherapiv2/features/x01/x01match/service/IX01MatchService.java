@@ -13,6 +13,8 @@ public interface IX01MatchService {
 
     X01Match getMatch(@NotNull ObjectId matchId) throws ResourceNotFoundException;
 
+    void checkMatchExists(ObjectId matchId);
+
     X01Match addTurn(@NotNull ObjectId matchId, @NotNull @Valid X01Turn turn);
 
     X01Match editTurn(@NotNull ObjectId matchId, @NotNull @Valid X01EditTurn editTurn);

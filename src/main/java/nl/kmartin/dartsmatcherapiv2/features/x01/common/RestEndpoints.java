@@ -12,6 +12,7 @@ public class RestEndpoints {
     // X01Match Endpoints
     public static final String X01_CREATE_MATCH = "/matches";
     public static final String X01_GET_MATCH = "/matches/{matchId}";
+    public static final String X01_MATCH_EXISTS = "/matches/{matchId}/exists";
     public static final String X01_RESET_MATCH = "/matches/x01/{matchId}/reset";
     public static final String X01_DELETE_MATCH = "/matches/x01/{matchId}/delete";
     public static final String X01_ADD_TURN = "/matches/x01/{matchId}/turn/add";

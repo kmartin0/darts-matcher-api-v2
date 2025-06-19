@@ -42,6 +42,12 @@ public class X01MatchRestController {
         return matchService.getMatch(matchId);
     }
 
+    @GetMapping(path = RestEndpoints.X01_MATCH_EXISTS, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void matchExists(@PathVariable ObjectId matchId) {
+        matchService.checkMatchExists(matchId);
+    }
+
     @PostMapping(path = RestEndpoints.X01_ADD_TURN, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public X01Match addTurn(@PathVariable ObjectId matchId, @Valid @RequestBody X01Turn turn) {
