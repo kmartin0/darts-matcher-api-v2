@@ -12,7 +12,7 @@ public interface IX01LegService {
 
     void checkLegEditable(X01Leg leg, ObjectId playerId);
 
-    boolean isScoreCheckout(X01Leg leg, X01LegRound legRound, ObjectId playerId);
+    boolean isPlayerCheckoutRound(X01Leg leg, int roundNumber, ObjectId playerId);
 
     boolean validateLegForPlayer(X01Leg leg, int x01, ObjectId throwerId);
 

@@ -12,14 +12,10 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 public class X01LegRound {
-    @Min(0)
-    private int round;
-
     @Valid
     private Map<ObjectId, X01LegRoundScore> scores = new HashMap<>();
 
-    public X01LegRound(int round, Map<ObjectId, X01LegRoundScore> scores) {
-        this.round = round;
+    public X01LegRound(Map<ObjectId, X01LegRoundScore> scores) {
         this.setScores(scores);
     }
 

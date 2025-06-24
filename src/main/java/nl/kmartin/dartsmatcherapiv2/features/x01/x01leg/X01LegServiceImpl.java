@@ -11,10 +11,7 @@ import org.bson.types.ObjectId;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.IntStream;
 
 @Service
@@ -45,19 +42,19 @@ public class X01LegServiceImpl implements IX01LegService {
     @Override
     public X01Leg createNewLeg(int legNumber, ObjectId throwsFirstInSet, List<X01MatchPlayer> players) {
         ObjectId throwsFirstInLeg = calcThrowsFirstInLeg(legNumber, throwsFirstInSet, players);
-        return new X01Leg(legNumber, null, throwsFirstInLeg, new ArrayList<>());
+        return new X01Leg(legNumber, null, throwsFirstInLeg, new TreeMap<>());
     }
 
     /**
      * Adds a score from a player to the list of scores in a round. Verifies if the added
      * score results in an illegal leg state, then the score will be set to zero and darts used to 3.
      *
-     * @param x01              int the x01 the leg is played in
-     * @param leg           {@link X01Leg} the leg of which the round belongs to
-     * @param roundNumber      int the round of which the score belongs to
-     * @param roundScore {@link X01LegRoundScore} the score that needs to be added to the round
+     * @param x01         int the x01 the leg is played in
+     * @param leg         {@link X01Leg} the leg of which the round belongs to
+     * @param roundNumber int the round of which the score belongs to
+     * @param turn        {@link X01Turn} the turn that needs to be added to the round
      * @param players     {@link List<X01MatchPlayer>} the list of match players.
-     * @param throwerId        {@link ObjectId} the player that has thrown the score.
+     * @param throwerId   {@link ObjectId} the player that has thrown the score.
      */
     @Override
     public void addScore(int x01, X01Leg leg, int roundNumber, X01Turn turn, List<X01MatchPlayer> players, ObjectId throwerId, boolean trackDoubles) {
@@ -72,7 +69,7 @@ public class X01LegServiceImpl implements IX01LegService {
         // Add the score to the round.
         X01LegRoundScore roundScore = new X01LegRoundScore(turn, trackDoubles);
         x01LegRound.get().getScores().put(throwerId, roundScore);
-        if(turn.getCheckoutDartsUsed() != null) leg.setCheckoutDartsUsed(turn.getCheckoutDartsUsed());
+        if (turn.getCheckoutDartsUsed() != null) leg.setCheckoutDartsUsed(turn.getCheckoutDartsUsed());
 
         // Verify if the rounds are legal after adding the new score.
         boolean isPlayerRoundsLegal = validateLegForPlayer(leg, x01, throwerId);
@@ -90,7 +87,7 @@ public class X01LegServiceImpl implements IX01LegService {
     /**
      * Determines if a leg can be edited. When a leg is concluded, only the score of the winner can be modified.
      *
-     * @param leg   {@link X01Leg} the leg to be modified
+     * @param leg      {@link X01Leg} the leg to be modified
      * @param playerId {@link ObjectId} the player of which the score is going to be modified
      */
     @Override
@@ -107,16 +104,15 @@ public class X01LegServiceImpl implements IX01LegService {
      * Determines if a score made by a player in a round of a leg is a checkout.
      *
      * @param leg      {@link X01Leg} the leg that the round is in
-     * @param legRound {@link X01LegRound} the round the score is in
-     * @param playerId    {@link ObjectId} the player that scored
+     * @param roundNumber the round number to check
+     * @param playerId {@link ObjectId} the player that scored
      * @return boolean whether the score made a player is a checkout
      */
     @Override
-    public boolean isScoreCheckout(X01Leg leg, X01LegRound legRound, ObjectId playerId) {
-        if (leg == null || legRound == null) return false;
+    public boolean isPlayerCheckoutRound(X01Leg leg, int roundNumber, ObjectId playerId) {
+        if (leg == null) return false;
 
-        return playerId.equals(leg.getWinner()) &&
-                legProgressService.getLegRound(leg, legRound.getRound() + 1, false).isEmpty();
+        return playerId.equals(leg.getWinner()) && leg.getRounds().higherKey(roundNumber) == null;
     }
 
     /**

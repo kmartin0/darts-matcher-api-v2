@@ -56,21 +56,19 @@ public class X01LegResultServiceImpl implements IX01LegResultService {
         // If there is no leg winner. No trimming needs to happen.
         if (X01ValidationUtils.isRoundsEmpty(leg) || legWinner == null) return;
 
-        // Create a reversed copy of the rounds to iterate from last to first
-        List<X01LegRound> reverseRounds = new ArrayList<>(leg.getRounds());
-        Collections.reverse(reverseRounds);
-
-        // Trims scores beyond the final score of the leg winner.
+        // Iterate through the rounds in reverse order. Trim scores beyond the final score of the leg winner.
         // This situation can occur if a score is edited and, as a result, another player becomes the winner.
+        List<Integer> reverseRoundKeys = new ArrayList<>(leg.getRounds().descendingKeySet());
         outer:
-        for (X01LegRound round : reverseRounds) {
+        for (Integer roundKey : reverseRoundKeys) {
+            X01LegRound round = leg.getRounds().get(roundKey);
             List<ObjectId> reverseKeys = new ArrayList<>(round.getScores().keySet());
             Collections.reverse(reverseKeys);
 
             for (ObjectId playerId : reverseKeys) {
                 if (!playerId.equals(legWinner)) {
                     round.getScores().remove(playerId);
-                    if (round.getScores().isEmpty()) leg.getRounds().remove(round);
+                    if (round.getScores().isEmpty()) leg.getRounds().remove(roundKey);
                 } else break outer;
             }
         }
@@ -90,7 +88,7 @@ public class X01LegResultServiceImpl implements IX01LegResultService {
         if (X01ValidationUtils.isRoundsEmpty(leg) || playerId == null) return x01;
 
         // For every round map the player score and sum these up.
-        int totalScored = leg.getRounds().stream()
+        int totalScored = leg.getRounds().values().stream()
                 .mapToInt(value -> {
                     X01LegRoundScore playerScore = value.getScores().get(playerId);
                     return (playerScore != null) ? playerScore.getScore() : 0;
@@ -113,16 +111,16 @@ public class X01LegResultServiceImpl implements IX01LegResultService {
         if (X01ValidationUtils.isRoundsEmpty(leg) || playerId == null) return 0;
 
         // If the player has won the leg, get the checkout round.
-        Optional<X01LegRound> checkoutRound = leg.getWinner() == null
+        Optional<Integer> checkoutRoundNumber = leg.getWinner() == null
                 ? Optional.empty()
-                : leg.getRounds().stream().max(Comparator.comparing(X01LegRound::getRound));
+                : leg.getRounds().keySet().stream().max(Integer::compareTo);
 
         // For every round map the player darts used and sum these up.
-        return leg.getRounds().stream()
-                .mapToInt(value -> {
-                    X01LegRoundScore playerScore = value.getScores().get(playerId);
+        return leg.getRounds().entrySet().stream()
+                .mapToInt(entry -> {
+                    X01LegRoundScore playerScore = entry.getValue().getScores().get(playerId);
                     if (playerScore == null) return 0;
-                    if (checkoutRound.isPresent() && checkoutRound.get().getRound() == value.getRound())
+                    if (checkoutRoundNumber.isPresent() && checkoutRoundNumber.get().equals(entry.getKey()))
                         return leg.getCheckoutDartsUsed();
 
                     return 3;

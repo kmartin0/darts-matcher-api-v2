@@ -8,7 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 
-import java.util.ArrayList;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 
 @Data
 @NoArgsConstructor
@@ -26,16 +27,16 @@ public class X01Leg {
     private Integer checkoutDartsUsed;
 
     @Valid
-    private ArrayList<X01LegRound> rounds = new ArrayList<>();
+    private NavigableMap<Integer, X01LegRound> rounds = new TreeMap<>();
 
-    public X01Leg(int leg, ObjectId winner, ObjectId throwsFirst, ArrayList<X01LegRound> rounds) {
+    public X01Leg(int leg, ObjectId winner, ObjectId throwsFirst, NavigableMap<Integer, X01LegRound> rounds) {
         this.leg = leg;
         this.winner = winner;
         this.throwsFirst = throwsFirst;
         this.setRounds(rounds);
     }
 
-    public void setRounds(@Valid ArrayList<X01LegRound> rounds) {
-        this.rounds = rounds != null ? rounds : new ArrayList<>();
+    public void setRounds(@Valid NavigableMap<Integer, X01LegRound> rounds) {
+        this.rounds = rounds != null ? rounds : new TreeMap<>();
     }
 }

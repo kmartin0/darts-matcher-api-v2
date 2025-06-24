@@ -8,9 +8,7 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.x01scorestatistics.IX01ScoreSta
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class X01StatisticsServiceImpl implements IX01StatisticsService {
@@ -55,7 +53,7 @@ public class X01StatisticsServiceImpl implements IX01StatisticsService {
         if (sets == null || players == null) return;
 
         // Process and update the player statistics using the data of all the legs
-        sets.forEach(x01Set -> processLegs(x01Set.getLegs(), players, trackDoubles));
+        sets.forEach(set -> processLegs(set.getLegs(), players, trackDoubles));
     }
 
     /**
@@ -68,7 +66,7 @@ public class X01StatisticsServiceImpl implements IX01StatisticsService {
         if (legs == null || players == null) return;
 
         // Process and update the player statistics using the data of all the leg rounds
-        legs.forEach(x01Leg -> processLegRounds(x01Leg.getRounds(), x01Leg, players, trackDoubles));
+        legs.forEach(leg -> processLegRounds(leg.getRounds(), leg, players, trackDoubles));
     }
 
     /**
@@ -78,24 +76,25 @@ public class X01StatisticsServiceImpl implements IX01StatisticsService {
      * @param leg     {@link X01Leg} the leg from which the rounds originate
      * @param players {@link List<X01MatchPlayer>} the players for which the statistics need to be updated
      */
-    private void processLegRounds(List<X01LegRound> rounds, X01Leg leg, List<X01MatchPlayer> players, boolean trackDoubles) {
+    private void processLegRounds(NavigableMap<Integer, X01LegRound> rounds, X01Leg leg, List<X01MatchPlayer> players, boolean trackDoubles) {
         if (rounds == null || leg == null || players == null) return;
 
         // Process and update player statistics based on the scores from all rounds
-        rounds.forEach(x01LegRound -> processRoundScores(x01LegRound.getScores(), leg, x01LegRound, players, trackDoubles));
+        rounds.entrySet().forEach(round -> processRoundScores(round.getValue().getScores(), leg, round, players, trackDoubles));
     }
 
     /**
      * Process and update player statistics based on the scores from a round
      *
-     * @param roundScores Map<ObjectId, X01LegRoundScore> the player scores made in a round
-     * @param leg         {@link X01Leg} the leg from which the scores originate
-     * @param legRound    {@link X01LegRound} the round from which the scores originate
-     * @param players     {@link List<X01MatchPlayer>} the players for which the statistics need to be updated
+     * @param roundScores   Map<ObjectId, X01LegRoundScore> the player scores made in a round
+     * @param leg           {@link X01Leg} the leg from which the scores originate
+     * @param legRoundEntry Map entry for the round from which the score originates
+     * @param players       {@link List<X01MatchPlayer>} the players for which the statistics need to be updated
      */
-    private void processRoundScores(Map<ObjectId, X01LegRoundScore> roundScores, X01Leg leg, X01LegRound legRound,
-                                    List<X01MatchPlayer> players, boolean trackDoubles) {
-        if (roundScores == null || leg == null || legRound == null || players == null) return;
+    private void processRoundScores(Map<ObjectId, X01LegRoundScore> roundScores, X01Leg leg,
+                                    Map.Entry<Integer, X01LegRound> legRoundEntry, List<X01MatchPlayer> players,
+                                    boolean trackDoubles) {
+        if (roundScores == null || leg == null || legRoundEntry == null || players == null) return;
 
         // Update the player statistics for all players that scored in this round
         roundScores.forEach((playerId, roundScore) -> {
@@ -110,7 +109,7 @@ public class X01StatisticsServiceImpl implements IX01StatisticsService {
                 }
 
                 // Update the player statistics for the player that scored this turn
-                processPlayerScore(playerOpt.get(), leg, legRound, roundScore, trackDoubles);
+                processPlayerScore(playerOpt.get(), leg, legRoundEntry, roundScore, trackDoubles);
             }
         });
     }
@@ -118,18 +117,18 @@ public class X01StatisticsServiceImpl implements IX01StatisticsService {
     /**
      * Update the player statistics for the player that scored
      *
-     * @param player      {@link X01MatchPlayer} the player that scored
-     * @param x01Leg      {@link X01Leg} the leg from which the score originates
-     * @param x01LegRound {@link X01LegRound} the round from which the score originates
-     * @param playerScore {@link X01LegRoundScore} the object containing the score and associated statistics for the player's turn
+     * @param player        {@link X01MatchPlayer} the player that scored
+     * @param leg           {@link X01Leg} the leg from which the score originates
+     * @param legRoundEntry Map entry for the round from which the score originates
+     * @param playerScore   {@link X01LegRoundScore} the object containing the score and associated statistics for the player's turn
      */
-    private void processPlayerScore(X01MatchPlayer player, X01Leg x01Leg, X01LegRound x01LegRound,
+    private void processPlayerScore(X01MatchPlayer player, X01Leg leg, Map.Entry<Integer, X01LegRound> legRoundEntry,
                                     X01LegRoundScore playerScore, boolean trackDoubles) {
-        if (player == null || x01Leg == null || x01LegRound == null || playerScore == null) return;
+        if (player == null || leg == null || legRoundEntry == null || playerScore == null) return;
 
         // Get the player's current statistics
         X01Statistics playerStats = player.getStatistics();
-        boolean isScoreCheckout = legService.isScoreCheckout(x01Leg, x01LegRound, player.getPlayerId());
+        boolean isScoreCheckout = legService.isPlayerCheckoutRound(leg, legRoundEntry.getKey(), player.getPlayerId());
 
         // Update score stats
         scoreStatisticsService.updateScoreStatistics(playerStats.getScoreStatistics(), playerScore);
@@ -140,8 +139,8 @@ public class X01StatisticsServiceImpl implements IX01StatisticsService {
 
         // Update average stats
         X01AverageStatistics playerAverageStats = playerStats.getAverageStats();
-        Integer checkoutDartsUsed = isScoreCheckout ? x01Leg.getCheckoutDartsUsed() : null;
-        averageStatisticsService.updateAverageStats(playerAverageStats, playerScore, x01LegRound.getRound(), checkoutDartsUsed);
+        Integer checkoutDartsUsed = isScoreCheckout ? leg.getCheckoutDartsUsed() : null;
+        averageStatisticsService.updateAverageStats(playerAverageStats, playerScore, legRoundEntry.getKey(), checkoutDartsUsed);
     }
 
     /**

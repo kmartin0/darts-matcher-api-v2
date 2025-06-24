@@ -58,7 +58,7 @@ public class X01DartBotTests {
     private void executeTestForTargetAvg(X01Match match, ObjectId dartBotId, int targetAvg) {
         printTargetAvg(targetAvg);
         // Initialize the match with the base settings.
-        X01Leg x01Leg = new X01Leg(1, null, dartBotId, new ArrayList<>());
+        X01Leg x01Leg = new X01Leg(1, null, dartBotId, new TreeMap<>());
         X01Set x01Set = new X01Set(1, new ArrayList<>(Collections.singletonList(x01Leg)), dartBotId, null);
 
         X01DartBotSettings dartBotSettings = new X01DartBotSettings(targetAvg);
@@ -92,7 +92,7 @@ public class X01DartBotTests {
             X01Turn x01Turn = dartBotService.createDartBotTurn(match.getId());
             X01LegRoundScore roundScore = new X01LegRoundScore(x01Turn.getDoublesMissed(), x01Turn.getScore());
 
-            currentLeg.getRounds().add(new X01LegRound(round++, Map.of(dartBotId, roundScore)));
+            currentLeg.getRounds().put(round++, new X01LegRound(Map.of(dartBotId, roundScore)));
             remaining -= x01Turn.getScore();
             round++;
             dartsUsed = dartsUsed + (x01Turn.getCheckoutDartsUsed() == null ? 3 : x01Turn.getCheckoutDartsUsed());
