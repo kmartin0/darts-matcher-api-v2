@@ -119,9 +119,10 @@ public class X01DartBotThrowSimulatorImpl implements IX01DartBotThrowSimulator {
     private List<DartThrow> throwAtCheckout(X01Checkout checkout, X01DartBotLegState dartBotLegState) {
         // Check if the bot has to complete the checkout based on if the checkout sequence will equal or surpass the target number of darts
         int dartsUsedAfterCheckout = dartBotLegState.getDartsUsedInLeg() + checkout.getMinDarts();
+
         boolean hasToCheckout = dartBotCheckoutPolicy.isTargetNumOfDartsReached(dartsUsedAfterCheckout, dartBotLegState.getTargetNumOfDarts());
         if (hasToCheckout) {
-            return createGuaranteedCheckoutThrows(checkout, dartBotLegState.getLegRoundScore().getDartsLeft());
+            return createGuaranteedCheckoutThrows(checkout, dartBotLegState.getDartsLeftInRound());
         }
 
         // Simulate throwing at the first target in the checkout sequence.

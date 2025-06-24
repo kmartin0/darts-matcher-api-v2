@@ -5,10 +5,7 @@ import nl.kmartin.dartsmatcherapiv2.exceptionhandler.response.TargetError;
 import nl.kmartin.dartsmatcherapiv2.features.x01.common.MessageKeys;
 import nl.kmartin.dartsmatcherapiv2.features.x01.common.MessageResolver;
 import nl.kmartin.dartsmatcherapiv2.features.x01.common.X01ValidationUtils;
-import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Leg;
-import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01LegRound;
-import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01LegRoundScore;
-import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
+import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01checkout.IX01CheckoutService;
 import org.bson.types.ObjectId;
 import org.springframework.context.annotation.Primary;
@@ -63,8 +60,8 @@ public class X01LegServiceImpl implements IX01LegService {
      * @param throwerId        {@link ObjectId} the player that has thrown the score.
      */
     @Override
-    public void addScore(int x01, X01Leg leg, int roundNumber, X01LegRoundScore roundScore, List<X01MatchPlayer> players, ObjectId throwerId) {
-        if (leg == null || roundScore == null || players == null) return;
+    public void addScore(int x01, X01Leg leg, int roundNumber, X01Turn turn, List<X01MatchPlayer> players, ObjectId throwerId, boolean trackDoubles) {
+        if (leg == null || turn == null || players == null) return;
 
         // Determine if the leg is editable, will throw InvalidArgumentsException if the leg is not editable.
         checkLegEditable(leg, throwerId);
@@ -73,15 +70,17 @@ public class X01LegServiceImpl implements IX01LegService {
         if (x01LegRound.isEmpty()) return;
 
         // Add the score to the round.
+        X01LegRoundScore roundScore = new X01LegRoundScore(turn, trackDoubles);
         x01LegRound.get().getScores().put(throwerId, roundScore);
+        if(turn.getCheckoutDartsUsed() != null) leg.setCheckoutDartsUsed(turn.getCheckoutDartsUsed());
 
         // Verify if the rounds are legal after adding the new score.
         boolean isPlayerRoundsLegal = validateLegForPlayer(leg, x01, throwerId);
 
-        // When the round is not legal. Set the score to zero and darts used to 3
+        // When the round is not legal. Set the score to zero and checkout darts used to null
         if (!isPlayerRoundsLegal) {
             roundScore.setScore(0);
-            roundScore.setDartsUsed(3);
+            leg.setCheckoutDartsUsed(null);
         }
 
         // Update the leg result
@@ -141,7 +140,7 @@ public class X01LegServiceImpl implements IX01LegService {
         if (checkoutService.isRemainingZero(remaining)) {
             Optional<X01LegRoundScore> playerLatestTurn = legProgressService.getLastScoreForPlayer(leg, throwerId);
             if (playerLatestTurn.isPresent())
-                return checkoutService.isScoreCheckout(playerLatestTurn.get().getScore(), playerLatestTurn.get().getDartsUsed());
+                return checkoutService.isScoreCheckout(playerLatestTurn.get().getScore(), leg.getCheckoutDartsUsed());
         }
 
         // The rounds are in line with the game rules.

@@ -14,6 +14,7 @@ import org.bson.types.ObjectId;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -92,21 +93,25 @@ public class X01MatchServiceImpl implements IX01MatchService {
     @Override
     public X01Match addTurn(@NotNull ObjectId matchId, @NotNull @Valid X01Turn turn) {
         // Find the match
-        X01Match x01Match = this.getMatch(matchId);
+        X01Match match = this.getMatch(matchId);
 
         // Get the current set/leg/round.
-        Optional<X01Set> currentSet = matchProgressService.getCurrentSetOrCreate(x01Match);
-        Optional<X01Leg> currentLeg = matchProgressService.getCurrentLegOrCreate(x01Match, currentSet.orElse(null));
-        Optional<X01LegRound> currentLegRound = matchProgressService.getCurrentLegRoundOrCreate(x01Match, currentLeg.orElse(null));
+        Optional<X01Set> currentSet = matchProgressService.getCurrentSetOrCreate(match);
+        Optional<X01Leg> currentLeg = matchProgressService.getCurrentLegOrCreate(match, currentSet.orElse(null));
+        Optional<X01LegRound> currentLegRound = matchProgressService.getCurrentLegRoundOrCreate(match, currentLeg.orElse(null));
 
         // Add the turn to the current thrower of the current round.
         if (currentLeg.isPresent() && currentLegRound.isPresent()) {
-            ObjectId currentThrower = legRoundService.getCurrentThrowerInRound(currentLegRound.get(), currentLeg.get().getThrowsFirst(), x01Match.getPlayers());
-            addTurnToRound(x01Match, currentLeg.get(), currentLegRound.get().getRound(), turn, currentThrower);
+            int x01 = match.getMatchSettings().getX01();
+            boolean trackDoubles = match.getMatchSettings().isTrackDoubles();
+            List<X01MatchPlayer> players = match.getPlayers();
+            ObjectId currentThrower = legRoundService.getCurrentThrowerInRound(currentLegRound.get(), currentLeg.get().getThrowsFirst(), match.getPlayers());
+
+            legService.addScore(x01, currentLeg.get(), currentLegRound.get().getRound(), turn, players, currentThrower, trackDoubles);
         }
 
         // Save the updated match to the repository.
-        return saveMatch(x01Match);
+        return saveMatch(match);
     }
 
     /**
@@ -120,17 +125,24 @@ public class X01MatchServiceImpl implements IX01MatchService {
     @Override
     public X01Match editTurn(@NotNull ObjectId matchId, @NotNull @Valid X01EditTurn editTurn) {
         // Find the match
-        X01Match x01Match = this.getMatch(matchId);
+        X01Match match = this.getMatch(matchId);
 
         // Get the leg that contains the round.
-        Optional<X01Leg> legOpt = matchProgressService.getSet(x01Match, editTurn.getSet(), true)
+        Optional<X01Leg> legOpt = matchProgressService.getSet(match, editTurn.getSet(), true)
                 .flatMap(set -> setProgressService.getLeg(set, editTurn.getLeg(), true));
 
         // Replace the current score with the updated turn
-        legOpt.ifPresent(x01Leg -> addTurnToRound(x01Match, x01Leg, editTurn.getRound(), editTurn, editTurn.getPlayerId()));
+        legOpt.ifPresent(x01Leg -> {
+            int x01 = match.getMatchSettings().getX01();
+            boolean trackDoubles = match.getMatchSettings().isTrackDoubles();
+            List<X01MatchPlayer> players = match.getPlayers();
+
+            legService.addScore(x01, legOpt.get(), editTurn.getRound(), editTurn, players, editTurn.getPlayerId(), trackDoubles);
+        });
+
 
         // Save the updated match to the repository.
-        return saveMatch(x01Match);
+        return saveMatch(match);
     }
 
     /**
@@ -179,26 +191,6 @@ public class X01MatchServiceImpl implements IX01MatchService {
 
         // Save the reset match to the repository.
         return saveMatch(x01Match);
-    }
-
-    /**
-     * Adds a turn to the specified leg round of a given match.
-     * Updates and validates the current leg round with the score from the provided turn.
-     *
-     * @param match       The match to which the turn is being added.
-     * @param leg         The leg of the match that the turn is part of.
-     * @param roundNumber int the specific round of the leg in which the turn occurs.
-     * @param turn        The turn object containing details about the player's turn (score, darts used, doubles missed).
-     * @param throwerId   The id of the player who has thrown this turn
-     */
-    private void addTurnToRound(X01Match match, X01Leg leg, int roundNumber, X01Turn turn, ObjectId throwerId) {
-        if (match == null || leg == null || turn == null) return;
-
-        // Make the score object containing the turn details (score, darts used, doubles missed)
-        X01LegRoundScore roundScore = new X01LegRoundScore(turn.getDoublesMissed(), turn.getDartsUsed(), turn.getScore());
-
-        // Validate and add the score to the round.
-        legService.addScore(match.getMatchSettings().getX01(), leg, roundNumber, roundScore, match.getPlayers(), throwerId);
     }
 
     /**

@@ -1,6 +1,7 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.model;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -19,6 +20,10 @@ public class X01Leg {
 
     @NotNull
     private ObjectId throwsFirst;
+
+    @Min(1)
+    @Max(3)
+    private Integer checkoutDartsUsed;
 
     @Valid
     private ArrayList<X01LegRound> rounds = new ArrayList<>();

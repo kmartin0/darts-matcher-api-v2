@@ -46,7 +46,7 @@ public class ValidX01DartBotSettingsValidatorTests {
         // Given
         X01MatchPlayer x01MatchPlayer = new X01MatchPlayer(
                 null, null, PlayerType.DART_BOT,
-                null, 0, 0,
+                null,
                 new X01DartBotSettings(26), null
         );
 
@@ -62,7 +62,7 @@ public class ValidX01DartBotSettingsValidatorTests {
         // Given
         X01MatchPlayer x01MatchPlayer = new X01MatchPlayer(
                 null, null, PlayerType.DART_BOT,
-                null, 0, 0,
+                null,
                 null, null
         );
 
@@ -84,7 +84,7 @@ public class ValidX01DartBotSettingsValidatorTests {
         // Given
         X01MatchPlayer x01MatchPlayer = new X01MatchPlayer(
                 null, null, PlayerType.HUMAN,
-                null, 0, 0,
+                null,
                 null, null
         );
 
@@ -100,7 +100,7 @@ public class ValidX01DartBotSettingsValidatorTests {
         // Given
         X01MatchPlayer x01MatchPlayer = new X01MatchPlayer(
                 null, null, PlayerType.HUMAN,
-                null, 0, 0,
+                null,
                 new X01DartBotSettings(26), null
         );
 

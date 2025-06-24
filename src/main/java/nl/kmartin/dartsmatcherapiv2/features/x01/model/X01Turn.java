@@ -1,5 +1,6 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.model;
 
+
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
@@ -16,9 +17,9 @@ public class X01Turn {
 
     @Min(1)
     @Max(3)
-    int dartsUsed;
+    Integer checkoutDartsUsed;
 
     @Min(0)
     @Max(3)
-    int doublesMissed;
+    Integer doublesMissed;
 }

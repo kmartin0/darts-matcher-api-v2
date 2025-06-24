@@ -62,10 +62,13 @@ public class X01DartBotServiceImpl implements IX01DartBotService {
                 .orElseThrow(() -> new InvalidArgumentsException(new TargetError("currentLeg", messageResolver.getMessage(MessageKeys.EXCEPTION_INVALID_ARGUMENTS))));
 
         // Create the round score object for this turn.
-        X01LegRoundScore roundScore = createRoundScore(createDartBotLegState(match, dartBotPlayer, currentLeg));
+        X01DartBotLegState dartBotLegState = createDartBotLegState(match, dartBotPlayer, currentLeg);
+        X01LegRoundScore roundScore = createRoundScore(dartBotLegState, match.getMatchSettings().isTrackDoubles());
+
+        Integer checkoutDartsUsed = dartBotLegState.getRemainingPoints() == 0 ? dartBotLegState.getDartsUsedInRound() : null;
 
         // Create and return an X01Turn object using the values from the created round score for this turn
-        return new X01Turn(roundScore.getScore(), roundScore.getDartsUsed(), roundScore.getDoublesMissed());
+        return new X01Turn(roundScore.getScore(), checkoutDartsUsed, roundScore.getDoublesMissed());
     }
 
     /**
@@ -118,10 +121,11 @@ public class X01DartBotServiceImpl implements IX01DartBotService {
         return new X01DartBotLegState(
                 x01,
                 legScored,
+                0,
                 dartsUsed,
                 createTargetNumOfDarts(match.getMatchSettings().getX01(), targetOneDartAvg),
                 targetOneDartAvg,
-                new X01LegRoundScore(0, 0, 0)
+                new X01LegRoundScore(0, 0)
         );
     }
 
@@ -158,14 +162,17 @@ public class X01DartBotServiceImpl implements IX01DartBotService {
      * @param dartBotLegState {@link X01DartBotLegState} representing the dart bot's current state in the leg.
      * @return {@link X01LegRoundScore} representing the score, darts used, and doubles missed for the dart bot's turn in the current leg.
      */
-    private X01LegRoundScore createRoundScore(X01DartBotLegState dartBotLegState) {
+    private X01LegRoundScore createRoundScore(X01DartBotLegState dartBotLegState, boolean trackDoubles) {
         int remaining = dartBotLegState.getRemainingPoints();
 
         // Simulate dart throws until either the remaining points has reached zero or there no darts left to throw in the round
-        while (remaining != 0 && dartBotLegState.getLegRoundScore().getDartsLeft() > 0) {
+        while (remaining != 0 && dartBotLegState.getDartsLeftInRound() > 0) {
             // Simulate dart throws and update the leg state for each throw.
             List<DartThrow> dartThrows = dartBotThrowSimulatorService.getNextDartThrows(dartBotLegState);
-            dartThrows.forEach(dartThrow -> updateRoundScore(dartBotLegState.getLegRoundScore(), dartThrow));
+            dartThrows.forEach(dartThrow -> {
+                updateRoundScore(dartBotLegState.getLegRoundScore(), dartThrow, trackDoubles);
+                dartBotLegState.setDartsUsedInRound(dartBotLegState.getDartsUsedInRound() + 1);
+            });
 
             // Update the remaining counter
             remaining = dartBotLegState.getRemainingPoints();
@@ -184,16 +191,18 @@ public class X01DartBotServiceImpl implements IX01DartBotService {
      * @param roundScore {@link X01LegRoundScore} the current round score to update
      * @param dartThrow  {@link DartThrow} the dart throw that contains the result to be added to the score
      */
-    private void updateRoundScore(X01LegRoundScore roundScore, DartThrow dartThrow) {
+    private void updateRoundScore(X01LegRoundScore roundScore, DartThrow dartThrow, boolean trackDoubles) {
         roundScore.setScore(roundScore.getScore() + dartThrow.getResult().getScore());
-        roundScore.setDartsUsed(roundScore.getDartsUsed() + 1);
 
         // Check for double missed
-        DartboardSectionArea targetArea = dartThrow.getTarget().getArea();
-        DartboardSectionArea resultArea = dartThrow.getResult().getArea();
-        if ((targetArea.equals(DartboardSectionArea.DOUBLE_BULL) && !resultArea.equals(DartboardSectionArea.DOUBLE_BULL)) ||
-                (targetArea.equals(DartboardSectionArea.DOUBLE) && !resultArea.equals(DartboardSectionArea.DOUBLE))) {
-            roundScore.setDoublesMissed(roundScore.getDoublesMissed() + 1);
+        if (trackDoubles) {
+            DartboardSectionArea targetArea = dartThrow.getTarget().getArea();
+            DartboardSectionArea resultArea = dartThrow.getResult().getArea();
+            if ((targetArea.equals(DartboardSectionArea.DOUBLE_BULL) && !resultArea.equals(DartboardSectionArea.DOUBLE_BULL)) ||
+                    (targetArea.equals(DartboardSectionArea.DOUBLE) && !resultArea.equals(DartboardSectionArea.DOUBLE))) {
+                if (roundScore.getDoublesMissed() == null) roundScore.setDoublesMissed(0);
+                roundScore.setDoublesMissed(roundScore.getDoublesMissed() + 1);
+            }
         }
     }
 }

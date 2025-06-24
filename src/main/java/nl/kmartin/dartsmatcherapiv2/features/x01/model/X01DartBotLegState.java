@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class X01DartBotLegState {
     private int x01;
     private int scoredInLeg;
+    private int dartsUsedInRound;
     private int dartsUsedInLeg;
     private int targetNumOfDarts;
     private double targetOneDartAvg;
@@ -24,7 +25,11 @@ public class X01DartBotLegState {
     }
 
     public int getDartsUsedInLeg() {
-        return dartsUsedInLeg + legRoundScore.getDartsUsed();
+        return dartsUsedInLeg + dartsUsedInRound;
+    }
+
+    public int getDartsLeftInRound() {
+        return 3 - dartsUsedInRound;
     }
 
     public double getCurrentOneDartAvg() {

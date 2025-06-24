@@ -11,22 +11,23 @@ public class X01AverageStatisticsServiceImpl implements IX01AverageStatisticsSer
      * Updates the player's average statistics based on the current round's score and dart usage.
      *
      * @param playerAverageStats {@link X01AverageStatistics} the average statistics of the player to be updated.
-     * @param playerScore  {@link X01LegRoundScore} the score and dart usage details for the current round.
-     * @param roundNumber       {@link int} the current round number (used to differentiate first nine rounds).
+     * @param playerScore        {@link X01LegRoundScore} the score and dart usage details for the current round.
+     * @param roundNumber        {@link int} the current round number (used to differentiate first nine rounds).
      */
     @Override
-    public void updateAverageStats(X01AverageStatistics playerAverageStats, X01LegRoundScore playerScore, int roundNumber) {
+    public void updateAverageStats(X01AverageStatistics playerAverageStats, X01LegRoundScore playerScore, int roundNumber, Integer checkoutDartsUsed) {
         if (playerAverageStats == null || playerScore == null) return;
+        int dartsUsed = checkoutDartsUsed == null ? 3 : checkoutDartsUsed;
 
         // Update the average statistics for with this score
         updatePointsThrown(playerAverageStats, playerScore);
-        updateDartsThrown(playerAverageStats, playerScore);
+        updateDartsThrown(playerAverageStats, playerScore, dartsUsed);
         updateAverage(playerAverageStats);
 
         // If it's one of the first three rounds, update the first nine statistics
         if (roundNumber <= 3) {
             updatePointsThrownFirstNine(playerAverageStats, playerScore);
-            updateDartsThrownFirstNine(playerAverageStats, playerScore);
+            updateDartsThrownFirstNine(playerAverageStats, playerScore, dartsUsed);
             updateAverageFirstNine(playerAverageStats);
         }
     }
@@ -35,7 +36,7 @@ public class X01AverageStatisticsServiceImpl implements IX01AverageStatisticsSer
      * Updates the total points thrown by the player based on the current round's score.
      *
      * @param playerAverageStats {@link X01AverageStatistics} the player's average statistics.
-     * @param playerScore       {@link X01LegRoundScore} the current round's score information.
+     * @param playerScore        {@link X01LegRoundScore} the current round's score information.
      */
     private void updatePointsThrown(X01AverageStatistics playerAverageStats, X01LegRoundScore playerScore) {
         if (playerAverageStats == null || playerScore == null) return;
@@ -48,13 +49,14 @@ public class X01AverageStatisticsServiceImpl implements IX01AverageStatisticsSer
      * Updates the total darts thrown by the player based on the current round's dart usage.
      *
      * @param playerAverageStats {@link X01AverageStatistics} the player's average statistics.
-     * @param playerScore       {@link X01LegRoundScore} the current round's dart usage information.
+     * @param playerScore        {@link X01LegRoundScore} the current round's dart usage information.
+     * @param dartsUsed          the number of darts used for this score.
      */
-    private void updateDartsThrown(X01AverageStatistics playerAverageStats, X01LegRoundScore playerScore) {
+    private void updateDartsThrown(X01AverageStatistics playerAverageStats, X01LegRoundScore playerScore, int dartsUsed) {
         if (playerAverageStats == null || playerScore == null) return;
 
         // Increment the total darts thrown by the player's darts used in the current round
-        playerAverageStats.setDartsThrown(playerAverageStats.getDartsThrown() + playerScore.getDartsUsed());
+        playerAverageStats.setDartsThrown(playerAverageStats.getDartsThrown() + dartsUsed);
     }
 
     /**
@@ -74,7 +76,7 @@ public class X01AverageStatisticsServiceImpl implements IX01AverageStatisticsSer
      * Updates the total points thrown by the player for the first nine darts.
      *
      * @param playerAverageStats {@link X01AverageStatistics} the player's average statistics.
-     * @param playerScore       {@link X01LegRoundScore} the current round's score information.
+     * @param playerScore        {@link X01LegRoundScore} the current round's score information.
      */
     private void updatePointsThrownFirstNine(X01AverageStatistics playerAverageStats, X01LegRoundScore playerScore) {
         if (playerAverageStats == null || playerScore == null) return;
@@ -87,13 +89,14 @@ public class X01AverageStatisticsServiceImpl implements IX01AverageStatisticsSer
      * Updates the total darts thrown by the player for the first nine darts.
      *
      * @param playerAverageStats {@link X01AverageStatistics} the player's average statistics.
-     * @param playerScore       {@link X01LegRoundScore} the current round's dart usage information.
+     * @param playerScore        {@link X01LegRoundScore} the current round's dart usage information.
+     * @param dartsUsed          the number of darts used for this score.
      */
-    private void updateDartsThrownFirstNine(X01AverageStatistics playerAverageStats, X01LegRoundScore playerScore) {
+    private void updateDartsThrownFirstNine(X01AverageStatistics playerAverageStats, X01LegRoundScore playerScore, int dartsUsed) {
         if (playerAverageStats == null || playerScore == null) return;
 
         // Increment the total darts thrown for the first nine darts
-        playerAverageStats.setDartsThrownFirstNine(playerAverageStats.getDartsThrownFirstNine() + playerScore.getDartsUsed());
+        playerAverageStats.setDartsThrownFirstNine(playerAverageStats.getDartsThrownFirstNine() + dartsUsed);
     }
 
     /**

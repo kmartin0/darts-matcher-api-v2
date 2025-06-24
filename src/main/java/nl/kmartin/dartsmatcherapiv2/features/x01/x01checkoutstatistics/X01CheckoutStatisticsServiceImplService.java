@@ -17,7 +17,7 @@ public class X01CheckoutStatisticsServiceImplService implements IX01CheckoutStat
      */
     @Override
     public void updateCheckoutStatistics(X01CheckoutStatistics playerCheckoutStats, X01LegRoundScore playerScore,
-                                         boolean isCheckout) {
+                                         boolean isCheckout, boolean trackDoubles) {
         if (playerCheckoutStats == null || playerScore == null) return;
 
         // If the player attempted to make a checkout. Update the relevant statistics
@@ -32,11 +32,13 @@ public class X01CheckoutStatisticsServiceImplService implements IX01CheckoutStat
             updateTonPlusCheckout(playerCheckoutStats, playerScore);
         }
 
-        // Update missed checkouts based on doubles missed in the round
-        updateCheckoutsMissed(playerCheckoutStats, playerScore);
+        if (trackDoubles) {
+            // Update missed checkouts based on doubles missed in the round
+            updateCheckoutsMissed(playerCheckoutStats, playerScore);
 
-        // Calculate and set the checkout percentage based on attempts and hits
-        updateCheckoutPercentage(playerCheckoutStats);
+            // Calculate and set the checkout percentage based on attempts and hits
+            updateCheckoutPercentage(playerCheckoutStats);
+        }
     }
 
     /**
@@ -81,6 +83,8 @@ public class X01CheckoutStatisticsServiceImplService implements IX01CheckoutStat
      */
     private void updateCheckoutsMissed(X01CheckoutStatistics playerCheckoutStats, X01LegRoundScore playerScore) {
         if (playerCheckoutStats == null || playerScore == null) return;
+        if (playerScore.getDoublesMissed() == null) playerScore.setDoublesMissed(0);
+        if (playerCheckoutStats.getCheckoutsMissed() == null) playerCheckoutStats.setCheckoutsMissed(0);
 
         // Update the missed checkouts by adding the number of missed doubles
         playerCheckoutStats.setCheckoutsMissed(playerCheckoutStats.getCheckoutsMissed() + playerScore.getDoublesMissed());
@@ -93,6 +97,7 @@ public class X01CheckoutStatisticsServiceImplService implements IX01CheckoutStat
      */
     private void updateCheckoutPercentage(X01CheckoutStatistics playerCheckoutStats) {
         if (playerCheckoutStats == null) return;
+        if(playerCheckoutStats.getCheckoutsMissed() == null) playerCheckoutStats.setCheckoutsMissed(0);
 
         // Calculate the checkout attempts (successful + missed)
         int checkoutAttempts = playerCheckoutStats.getCheckoutsHit() + playerCheckoutStats.getCheckoutsMissed();

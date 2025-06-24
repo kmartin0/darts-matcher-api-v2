@@ -14,9 +14,9 @@ public class X01CheckoutStatistics {
 
     private int checkoutTonPlus;
 
-    private int checkoutPercentage;
+    private Integer checkoutPercentage;
 
-    private int checkoutsMissed;
+    private Integer checkoutsMissed;
 
     private int checkoutsHit;
 
@@ -31,8 +31,8 @@ public class X01CheckoutStatistics {
     public void reset() {
         this.checkoutHighest = 0;
         this.checkoutTonPlus = 0;
-        this.checkoutPercentage = 0;
-        this.checkoutsMissed = 0;
+        this.checkoutPercentage = null;
+        this.checkoutsMissed = null;
         this.checkoutsHit = 0;
     }
 }

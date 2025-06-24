@@ -8,10 +8,7 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class X01LegResultServiceImpl implements IX01LegResultService {
@@ -115,11 +112,20 @@ public class X01LegResultServiceImpl implements IX01LegResultService {
         // When no rounds exist, the player has no darts used.
         if (X01ValidationUtils.isRoundsEmpty(leg) || playerId == null) return 0;
 
+        // If the player has won the leg, get the checkout round.
+        Optional<X01LegRound> checkoutRound = leg.getWinner() == null
+                ? Optional.empty()
+                : leg.getRounds().stream().max(Comparator.comparing(X01LegRound::getRound));
+
         // For every round map the player darts used and sum these up.
         return leg.getRounds().stream()
                 .mapToInt(value -> {
                     X01LegRoundScore playerScore = value.getScores().get(playerId);
-                    return (playerScore != null) ? playerScore.getDartsUsed() : 0;
+                    if (playerScore == null) return 0;
+                    if (checkoutRound.isPresent() && checkoutRound.get().getRound() == value.getRound())
+                        return leg.getCheckoutDartsUsed();
+
+                    return 3;
                 }).sum();
     }
 }

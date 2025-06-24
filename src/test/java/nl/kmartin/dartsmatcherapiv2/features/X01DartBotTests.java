@@ -20,9 +20,9 @@ import java.util.*;
 @ExtendWith(MockitoExtension.class)
 public class X01DartBotTests {
 
-    private static final int MAX_AVG_TO_TEST = 50;
-    private static final int MIN_AVG_TO_TEST = 40;
-    private static final int ITERATION_PER_TARGET = 50;
+    private static final int MAX_AVG_TO_TEST = 180;
+    private static final int MIN_AVG_TO_TEST = 1;
+    private static final int ITERATION_PER_TARGET = 500;
 
     @Mock
     private IX01MatchRepository matchRepository; // Mocked repository
@@ -75,13 +75,14 @@ public class X01DartBotTests {
             dartsUsedMap.put(dartsUsed, dartsUsedMap.getOrDefault(dartsUsed, 0) + 1);
             x01Leg.getRounds().clear();
         }
-        System.out.println("\nDarts Used Map: " + dartsUsedMap);
+        System.out.println("Darts Used Map: " + dartsUsedMap);
     }
 
     private int simulateLeg(int targetAvg, X01Match match, X01Leg currentLeg, ObjectId dartBotId) {
         int round = 1;
         int remaining = match.getMatchSettings().getX01();
         int dartsUsed = 0;
+
         while (remaining != 0) {
             if (remaining < 0) {
                 System.out.println("ERROR: Remaining below zero");
@@ -89,11 +90,12 @@ public class X01DartBotTests {
             }
             match.getMatchProgress().setCurrentRound(round);
             X01Turn x01Turn = dartBotService.createDartBotTurn(match.getId());
-            X01LegRoundScore roundScore = new X01LegRoundScore(x01Turn.getDoublesMissed(), x01Turn.getDartsUsed(), x01Turn.getScore());
+            X01LegRoundScore roundScore = new X01LegRoundScore(x01Turn.getDoublesMissed(), x01Turn.getScore());
+
             currentLeg.getRounds().add(new X01LegRound(round++, Map.of(dartBotId, roundScore)));
             remaining -= x01Turn.getScore();
             round++;
-            dartsUsed = dartsUsed + roundScore.getDartsUsed();
+            dartsUsed = dartsUsed + (x01Turn.getCheckoutDartsUsed() == null ? 3 : x01Turn.getCheckoutDartsUsed());
         }
 
         assertDartsUsedWithinBounds(targetAvg, match.getMatchSettings().getX01(), dartsUsed);
@@ -120,7 +122,7 @@ public class X01DartBotTests {
     private X01Match createTestMatch(ObjectId starter) {
         X01Match match = new X01Match();
         match.setId(new ObjectId());
-        match.setMatchSettings(new X01MatchSettings(501, false, new X01BestOf(1, 1)));
+        match.setMatchSettings(new X01MatchSettings(501, true, new X01BestOf(1, 1)));
         match.setMatchProgress(new X01MatchProgress(1, 1, 1, starter));
         return match;
     }
