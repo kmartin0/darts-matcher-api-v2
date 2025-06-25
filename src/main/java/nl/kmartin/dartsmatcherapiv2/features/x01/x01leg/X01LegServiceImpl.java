@@ -37,12 +37,15 @@ public class X01LegServiceImpl implements IX01LegService {
      * @param legNumber        int the leg number
      * @param throwsFirstInSet {@link ObjectId} the player that started the set
      * @param players          {@link List<X01MatchPlayer>} the list of match players
-     * @return {@link X01Leg} the created leg
+     * @return {@link X01LegEntry} the created leg
      */
     @Override
-    public X01Leg createNewLeg(int legNumber, ObjectId throwsFirstInSet, List<X01MatchPlayer> players) {
+    public X01LegEntry createNewLeg(int legNumber, ObjectId throwsFirstInSet, List<X01MatchPlayer> players) {
         ObjectId throwsFirstInLeg = calcThrowsFirstInLeg(legNumber, throwsFirstInSet, players);
-        return new X01Leg(legNumber, null, throwsFirstInLeg, new TreeMap<>());
+        return new X01LegEntry(
+                legNumber,
+                new X01Leg(null, throwsFirstInLeg, new TreeMap<>())
+        );
     }
 
     /**
@@ -103,9 +106,9 @@ public class X01LegServiceImpl implements IX01LegService {
     /**
      * Determines if a score made by a player in a round of a leg is a checkout.
      *
-     * @param leg      {@link X01Leg} the leg that the round is in
+     * @param leg         {@link X01Leg} the leg that the round is in
      * @param roundNumber the round number to check
-     * @param playerId {@link ObjectId} the player that scored
+     * @param playerId    {@link ObjectId} the player that scored
      * @return boolean whether the score made a player is a checkout
      */
     @Override

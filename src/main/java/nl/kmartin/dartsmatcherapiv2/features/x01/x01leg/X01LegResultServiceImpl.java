@@ -58,17 +58,17 @@ public class X01LegResultServiceImpl implements IX01LegResultService {
 
         // Iterate through the rounds in reverse order. Trim scores beyond the final score of the leg winner.
         // This situation can occur if a score is edited and, as a result, another player becomes the winner.
-        List<Integer> reverseRoundKeys = new ArrayList<>(leg.getRounds().descendingKeySet());
+        Iterator<Integer> reverseRoundsIterator = leg.getRounds().descendingKeySet().iterator();
         outer:
-        for (Integer roundKey : reverseRoundKeys) {
-            X01LegRound round = leg.getRounds().get(roundKey);
-            List<ObjectId> reverseKeys = new ArrayList<>(round.getScores().keySet());
-            Collections.reverse(reverseKeys);
+        while (reverseRoundsIterator.hasNext()) {
+            X01LegRound round = leg.getRounds().get(reverseRoundsIterator.next());
+            List<ObjectId> reverseScoreKeys = new ArrayList<>(round.getScores().keySet());
+            Collections.reverse(reverseScoreKeys);
 
-            for (ObjectId playerId : reverseKeys) {
+            for (ObjectId playerId : reverseScoreKeys) {
                 if (!playerId.equals(legWinner)) {
                     round.getScores().remove(playerId);
-                    if (round.getScores().isEmpty()) leg.getRounds().remove(roundKey);
+                    if (round.getScores().isEmpty()) reverseRoundsIterator.remove();
                 } else break outer;
             }
         }

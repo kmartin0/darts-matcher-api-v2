@@ -17,6 +17,7 @@ import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
@@ -58,11 +59,11 @@ public class X01DartBotServiceImpl implements IX01DartBotService {
 
         // Get the current leg for the match.
         X01Set currentSet = matchProgressService.getCurrentSetOrCreate(match).orElse(null);
-        X01Leg currentLeg = matchProgressService.getCurrentLegOrCreate(match, currentSet)
+        X01LegEntry currentLegEntry = matchProgressService.getCurrentLegOrCreate(match, currentSet)
                 .orElseThrow(() -> new InvalidArgumentsException(new TargetError("currentLeg", messageResolver.getMessage(MessageKeys.EXCEPTION_INVALID_ARGUMENTS))));
 
         // Create the round score object for this turn.
-        X01DartBotLegState dartBotLegState = createDartBotLegState(match, dartBotPlayer, currentLeg);
+        X01DartBotLegState dartBotLegState = createDartBotLegState(match, dartBotPlayer, currentLegEntry.leg());
         X01LegRoundScore roundScore = createRoundScore(dartBotLegState, match.getMatchSettings().isTrackDoubles());
 
         Integer checkoutDartsUsed = dartBotLegState.getRemainingPoints() == 0 ? dartBotLegState.getDartsUsedInRound() : null;

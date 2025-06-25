@@ -62,11 +62,11 @@ public class X01StatisticsServiceImpl implements IX01StatisticsService {
      * @param legs    {@link List<X01Leg>} the list of legs containing the player turns
      * @param players {@link List<X01MatchPlayer>} the players for which the statistics need to be updated
      */
-    private void processLegs(List<X01Leg> legs, List<X01MatchPlayer> players, boolean trackDoubles) {
+    private void processLegs(NavigableMap<Integer, X01Leg> legs, List<X01MatchPlayer> players, boolean trackDoubles) {
         if (legs == null || players == null) return;
 
         // Process and update the player statistics using the data of all the leg rounds
-        legs.forEach(leg -> processLegRounds(leg.getRounds(), leg, players, trackDoubles));
+        legs.values().forEach(leg -> processLegRounds(leg.getRounds(), leg, players, trackDoubles));
     }
 
     /**

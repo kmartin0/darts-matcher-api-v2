@@ -6,7 +6,7 @@ import org.bson.types.ObjectId;
 import java.util.List;
 
 public interface IX01LegService {
-    X01Leg createNewLeg(int legNumber, ObjectId throwsFirstInSet, List<X01MatchPlayer> players);
+    X01LegEntry createNewLeg(int legNumber, ObjectId throwsFirstInSet, List<X01MatchPlayer> players);
 
     void addScore(int x01, X01Leg leg, int roundNumber, X01Turn turn, List<X01MatchPlayer> players, ObjectId throwerId, boolean trackDoubles);
 

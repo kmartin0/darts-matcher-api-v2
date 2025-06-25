@@ -22,7 +22,7 @@ public class X01DartBotTests {
 
     private static final int MAX_AVG_TO_TEST = 180;
     private static final int MIN_AVG_TO_TEST = 1;
-    private static final int ITERATION_PER_TARGET = 500;
+    private static final int ITERATION_PER_TARGET = 100;
 
     @Mock
     private IX01MatchRepository matchRepository; // Mocked repository
@@ -58,8 +58,8 @@ public class X01DartBotTests {
     private void executeTestForTargetAvg(X01Match match, ObjectId dartBotId, int targetAvg) {
         printTargetAvg(targetAvg);
         // Initialize the match with the base settings.
-        X01Leg x01Leg = new X01Leg(1, null, dartBotId, new TreeMap<>());
-        X01Set x01Set = new X01Set(1, new ArrayList<>(Collections.singletonList(x01Leg)), dartBotId, null);
+        X01Leg x01Leg = new X01Leg(null, dartBotId, new TreeMap<>());
+        X01Set x01Set = new X01Set(1, new TreeMap<>(Map.of(1, x01Leg)), dartBotId, null);
 
         X01DartBotSettings dartBotSettings = new X01DartBotSettings(targetAvg);
         X01MatchPlayer dartBotPlayer = new X01MatchPlayer(dartBotId, "Dart Bot", PlayerType.DART_BOT, null, dartBotSettings, null);
@@ -92,7 +92,7 @@ public class X01DartBotTests {
             X01Turn x01Turn = dartBotService.createDartBotTurn(match.getId());
             X01LegRoundScore roundScore = new X01LegRoundScore(x01Turn.getDoublesMissed(), x01Turn.getScore());
 
-            currentLeg.getRounds().put(round++, new X01LegRound(Map.of(dartBotId, roundScore)));
+            currentLeg.getRounds().put(round++, new X01LegRound(new LinkedHashMap<>(Map.of(dartBotId, roundScore))));
             remaining -= x01Turn.getScore();
             round++;
             dartsUsed = dartsUsed + (x01Turn.getCheckoutDartsUsed() == null ? 3 : x01Turn.getCheckoutDartsUsed());

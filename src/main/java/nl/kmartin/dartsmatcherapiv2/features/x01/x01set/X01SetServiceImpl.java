@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
 
 @Service
 @Primary
@@ -24,7 +25,7 @@ public class X01SetServiceImpl implements IX01SetService {
     @Override
     public X01Set createNewSet(int setNumber, List<X01MatchPlayer> players) {
         ObjectId throwsFirstInSet = calcThrowsFirstInSet(setNumber, players);
-        return new X01Set(setNumber, new ArrayList<>(), throwsFirstInSet, null);
+        return new X01Set(setNumber, new TreeMap<>(), throwsFirstInSet, null);
     }
 
     /**

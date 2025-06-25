@@ -5,6 +5,7 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Set;
 import org.bson.types.ObjectId;
 
 import java.util.List;
+import java.util.Map;
 
 public interface IX01SetResultService {
     void updateSetResult(X01Set set, int bestOfLegs, List<X01MatchPlayer> players, int x01);
@@ -13,7 +14,7 @@ public interface IX01SetResultService {
 
     List<ObjectId> getSetWinners(X01Set set, int bestOfLegs, List<X01MatchPlayer> players);
 
-    java.util.Map<ObjectId, Long> getSetStandings(X01Set set, List<X01MatchPlayer> players);
+    Map<ObjectId, Long> getSetStandings(X01Set set, List<X01MatchPlayer> players);
 
     void removeLegsAfterSetWinner(X01Set set, List<ObjectId> setWinners);
 }

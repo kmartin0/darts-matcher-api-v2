@@ -135,20 +135,20 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
      *
      * @param match      {@link X01Match}  the match for which the current leg needs to be determined
      * @param currentSet {@link X01Set} the current set in play.
-     * @return {@link Optional<X01Leg>} the current leg in play.
+     * @return {@link Optional<X01LegEntry>} the current leg in play.
      */
     @Override
-    public Optional<X01Leg> getCurrentLegOrCreate(X01Match match, X01Set currentSet) {
+    public Optional<X01LegEntry> getCurrentLegOrCreate(X01Match match, X01Set currentSet) {
         if (match == null || currentSet == null) return Optional.empty();
 
         // First find the current leg in the active list of legs from the current set.
         int bestOfLegs = match.getMatchSettings().getBestOf().getLegs();
-        Optional<X01Leg> curLeg = setProgressService.getCurrentLeg(currentSet);
+        Optional<X01LegEntry> curLegEntry = setProgressService.getCurrentLeg(currentSet);
 
         // If there is no current leg and the set isn't concluded, create the next leg.
-        return curLeg.isEmpty() && !setProgressService.isSetConcluded(currentSet, match.getPlayers())
+        return curLegEntry.isEmpty() && !setProgressService.isSetConcluded(currentSet, match.getPlayers())
                 ? setProgressService.createNextLeg(currentSet, match.getPlayers(), bestOfLegs, currentSet.getThrowsFirst())
-                : curLeg;
+                : curLegEntry;
     }
 
     /**
@@ -203,21 +203,24 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
         // Stops after the first removal of a score.
         outer:
         for (X01Set set : setsReverse) {
-            List<X01Leg> legsReverse = new ArrayList<>(set.getLegs());
-            Collections.reverse(legsReverse);
+            Iterator<Integer> reverseLegIterator = set.getLegs().descendingKeySet().iterator();
+            while (reverseLegIterator.hasNext()) {
+                X01Leg leg = set.getLegs().get(reverseLegIterator.next());
+                Iterator<Integer> reverseRoundsIterator = leg.getRounds().descendingKeySet().iterator();
+                while (reverseRoundsIterator.hasNext()) {
+                    X01LegRound round = leg.getRounds().get(reverseRoundsIterator.next());
 
-            for (X01Leg leg : legsReverse) {
-                List<Integer> reverseRoundKeys = new ArrayList<>(leg.getRounds().descendingKeySet());
-
-                for (Integer roundKey : reverseRoundKeys) {
-                    X01LegRound round = leg.getRounds().get(roundKey);
-                    boolean removed = legRoundService.removeLastScoreFromRound(round);
-                    if (round.getScores().isEmpty()) leg.getRounds().remove(roundKey);
-                    if (leg.getRounds().isEmpty()) set.getLegs().remove(leg);
-                    if (set.getLegs().isEmpty()) match.getSets().remove(set);
-                    if (removed) break outer;
+                    if (legRoundService.removeLastScoreFromRound(round)) {
+                        if (round.getScores().isEmpty()) reverseRoundsIterator.remove();
+                        if (leg.getRounds().isEmpty()) reverseLegIterator.remove();
+                        if (set.getLegs().isEmpty()) match.getSets().remove(set);
+                        break outer;
+                    }
+                    if (round.getScores().isEmpty()) reverseRoundsIterator.remove();
                 }
+                if (leg.getRounds().isEmpty()) reverseLegIterator.remove();
             }
+            if (set.getLegs().isEmpty()) match.getSets().remove(set);
         }
     }
 
@@ -230,23 +233,25 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
     public void updateMatchProgress(X01Match match) {
         if (match == null) return;
 
-        // Get the current set/leg/round
-        X01Set currentSet = getCurrentSetOrCreate(match).orElse(null);
-        X01Leg currentLeg = getCurrentLegOrCreate(match, currentSet).orElse(null);
-
-        Map.Entry<Integer, X01LegRound> currentLegRoundEntry = getCurrentLegRoundOrCreate(match, currentLeg).orElse(null);
-        X01LegRound currentLegRound = currentLegRoundEntry != null ? currentLegRoundEntry.getValue() : null;
+        // Get the current set, leg and round.
+        Optional<X01Set> currentSet = getCurrentSetOrCreate(match);
+        Optional<X01LegEntry> currentLegEntry = currentSet.flatMap(set -> getCurrentLegOrCreate(match, set));
+        Optional<Map.Entry<Integer, X01LegRound>> currentLegRoundEntry = currentLegEntry.flatMap(legEntry -> getCurrentLegRoundOrCreate(match, legEntry.leg()));
 
         // Get the current thrower for the current round
-        ObjectId throwsFirstInCurrentLeg = currentLeg != null ? currentLeg.getThrowsFirst() : null;
-        ObjectId currentThrower = legRoundService.getCurrentThrowerInRound(currentLegRound, throwsFirstInCurrentLeg, match.getPlayers());
+        Optional<ObjectId> throwsFirstInCurrentLeg = currentLegEntry.map(legEntry -> legEntry.leg().getThrowsFirst());
+        Optional<ObjectId> currentThrower = currentLegRoundEntry.flatMap(roundEntry ->
+                throwsFirstInCurrentLeg.map(throwsFirst ->
+                        legRoundService.getCurrentThrowerInRound(roundEntry.getValue(), throwsFirst, match.getPlayers())
+                )
+        );
 
         // Update the match progress with the new state of the match
         match.setMatchProgress(new X01MatchProgress(
-                currentSet != null ? currentSet.getSet() : null,
-                currentLeg != null ? currentLeg.getLeg() : null,
-                currentLegRoundEntry != null ? currentLegRoundEntry.getKey() : null,
-                currentThrower
+                currentSet.map(X01Set::getSet).orElse(null),
+                currentLegEntry.map(X01LegEntry::legNumber).orElse(null),
+                currentLegRoundEntry.map(Map.Entry::getKey).orElse(null),
+                currentThrower.orElse(null)
         ));
     }
 

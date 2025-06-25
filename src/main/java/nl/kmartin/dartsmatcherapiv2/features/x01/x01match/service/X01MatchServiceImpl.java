@@ -96,20 +96,25 @@ public class X01MatchServiceImpl implements IX01MatchService {
         // Find the match
         X01Match match = this.getMatch(matchId);
 
-        // Get the current set/leg/round.
-        Optional<X01Set> currentSet = matchProgressService.getCurrentSetOrCreate(match);
-        Optional<X01Leg> currentLeg = matchProgressService.getCurrentLegOrCreate(match, currentSet.orElse(null));
-        Optional<Map.Entry<Integer, X01LegRound>> currentLegRound = matchProgressService.getCurrentLegRoundOrCreate(match, currentLeg.orElse(null));
+        // Get the current set
+        X01Set currentSet = matchProgressService.getCurrentSetOrCreate(match)
+                .orElseThrow(() -> new ResourceNotFoundException(X01Set.class, null));
+
+        // Get the current leg
+        X01LegEntry currentLegEntry = matchProgressService.getCurrentLegOrCreate(match, currentSet)
+                .orElseThrow(() -> new ResourceNotFoundException(X01Leg.class, null));
+
+        // Get the current leg round
+        Map.Entry<Integer, X01LegRound> currentLegRound = matchProgressService.getCurrentLegRoundOrCreate(match, currentLegEntry.leg())
+                .orElseThrow(() -> new ResourceNotFoundException(X01LegRound.class, null));
 
         // Add the turn to the current thrower of the current round.
-        if (currentLeg.isPresent() && currentLegRound.isPresent()) {
-            int x01 = match.getMatchSettings().getX01();
-            boolean trackDoubles = match.getMatchSettings().isTrackDoubles();
-            List<X01MatchPlayer> players = match.getPlayers();
-            ObjectId currentThrower = legRoundService.getCurrentThrowerInRound(currentLegRound.get().getValue(), currentLeg.get().getThrowsFirst(), match.getPlayers());
+        int x01 = match.getMatchSettings().getX01();
+        boolean trackDoubles = match.getMatchSettings().isTrackDoubles();
+        List<X01MatchPlayer> players = match.getPlayers();
+        ObjectId currentThrower = legRoundService.getCurrentThrowerInRound(currentLegRound.getValue(), currentLegEntry.leg().getThrowsFirst(), match.getPlayers());
 
-            legService.addScore(x01, currentLeg.get(), currentLegRound.get().getKey(), turn, players, currentThrower, trackDoubles);
-        }
+        legService.addScore(x01, currentLegEntry.leg(), currentLegRound.getKey(), turn, players, currentThrower, trackDoubles);
 
         // Save the updated match to the repository.
         return saveMatch(match);
@@ -129,18 +134,17 @@ public class X01MatchServiceImpl implements IX01MatchService {
         X01Match match = this.getMatch(matchId);
 
         // Get the leg that contains the round.
-        Optional<X01Leg> legOpt = matchProgressService.getSet(match, editTurn.getSet(), true)
+        Optional<X01LegEntry> legOpt = matchProgressService.getSet(match, editTurn.getSet(), true)
                 .flatMap(set -> setProgressService.getLeg(set, editTurn.getLeg(), true));
 
         // Replace the current score with the updated turn
-        legOpt.ifPresent(x01Leg -> {
+        legOpt.ifPresent(legEntry -> {
             int x01 = match.getMatchSettings().getX01();
             boolean trackDoubles = match.getMatchSettings().isTrackDoubles();
             List<X01MatchPlayer> players = match.getPlayers();
 
-            legService.addScore(x01, legOpt.get(), editTurn.getRound(), editTurn, players, editTurn.getPlayerId(), trackDoubles);
+            legService.addScore(x01, legEntry.leg(), editTurn.getRound(), editTurn, players, editTurn.getPlayerId(), trackDoubles);
         });
-
 
         // Save the updated match to the repository.
         return saveMatch(match);

@@ -13,10 +13,7 @@ import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,7 +30,7 @@ public class X01SetResultServiceImpl implements IX01SetResultService {
     /**
      * Updates the player results for a set.
      *
-     * @param set     {@link X01Set} the set to be updated
+     * @param set        {@link X01Set} the set to be updated
      * @param bestOfLegs int the best of setting for the legs
      * @param players    {@link List<X01MatchPlayer>} the list of match players
      */
@@ -82,14 +79,14 @@ public class X01SetResultServiceImpl implements IX01SetResultService {
         if (X01ValidationUtils.isLegsEmpty(set)) return;
 
         // For each leg update the leg result.
-        set.getLegs().forEach(x01Leg -> legResultService.updateLegResult(x01Leg, players, x01));
+        set.getLegs().values().forEach(x01Leg -> legResultService.updateLegResult(x01Leg, players, x01));
     }
 
     /**
      * A list of object ids is created containing all players that have won the set. Multiple set winners
      * means a draw has occurred.
      *
-     * @param set     {@link X01Set} The set for which the winners are being determined.
+     * @param set        {@link X01Set} The set for which the winners are being determined.
      * @param bestOfLegs int the best of setting for the legs
      * @param players    {@link List<X01MatchPlayer>} the list of match players
      * @return {@link List<ObjectId>} containing the IDs of players who won the set. multiple winners indicates a draw.
@@ -123,7 +120,7 @@ public class X01SetResultServiceImpl implements IX01SetResultService {
                 .collect(Collectors.toMap(MatchPlayer::getPlayerId, player -> 0L));
 
         // Update the map with the number of wins from the legs for each player
-        set.getLegs().stream()
+        set.getLegs().values().stream()
                 .filter(x01Leg -> x01Leg.getWinner() != null)  // Filter out legs with no winner
                 .forEach(x01Leg -> standings.merge(x01Leg.getWinner(), 1L, Long::sum)); // Increment win count for the winner
 
@@ -145,13 +142,13 @@ public class X01SetResultServiceImpl implements IX01SetResultService {
     public void removeLegsAfterSetWinner(X01Set set, List<ObjectId> setWinners) {
         if (X01ValidationUtils.isLegsEmpty(set) || CollectionUtils.isEmpty(setWinners)) return;
 
-        List<X01Leg> reverseLegs = new ArrayList<>(set.getLegs());
-        Collections.reverse(reverseLegs);
-
         // Iterate legs backwards, removing any legs that come after a set winner. Stop when a winner is matched.
-        for (X01Leg leg : reverseLegs) {
+        Iterator<Integer> iterator = set.getLegs().descendingKeySet().iterator();
+        while (iterator.hasNext()) {
+            Integer legKey = iterator.next();
+            X01Leg leg = set.getLegs().get(legKey);
             if (setWinners.contains(leg.getWinner())) break;
-            set.getLegs().remove(leg);
+            iterator.remove();
         }
     }
 
@@ -159,7 +156,7 @@ public class X01SetResultServiceImpl implements IX01SetResultService {
      * Determine the number of legs that are yet to be played in a set
      *
      * @param bestOfLegs int the maximum number of legs going to be played
-     * @param set     {@link X01Set} the set for which the remaining legs need to be determined
+     * @param set        {@link X01Set} the set for which the remaining legs need to be determined
      * @return int the number of legs can still be played
      */
     private int calcRemainingLegs(int bestOfLegs, X01Set set) {
@@ -167,7 +164,7 @@ public class X01SetResultServiceImpl implements IX01SetResultService {
         if (X01ValidationUtils.isLegsEmpty(set)) return bestOfLegs;
 
         // Count the number of completed legs (legs with a winner)
-        long completedLegs = set.getLegs().stream()
+        long completedLegs = set.getLegs().values().stream()
                 .filter(legProgressService::isLegConcluded)
                 .count();
 

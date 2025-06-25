@@ -14,9 +14,6 @@ import java.util.TreeMap;
 @Data
 @NoArgsConstructor
 public class X01Leg {
-    @Min(1)
-    private int leg;
-
     private ObjectId winner;
 
     @NotNull
@@ -29,8 +26,7 @@ public class X01Leg {
     @Valid
     private NavigableMap<Integer, X01LegRound> rounds = new TreeMap<>();
 
-    public X01Leg(int leg, ObjectId winner, ObjectId throwsFirst, NavigableMap<Integer, X01LegRound> rounds) {
-        this.leg = leg;
+    public X01Leg(ObjectId winner, ObjectId throwsFirst, NavigableMap<Integer, X01LegRound> rounds) {
         this.winner = winner;
         this.throwsFirst = throwsFirst;
         this.setRounds(rounds);

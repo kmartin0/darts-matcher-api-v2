@@ -76,7 +76,7 @@ public class X01LegProgressServiceImpl implements IX01LegProgressService {
         if (nextRoundNumber == -1) return Optional.empty();
 
         // Create and add a new leg round to the leg.
-        X01LegRound newLegRound = new X01LegRound(new HashMap<>());
+        X01LegRound newLegRound = new X01LegRound(new LinkedHashMap<>());
 
         leg.getRounds().put(nextRoundNumber, newLegRound);
         return Optional.of(Map.entry(nextRoundNumber, newLegRound));
