@@ -80,7 +80,7 @@ public class X01MatchServiceTests {
         // When
         X01Match createdMatch = x01MatchService.createMatch(x01Match);
         Mockito.when(x01MatchRepository.findById(createdMatch.getId())).thenReturn(Optional.of(createdMatch));
-        Mockito.when(matchProgressService.getCurrentSetOrCreate(x01Match)).thenReturn(Optional.of(new X01Set()));
+        Mockito.when(matchProgressService.getCurrentSetOrCreate(x01Match)).thenReturn(Optional.of(new X01SetEntry(1, new X01Set())));
         Mockito.when(matchProgressService.getCurrentLegOrCreate(Mockito.any(), Mockito.any())).thenReturn(Optional.of(new X01LegEntry(1, new X01Leg())));
         Mockito.when(matchProgressService.getCurrentLegRoundOrCreate(Mockito.any(), Mockito.any())).thenReturn(Optional.of(new X01LegRoundEntry(1, new X01LegRound())));
 

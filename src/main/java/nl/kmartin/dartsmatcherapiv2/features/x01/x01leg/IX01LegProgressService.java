@@ -9,7 +9,7 @@ import java.util.Set;
 
 
 public interface IX01LegProgressService {
-    Optional<X01LegRound> getLegRound(X01Leg leg, int roundNumber, boolean throwIfNotFound);
+    Optional<X01LegRoundEntry> getLegRound(X01Leg leg, int roundNumber, boolean throwIfNotFound);
 
     Optional<X01LegRoundEntry> getCurrentLegRound(X01Leg leg, List<X01MatchPlayer> players);
 
@@ -17,9 +17,11 @@ public interface IX01LegProgressService {
 
     Set<Integer> getLegRoundNumbers(X01Leg leg);
 
-    Optional<X01LegRound> getLastRound(X01Leg leg);
+    Optional<X01LegRoundEntry> getLastRound(X01Leg leg);
 
     Optional<X01LegRoundScore> getLastScoreForPlayer(X01Leg leg, ObjectId throwerId);
 
     boolean isLegConcluded(X01Leg leg);
+
+    boolean removeLastScoreFromLeg(X01Leg leg);
 }

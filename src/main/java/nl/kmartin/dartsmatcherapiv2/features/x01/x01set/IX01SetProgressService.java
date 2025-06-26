@@ -19,4 +19,6 @@ public interface IX01SetProgressService {
     Set<Integer> getLegNumbers(X01Set set);
 
     boolean isSetConcluded(X01Set set, List<X01MatchPlayer> players);
+
+    boolean removeLastScoreFromSet(X01Set set);
 }

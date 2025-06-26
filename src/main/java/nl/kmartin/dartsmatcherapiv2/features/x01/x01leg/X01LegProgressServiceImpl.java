@@ -3,6 +3,7 @@ package nl.kmartin.dartsmatcherapiv2.features.x01.x01leg;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceNotFoundException;
 import nl.kmartin.dartsmatcherapiv2.features.x01.common.X01ValidationUtils;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01leground.IX01LegRoundService;
 import nl.kmartin.dartsmatcherapiv2.utils.NumberUtils;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
@@ -12,15 +13,21 @@ import java.util.*;
 @Service
 public class X01LegProgressServiceImpl implements IX01LegProgressService {
 
+    private final IX01LegRoundService legRoundService;
+
+    public X01LegProgressServiceImpl(IX01LegRoundService legRoundService) {
+        this.legRoundService = legRoundService;
+    }
+
     /**
      * Find a round by its round number from a leg.
      *
      * @param leg         {@link X01Leg} the leg to find the round in
      * @param roundNumber int the round number to find
-     * @return {@link Optional<X01LegRound>} an optional round containing the round if it exists otherwise empty.
+     * @return {@link Optional<X01LegRoundEntry>} an optional round containing the round if it exists otherwise empty.
      */
     @Override
-    public Optional<X01LegRound> getLegRound(X01Leg leg, int roundNumber, boolean throwIfNotFound) {
+    public Optional<X01LegRoundEntry> getLegRound(X01Leg leg, int roundNumber, boolean throwIfNotFound) {
         ResourceNotFoundException notFoundException = new ResourceNotFoundException(X01LegRound.class, roundNumber);
 
         // If the round can't exist. Early exit.
@@ -30,11 +37,13 @@ public class X01LegProgressServiceImpl implements IX01LegProgressService {
         }
 
         // Find the first round in the rounds list matching the round number.
-        Optional<X01LegRound> round = Optional.ofNullable(leg.getRounds().get(roundNumber));
-        if (throwIfNotFound && round.isEmpty()) throw notFoundException;
+        Optional<X01LegRoundEntry> roundEntry = Optional.ofNullable(leg.getRounds().get(roundNumber))
+                .map(round -> new X01LegRoundEntry(roundNumber, round));
+
+        if (throwIfNotFound && roundEntry.isEmpty()) throw notFoundException;
 
         // Return the first round with the round number otherwise empty.
-        return round;
+        return roundEntry;
     }
 
     /**
@@ -52,7 +61,7 @@ public class X01LegProgressServiceImpl implements IX01LegProgressService {
         // Filter rounds with missing player scores and get the lowest round number.
         return leg.getRounds().entrySet().stream()
                 .filter(entry -> players.stream().anyMatch(matchPlayer -> entry.getValue().getScores().get(matchPlayer.getPlayerId()) == null))
-                .min(Map.Entry.comparingByKey())
+                .findFirst()
                 .map(X01LegRoundEntry::new);
     }
 
@@ -101,10 +110,10 @@ public class X01LegProgressServiceImpl implements IX01LegProgressService {
      * @return {@link Optional<X01LegRound>} the highest numbered round from a leg, empty if the leg has no rounds
      */
     @Override
-    public Optional<X01LegRound> getLastRound(X01Leg leg) {
+    public Optional<X01LegRoundEntry> getLastRound(X01Leg leg) {
         if (X01ValidationUtils.isRoundsEmpty(leg)) return Optional.empty();
 
-        return Optional.ofNullable(leg.getRounds().lastEntry().getValue());
+        return Optional.ofNullable(leg.getRounds().lastEntry()).map(X01LegRoundEntry::new);
     }
 
     /**
@@ -136,5 +145,26 @@ public class X01LegProgressServiceImpl implements IX01LegProgressService {
     @Override
     public boolean isLegConcluded(X01Leg leg) {
         return leg != null && leg.getWinner() != null;
+    }
+
+    /**
+     * Removes the last score from a leg.
+     * While traversing in reverse order also cleans up empty rounds, up to the removed score.
+     *
+     * @param leg {@link X01Leg} the leg from which to remove the last score
+     * @return true if a score was successfully removed; false otherwise
+     */
+    @Override
+    public boolean removeLastScoreFromLeg(X01Leg leg) {
+        Iterator<Integer> reverseRoundsIterator = leg.getRounds().descendingKeySet().iterator();
+        while (reverseRoundsIterator.hasNext()) {
+            X01LegRound round = leg.getRounds().get(reverseRoundsIterator.next());
+            boolean scoreRemoved = legRoundService.removeLastScoreFromRound(round);
+
+            if (round.getScores().isEmpty()) reverseRoundsIterator.remove();
+            if (scoreRemoved) return true;
+        }
+
+        return false;
     }
 }

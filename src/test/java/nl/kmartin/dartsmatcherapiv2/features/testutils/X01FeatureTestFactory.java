@@ -71,7 +71,7 @@ public class X01FeatureTestFactory {
     }
 
     public IX01SetProgressService createSetProgressService() {
-        return new X01SetProgressServiceImpl(createLegService());
+        return new X01SetProgressServiceImpl(createLegService(), createLegProgressService());
     }
 
     public IX01LegService createLegService() {
@@ -84,11 +84,11 @@ public class X01FeatureTestFactory {
     }
 
     public IX01LegResultService createLegResultService() {
-        return new X01LegResultServiceImpl();
+        return new X01LegResultServiceImpl(createLegRoundService());
     }
 
     public IX01LegProgressService createLegProgressService() {
-        return new X01LegProgressServiceImpl();
+        return new X01LegProgressServiceImpl(createLegRoundService());
     }
 
     public IX01LegRoundService createLegRoundService() {

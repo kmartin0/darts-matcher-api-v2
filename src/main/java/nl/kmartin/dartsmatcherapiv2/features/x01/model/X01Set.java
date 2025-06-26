@@ -18,10 +18,6 @@ import java.util.stream.Collectors;
 @Data
 @NoArgsConstructor
 public class X01Set {
-
-    @Min(0)
-    private int set;
-
     @Valid
     private NavigableMap<Integer, X01Leg> legs = new TreeMap<>();
 
@@ -29,8 +25,7 @@ public class X01Set {
 
     private Map<ObjectId, ResultType> result;
 
-    public X01Set(int set, NavigableMap<Integer, X01Leg> legs, ObjectId throwsFirst, Map<ObjectId, ResultType> result) {
-        this.set = set;
+    public X01Set(NavigableMap<Integer, X01Leg> legs, ObjectId throwsFirst, Map<ObjectId, ResultType> result) {
         this.setLegs(legs);
         this.throwsFirst = throwsFirst;
         this.result = result;

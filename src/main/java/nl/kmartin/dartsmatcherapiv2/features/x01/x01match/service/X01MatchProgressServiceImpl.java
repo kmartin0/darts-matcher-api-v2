@@ -37,10 +37,10 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
      *
      * @param match     The match containing the sets
      * @param setNumber int the set number that needs to be found
-     * @return {@link Optional<X01Set>} the matching set, empty if no set is found
+     * @return {@link Optional<X01SetEntry>} the matching set, empty if no set is found
      */
     @Override
-    public Optional<X01Set> getSet(X01Match match, int setNumber, boolean throwIfNotFound) {
+    public Optional<X01SetEntry> getSet(X01Match match, int setNumber, boolean throwIfNotFound) {
         ResourceNotFoundException notFoundException = new ResourceNotFoundException(X01Set.class, setNumber);
 
         if (X01ValidationUtils.isSetsEmpty(match) || setNumber < 1) {
@@ -49,35 +49,38 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
         }
 
         // Find the first set matching the set number
-        Optional<X01Set> set = match.getSets().stream().filter(x01Set -> x01Set.getSet() == setNumber).findFirst();
-        if (throwIfNotFound && set.isEmpty()) throw notFoundException;
+        Optional<X01SetEntry> setEntry = Optional.ofNullable(match.getSets().get(setNumber))
+                .map(set -> new X01SetEntry(setNumber, set));
 
-        return set;
+        if (throwIfNotFound && setEntry.isEmpty()) throw notFoundException;
+
+        return setEntry;
     }
 
     /**
      * Finds the lowest-numbered set in a match which does not have a result.
      *
      * @param match {@link X01Match} the match to get the current set from
-     * @return {@link Optional<X01Set>} empty when all sets have a result. otherwise the lowest set without a result.
+     * @return {@link Optional<X01SetEntry>} empty when all sets have a result. otherwise the lowest set without a result.
      */
     @Override
-    public Optional<X01Set> getCurrentSet(X01Match match) {
+    public Optional<X01SetEntry> getCurrentSet(X01Match match) {
         if (X01ValidationUtils.isSetsEmpty(match)) return Optional.empty();
 
-        return match.getSets().stream()
-                .filter(set -> set.getResult() == null || set.getResult().isEmpty()) // Set without result
-                .min(Comparator.comparingInt(X01Set::getSet)); // Get the lowest numbered set
+        return match.getSets().entrySet().stream()
+                .filter(e -> e.getValue().getResult() == null || e.getValue().getResult().isEmpty()) // Set without result
+                .findFirst()// Get the lowest numbered set
+                .map(X01SetEntry::new);
     }
 
     /**
      * Creates the next set in a match but doesn't exceed the maximum number of sets.
      *
      * @param match {@link X01Match} the list of sets a set has to be added to.
-     * @return {@link Optional<X01Set>} the created set, empty when the maximum number of sets was reached.
+     * @return {@link Optional<X01SetEntry>} the created set, empty when the maximum number of sets was reached.
      */
     @Override
-    public Optional<X01Set> createNextSet(X01Match match) {
+    public Optional<X01SetEntry> createNextSet(X01Match match) {
         if (match == null) return Optional.empty();
 
         // Get existing set numbers
@@ -88,9 +91,9 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
         if (nextSetNumber == -1) return Optional.empty();
 
         // Create and add the next set to the sets.
-        X01Set newSet = setService.createNewSet(nextSetNumber, match.getPlayers());
-        match.getSets().add(newSet);
-        return Optional.of(newSet);
+        X01SetEntry newSetEntry = setService.createNewSet(nextSetNumber, match.getPlayers());
+        match.getSets().put(newSetEntry.setNumber(), newSetEntry.set());
+        return Optional.of(newSetEntry);
     }
 
     /**
@@ -104,9 +107,7 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
         if (X01ValidationUtils.isSetsEmpty(match)) return Collections.emptySet();
 
         // Map the set numbers and collect to a set of integers
-        return match.getSets().stream()
-                .map(X01Set::getSet)
-                .collect(Collectors.toSet());
+        return match.getSets().keySet();
     }
 
     /**
@@ -114,14 +115,14 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
      * to the match.
      *
      * @param match {@link X01Match} the match for which the current set needs to be determined
-     * @return {@link Optional<X01Set>} the current set in play.
+     * @return {@link Optional<X01SetEntry>} the current set in play.
      */
     @Override
-    public Optional<X01Set> getCurrentSetOrCreate(X01Match match) {
+    public Optional<X01SetEntry> getCurrentSetOrCreate(X01Match match) {
         if (match == null) return Optional.empty();
 
         // First find the current set in the active list of sets.
-        Optional<X01Set> curSet = getCurrentSet(match);
+        Optional<X01SetEntry> curSet = getCurrentSet(match);
 
         // If there is no current set and the match isn't concluded, create the next set.
         return curSet.isEmpty() && !isMatchConcluded(match)
@@ -187,40 +188,24 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
     }
 
     /**
-     * Removes the most last added score from a list of sets.
-     * While traversing also cleans up empty rounds, legs or sets.
+     * Removes the last score from a match.
+     * While traversing in reverse order also cleans up empty rounds, legs or sets up to the removed score.
      *
      * @param match {@link X01Match} The match containing the list of sets to remove the last score from.
      */
     @Override
-    public void deleteLastScore(X01Match match) {
+    public void removeLastScoreFromMatch(X01Match match) {
         if (match == null) return;
-
-        List<X01Set> setsReverse = new ArrayList<>(match.getSets());
-        Collections.reverse(setsReverse);
 
         // Iterate the sets, legs and rounds in reverse order to remove the last score and empty rounds, legs or sets.
         // Stops after the first removal of a score.
-        outer:
-        for (X01Set set : setsReverse) {
-            Iterator<Integer> reverseLegIterator = set.getLegs().descendingKeySet().iterator();
-            while (reverseLegIterator.hasNext()) {
-                X01Leg leg = set.getLegs().get(reverseLegIterator.next());
-                Iterator<Integer> reverseRoundsIterator = leg.getRounds().descendingKeySet().iterator();
-                while (reverseRoundsIterator.hasNext()) {
-                    X01LegRound round = leg.getRounds().get(reverseRoundsIterator.next());
+        Iterator<Integer> reverseSetsIterator = match.getSets().descendingKeySet().iterator();
+        while (reverseSetsIterator.hasNext()) {
+            X01Set set = match.getSets().get(reverseSetsIterator.next());
+            boolean scoreRemoved = setProgressService.removeLastScoreFromSet(set);
 
-                    if (legRoundService.removeLastScoreFromRound(round)) {
-                        if (round.getScores().isEmpty()) reverseRoundsIterator.remove();
-                        if (leg.getRounds().isEmpty()) reverseLegIterator.remove();
-                        if (set.getLegs().isEmpty()) match.getSets().remove(set);
-                        break outer;
-                    }
-                    if (round.getScores().isEmpty()) reverseRoundsIterator.remove();
-                }
-                if (leg.getRounds().isEmpty()) reverseLegIterator.remove();
-            }
-            if (set.getLegs().isEmpty()) match.getSets().remove(set);
+            if (set.getLegs().isEmpty()) reverseSetsIterator.remove();
+            if (scoreRemoved) break;
         }
     }
 
@@ -234,8 +219,8 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
         if (match == null) return;
 
         // Get the current set, leg and round.
-        Optional<X01Set> currentSet = getCurrentSetOrCreate(match);
-        Optional<X01LegEntry> currentLegEntry = currentSet.flatMap(set -> getCurrentLegOrCreate(match, set));
+        Optional<X01SetEntry> currentSetEntry = getCurrentSetOrCreate(match);
+        Optional<X01LegEntry> currentLegEntry = currentSetEntry.flatMap(setEntry -> getCurrentLegOrCreate(match, setEntry.set()));
         Optional<X01LegRoundEntry> currentLegRoundEntry = currentLegEntry.flatMap(legEntry -> getCurrentLegRoundOrCreate(match, legEntry.leg()));
 
         // Get the current thrower for the current round
@@ -248,7 +233,7 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
 
         // Update the match progress with the new state of the match
         match.setMatchProgress(new X01MatchProgress(
-                currentSet.map(X01Set::getSet).orElse(null),
+                currentSetEntry.map(X01SetEntry::setNumber).orElse(null),
                 currentLegEntry.map(X01LegEntry::legNumber).orElse(null),
                 currentLegRoundEntry.map(X01LegRoundEntry::roundNumber).orElse(null),
                 currentThrower.orElse(null)

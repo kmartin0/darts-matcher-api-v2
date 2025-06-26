@@ -72,7 +72,7 @@ public class X01MatchResultServiceImpl implements IX01MatchResultService {
         int bestOfLegs = match.getMatchSettings().getBestOf().getLegs();
 
         // For each set update the leg results and after update the set result
-        match.getSets().forEach(x01Set -> setResultService.updateSetResult(x01Set, bestOfLegs, players, x01));
+        match.getSets().values().forEach(set -> setResultService.updateSetResult(set, bestOfLegs, players, x01));
     }
 
     /**
@@ -97,7 +97,7 @@ public class X01MatchResultServiceImpl implements IX01MatchResultService {
     /**
      * Determines the number of sets each player has won for a given match
      *
-     * @param match   {@link X01Match} the match for which standings need to be calculated
+     * @param match {@link X01Match} the match for which standings need to be calculated
      * @return Map<ObjectId, Long> containing the number of sets each player has won
      */
     @Override
@@ -109,11 +109,11 @@ public class X01MatchResultServiceImpl implements IX01MatchResultService {
                 .collect(Collectors.toMap(MatchPlayer::getPlayerId, player -> 0L));
 
         // Update the map with the number of wins from the sets for each player
-        match.getSets().stream()
-                .filter(x01Set -> x01Set.getResult() != null && !x01Set.getResult().isEmpty())  // Filter out sets with no result
-                .flatMap(x01Set -> x01Set.getResult().entrySet().stream())  // Continue with the results map
-                .filter(entry -> entry.getValue() == ResultType.WIN || entry.getValue() == ResultType.DRAW)  // Filter for WIN or DRAW
-                .forEach(entry -> standings.merge(entry.getKey(), 1L, Long::sum));  // Increment the score for the player
+        match.getSets().values().stream()
+                .filter(set -> set.getResult() != null && !set.getResult().isEmpty())  // Filter out sets with no result
+                .flatMap(set -> set.getResult().entrySet().stream())  // Continue with the results map
+                .filter(resultEntry -> resultEntry.getValue() == ResultType.WIN || resultEntry.getValue() == ResultType.DRAW)  // Filter for WIN or DRAW
+                .forEach(resultEntry -> standings.merge(resultEntry.getKey(), 1L, Long::sum));  // Increment the score for the player
 
         // Return the standings map
         return standings;
@@ -133,17 +133,20 @@ public class X01MatchResultServiceImpl implements IX01MatchResultService {
     public void removeSetsAfterWinner(X01Match match, List<ObjectId> matchWinners) {
         if (X01ValidationUtils.isSetsEmpty(match) || CollectionUtils.isEmpty(matchWinners)) return;
 
-        List<X01Set> setsReverse = new ArrayList<>(match.getSets());
-        Collections.reverse(setsReverse);
+        // Iterate over the sets in reverse order.
+        Iterator<X01Set> reverseSetsIterator = match.getSets().descendingMap().values().iterator();
+        while (reverseSetsIterator.hasNext()) {
+            X01Set set = reverseSetsIterator.next();
 
-        for (X01Set set : setsReverse) {
+            // Determine if this set contains a 'set winner'.
             Map<ObjectId, ResultType> setResultMap = set.getResult();
             boolean setContainsWinner = setResultMap != null && matchWinners.stream().anyMatch(winner -> {
                 ResultType result = setResultMap.get(winner);
                 return result == ResultType.WIN || result == ResultType.DRAW;
             });
-            if (setContainsWinner) break;
-            match.getSets().remove(set);
+
+            if (setContainsWinner) break; // This is the deciding set, stop trimming.
+            else reverseSetsIterator.remove(); // This set is trailing the deciding set, so remove it.
         }
     }
 
@@ -157,8 +160,8 @@ public class X01MatchResultServiceImpl implements IX01MatchResultService {
         if (match == null) return 0;
 
         // Count the number of concluded sets
-        long completedSets = match.getSets().stream()
-                .filter(x01Set -> setProgressService.isSetConcluded(x01Set, match.getPlayers()))
+        long completedSets = match.getSets().values().stream()
+                .filter(set -> setProgressService.isSetConcluded(set, match.getPlayers()))
                 .count();
 
         // Determine the number of remaining sets and return them. Ensuring they are not negative.

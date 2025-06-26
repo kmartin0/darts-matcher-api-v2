@@ -96,11 +96,11 @@ public class X01MatchServiceImpl implements IX01MatchService {
         X01Match match = this.getMatch(matchId);
 
         // Get the current set
-        X01Set currentSet = matchProgressService.getCurrentSetOrCreate(match)
+        X01SetEntry currentSetEntry = matchProgressService.getCurrentSetOrCreate(match)
                 .orElseThrow(() -> new ResourceNotFoundException(X01Set.class, null));
 
         // Get the current leg
-        X01LegEntry currentLegEntry = matchProgressService.getCurrentLegOrCreate(match, currentSet)
+        X01LegEntry currentLegEntry = matchProgressService.getCurrentLegOrCreate(match, currentSetEntry.set())
                 .orElseThrow(() -> new ResourceNotFoundException(X01Leg.class, null));
 
         // Get the current leg round
@@ -134,7 +134,7 @@ public class X01MatchServiceImpl implements IX01MatchService {
 
         // Get the leg that contains the round.
         Optional<X01LegEntry> legOpt = matchProgressService.getSet(match, editTurn.getSet(), true)
-                .flatMap(set -> setProgressService.getLeg(set, editTurn.getLeg(), true));
+                .flatMap(setEntry -> setProgressService.getLeg(setEntry.set(), editTurn.getLeg(), true));
 
         // Replace the current score with the updated turn
         legOpt.ifPresent(legEntry -> {
@@ -163,7 +163,7 @@ public class X01MatchServiceImpl implements IX01MatchService {
         X01Match x01Match = this.getMatch(matchId);
 
         // Delete the last round score
-        matchProgressService.deleteLastScore(x01Match);
+        matchProgressService.removeLastScoreFromMatch(x01Match);
 
         // Save the updated match to the repository.
         return saveMatch(x01Match);

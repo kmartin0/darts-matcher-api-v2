@@ -69,12 +69,12 @@ public class X01LegServiceImpl implements IX01LegService {
         // Determine if the leg is editable, will throw InvalidArgumentsException if the leg is not editable.
         checkLegEditable(leg, throwerId);
 
-        Optional<X01LegRound> x01LegRound = legProgressService.getLegRound(leg, roundNumber, true);
+        Optional<X01LegRoundEntry> x01LegRound = legProgressService.getLegRound(leg, roundNumber, true);
         if (x01LegRound.isEmpty()) return;
 
         // Add the score to the round.
         X01LegRoundScore roundScore = new X01LegRoundScore(turn, trackDoubles);
-        x01LegRound.get().getScores().put(throwerId, roundScore);
+        x01LegRound.get().round().getScores().put(throwerId, roundScore);
         if (turn.getCheckoutDartsUsed() != null) leg.setCheckoutDartsUsed(turn.getCheckoutDartsUsed());
 
         // Verify if the rounds are legal after adding the new score.

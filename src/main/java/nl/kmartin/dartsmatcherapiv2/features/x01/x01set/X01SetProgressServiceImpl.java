@@ -6,23 +6,23 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Leg;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01LegEntry;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Set;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegProgressService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegService;
 import nl.kmartin.dartsmatcherapiv2.utils.NumberUtils;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class X01SetProgressServiceImpl implements IX01SetProgressService {
 
     private final IX01LegService legService;
+    private final IX01LegProgressService legProgressService;
 
-    public X01SetProgressServiceImpl(IX01LegService legService) {
+    public X01SetProgressServiceImpl(IX01LegService legService, IX01LegProgressService legProgressService) {
         this.legService = legService;
+        this.legProgressService = legProgressService;
     }
 
     /**
@@ -42,10 +42,12 @@ public class X01SetProgressServiceImpl implements IX01SetProgressService {
         }
 
         // Find the first leg in the leg list matching the leg number.
-        X01Leg leg = set.getLegs().get(legNumber);
-        if (throwIfNotFound && leg == null) throw notFoundException;
+        Optional<X01LegEntry> legEntry = Optional.ofNullable(set.getLegs().get(legNumber))
+                .map(leg -> new X01LegEntry(legNumber, leg));
 
-        return leg == null ? Optional.empty() : Optional.of(new X01LegEntry(legNumber, leg));
+        if (throwIfNotFound && legEntry.isEmpty()) throw notFoundException;
+
+        return legEntry;
     }
 
     /**
@@ -116,6 +118,27 @@ public class X01SetProgressServiceImpl implements IX01SetProgressService {
         if (set == null || set.getResult() == null || X01ValidationUtils.isPlayersEmpty(players)) return false;
 
         return players.stream().allMatch(player -> set.getResult().get(player.getPlayerId()) != null);
+    }
+
+    /**
+     * Removes the last score from a set.
+     * While traversing in reverse order also cleans up empty rounds and legs, up to the removed score.
+     *
+     * @param set {@link X01Set} the set from which to remove the last score
+     * @return true if a score was successfully removed; false otherwise
+     */
+    @Override
+    public boolean removeLastScoreFromSet(X01Set set) {
+        Iterator<Integer> reverseLegsIterator = set.getLegs().descendingKeySet().iterator();
+        while (reverseLegsIterator.hasNext()) {
+            X01Leg leg = set.getLegs().get(reverseLegsIterator.next());
+            boolean scoreRemoved = legProgressService.removeLastScoreFromLeg(leg);
+
+            if (leg.getRounds().isEmpty()) reverseLegsIterator.remove();
+            if (scoreRemoved) return true;
+        }
+
+        return false;
     }
 
 }

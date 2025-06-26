@@ -14,4 +14,6 @@ public interface IX01LegRoundService {
     List<X01MatchPlayer> getLegRoundThrowingOrder(ObjectId throwsFirst, List<X01MatchPlayer> players);
 
     boolean removeLastScoreFromRound(X01LegRound legRound);
+
+    void removeScoresAfterWinner(X01LegRound round, ObjectId legWinner);
 }

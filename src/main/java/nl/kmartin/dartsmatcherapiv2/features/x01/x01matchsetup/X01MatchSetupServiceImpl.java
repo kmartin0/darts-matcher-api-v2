@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.TreeMap;
 
 @Service
 public class X01MatchSetupServiceImpl implements IX01MatchSetupService {
@@ -75,7 +76,7 @@ public class X01MatchSetupServiceImpl implements IX01MatchSetupService {
      */
     private void setupMatchProgress(X01Match match) {
         // Initialize the sets list.
-        match.setSets(new ArrayList<>());
+        match.setSets(new TreeMap<>());
 
         // Initialize the match progress indicating the starting round and starting player.
         ObjectId startsMatch = match.getPlayers().get(0).getPlayerId();

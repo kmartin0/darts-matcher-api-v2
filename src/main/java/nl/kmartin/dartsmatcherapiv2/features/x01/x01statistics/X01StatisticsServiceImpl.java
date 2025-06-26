@@ -49,14 +49,14 @@ public class X01StatisticsServiceImpl implements IX01StatisticsService {
     /**
      * Process and update the player statistics from the data of all the sets
      *
-     * @param sets    {@link List<X01Set>} the list of sets containing the player turns
+     * @param sets    NavigableMap<Integer, X01Set> the map of sets containing the player turns
      * @param players {@link List<X01MatchPlayer>} the players for which the statistics need to be updated
      */
-    private void processSets(List<X01Set> sets, List<X01MatchPlayer> players, boolean trackDoubles) {
+    private void processSets(NavigableMap<Integer, X01Set> sets, List<X01MatchPlayer> players, boolean trackDoubles) {
         if (sets == null || players == null) return;
 
         // Process and update the player statistics using the data of all the legs
-        sets.forEach(set -> processLegs(set.getLegs(), players, trackDoubles));
+        sets.values().forEach(set -> processLegs(set.getLegs(), players, trackDoubles));
     }
 
     /**

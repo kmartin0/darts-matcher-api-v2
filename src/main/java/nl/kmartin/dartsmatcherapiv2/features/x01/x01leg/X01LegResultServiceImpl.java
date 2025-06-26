@@ -5,6 +5,7 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Leg;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01LegRound;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01LegRoundScore;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01leground.IX01LegRoundService;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,12 @@ import java.util.*;
 
 @Service
 public class X01LegResultServiceImpl implements IX01LegResultService {
+
+    private final IX01LegRoundService legRoundService;
+
+    public X01LegResultServiceImpl(IX01LegRoundService legRoundService) {
+        this.legRoundService = legRoundService;
+    }
 
     /**
      * Updates the leg result for a leg.
@@ -56,23 +63,25 @@ public class X01LegResultServiceImpl implements IX01LegResultService {
         // If there is no leg winner. No trimming needs to happen.
         if (X01ValidationUtils.isRoundsEmpty(leg) || legWinner == null) return;
 
-        // Iterate through the rounds in reverse order. Trim scores beyond the final score of the leg winner.
-        // This situation can occur if a score is edited and, as a result, another player becomes the winner.
-        Iterator<Integer> reverseRoundsIterator = leg.getRounds().descendingKeySet().iterator();
-        outer:
+        // Iterate through the rounds in reverse order (latest round first)
+        Iterator<X01LegRound> reverseRoundsIterator = leg.getRounds().descendingMap().values().iterator();
         while (reverseRoundsIterator.hasNext()) {
-            X01LegRound round = leg.getRounds().get(reverseRoundsIterator.next());
-            List<ObjectId> reverseScoreKeys = new ArrayList<>(round.getScores().keySet());
-            Collections.reverse(reverseScoreKeys);
+            X01LegRound round = reverseRoundsIterator.next();
 
-            for (ObjectId playerId : reverseScoreKeys) {
-                if (!playerId.equals(legWinner)) {
-                    round.getScores().remove(playerId);
-                    if (round.getScores().isEmpty()) reverseRoundsIterator.remove();
-                } else break outer;
+            // If the leg winner has not thrown in this round, remove the round and move on to the next round.
+            if (!round.getScores().containsKey(legWinner)) {
+                reverseRoundsIterator.remove();
+                continue;
             }
+
+            // Remove all scores from this round that occur after the winner's score.
+            legRoundService.removeScoresAfterWinner(round, legWinner);
+
+            // This round contains the winner's score so we can stop trimming.
+            break;
         }
     }
+
 
     /**
      * Calculates the remaining score for a player in a leg.

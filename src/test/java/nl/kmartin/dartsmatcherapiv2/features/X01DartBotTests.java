@@ -59,12 +59,12 @@ public class X01DartBotTests {
         printTargetAvg(targetAvg);
         // Initialize the match with the base settings.
         X01Leg x01Leg = new X01Leg(null, dartBotId, new TreeMap<>());
-        X01Set x01Set = new X01Set(1, new TreeMap<>(Map.of(1, x01Leg)), dartBotId, null);
+        X01Set x01Set = new X01Set(new TreeMap<>(Map.of(1, x01Leg)), dartBotId, null);
 
         X01DartBotSettings dartBotSettings = new X01DartBotSettings(targetAvg);
         X01MatchPlayer dartBotPlayer = new X01MatchPlayer(dartBotId, "Dart Bot", PlayerType.DART_BOT, null, dartBotSettings, null);
 
-        match.setSets(new ArrayList<>(Collections.singletonList(x01Set)));
+        match.setSets(new TreeMap<>(Map.of(1, x01Set)));
         match.setPlayers(new ArrayList<>(Collections.singletonList(dartBotPlayer)));
 
         System.out.printf(TargetDartsBoundaries.create(targetAvg, match.getMatchSettings().getX01()) + "\n");

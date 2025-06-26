@@ -8,10 +8,7 @@ import org.bson.types.ObjectId;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Primary
@@ -20,7 +17,7 @@ public class X01LegRoundServiceImpl implements IX01LegRoundService {
     /**
      * Find the player whose turn it is to throw in a round.
      *
-     * @param legRound      {@link X01LegRound} the round to check.
+     * @param legRound         {@link X01LegRound} the round to check.
      * @param throwsFirstInLeg {@link ObjectId} the id of the player that started the leg.
      * @param players          {@link List<X01MatchPlayer>} list of all match players.
      * @return {@link ObjectId} the player whose turn it is.
@@ -51,7 +48,7 @@ public class X01LegRoundServiceImpl implements IX01LegRoundService {
      * Find all players that have yet to score in a round.
      *
      * @param legRound {@link X01LegRound} the round to check
-     * @param players     {@link List<X01MatchPlayer>} list of all match players.
+     * @param players  {@link List<X01MatchPlayer>} list of all match players.
      * @return {@link List<X01MatchPlayer>} list of players that have not scored in the round.
      */
     @Override
@@ -98,21 +95,42 @@ public class X01LegRoundServiceImpl implements IX01LegRoundService {
      */
     @Override
     public boolean removeLastScoreFromRound(X01LegRound legRound) {
+        // Nothing to remove
         if (X01ValidationUtils.isScoresEmpty(legRound)) return false;
 
-        // Create a list of the score keys and reverse it to have the last score first.
-        Map<ObjectId, X01LegRoundScore> scores = legRound.getScores();
-        List<ObjectId> reverseKeys = new ArrayList<>(scores.keySet());
-        Collections.reverse(reverseKeys);
-
-        // If there is at least one score, remove the most recently added one
-        if (!reverseKeys.isEmpty()) {
-            legRound.getScores().remove(reverseKeys.get(0));
-            return true;
+        // Iterate through the scores map keys. When the last key is reached, remove it and return true.
+        Iterator<ObjectId> it = legRound.getScores().keySet().iterator();
+        while (it.hasNext()) {
+            ObjectId playerId = it.next();
+            if (!it.hasNext()) {
+                legRound.getScores().remove(playerId);
+                return true;
+            }
         }
 
-        // No scores were present to remove
+        // Not score removed.
         return false;
+    }
+
+    /**
+     * Removes all the scores in a round that occur after the winner's score.
+     *
+     * @param round     {@link X01LegRound} the round to trim.
+     * @param legWinner {@link ObjectId} the player that won the leg.
+     */
+    @Override
+    public void removeScoresAfterWinner(X01LegRound round, ObjectId legWinner) {
+        if (round == null || legWinner == null) return;
+
+        // Iterate through the scores in insertion order. Remove all scores occur after the winner's score.
+        Iterator<ObjectId> scoresIterator = round.getScores().keySet().iterator();
+        boolean winnerHasThrown = false;
+        while (scoresIterator.hasNext()) {
+            ObjectId playerId = scoresIterator.next();
+
+            if (winnerHasThrown) scoresIterator.remove();
+            else if (playerId.equals(legWinner)) winnerHasThrown = true;
+        }
     }
 
 }

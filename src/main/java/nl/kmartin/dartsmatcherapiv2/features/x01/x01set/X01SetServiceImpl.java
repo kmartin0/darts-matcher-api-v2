@@ -3,6 +3,7 @@ package nl.kmartin.dartsmatcherapiv2.features.x01.x01set;
 import nl.kmartin.dartsmatcherapiv2.features.x01.common.X01ValidationUtils;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Set;
+import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01SetEntry;
 import org.bson.types.ObjectId;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -19,12 +20,13 @@ public class X01SetServiceImpl implements IX01SetService {
      *
      * @param setNumber int the sets number
      * @param players   {@link List<X01MatchPlayer>} the list of match players
-     * @return {@link X01Set} the created set
+     * @return {@link X01SetEntry} the created set
      */
     @Override
-    public X01Set createNewSet(int setNumber, List<X01MatchPlayer> players) {
+    public X01SetEntry createNewSet(int setNumber, List<X01MatchPlayer> players) {
         ObjectId throwsFirstInSet = calcThrowsFirstInSet(setNumber, players);
-        return new X01Set(setNumber, new TreeMap<>(), throwsFirstInSet, null);
+        X01Set newSet = new X01Set(new TreeMap<>(), throwsFirstInSet, null);
+        return new X01SetEntry(setNumber, newSet);
     }
 
     /**
