@@ -15,7 +15,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -105,16 +104,16 @@ public class X01MatchServiceImpl implements IX01MatchService {
                 .orElseThrow(() -> new ResourceNotFoundException(X01Leg.class, null));
 
         // Get the current leg round
-        Map.Entry<Integer, X01LegRound> currentLegRound = matchProgressService.getCurrentLegRoundOrCreate(match, currentLegEntry.leg())
+        X01LegRoundEntry currentRoundEntry = matchProgressService.getCurrentLegRoundOrCreate(match, currentLegEntry.leg())
                 .orElseThrow(() -> new ResourceNotFoundException(X01LegRound.class, null));
 
         // Add the turn to the current thrower of the current round.
         int x01 = match.getMatchSettings().getX01();
         boolean trackDoubles = match.getMatchSettings().isTrackDoubles();
         List<X01MatchPlayer> players = match.getPlayers();
-        ObjectId currentThrower = legRoundService.getCurrentThrowerInRound(currentLegRound.getValue(), currentLegEntry.leg().getThrowsFirst(), match.getPlayers());
+        ObjectId currentThrower = legRoundService.getCurrentThrowerInRound(currentRoundEntry.round(), currentLegEntry.leg().getThrowsFirst(), match.getPlayers());
 
-        legService.addScore(x01, currentLegEntry.leg(), currentLegRound.getKey(), turn, players, currentThrower, trackDoubles);
+        legService.addScore(x01, currentLegEntry.leg(), currentRoundEntry.roundNumber(), turn, players, currentThrower, trackDoubles);
 
         // Save the updated match to the repository.
         return saveMatch(match);

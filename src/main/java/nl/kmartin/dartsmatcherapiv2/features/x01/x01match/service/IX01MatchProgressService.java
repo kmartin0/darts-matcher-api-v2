@@ -2,7 +2,6 @@ package nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service;
 
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -19,7 +18,7 @@ public interface IX01MatchProgressService {
 
     Optional<X01LegEntry> getCurrentLegOrCreate(X01Match match, X01Set currentSet);
 
-    Optional<Map.Entry<Integer, X01LegRound>> getCurrentLegRoundOrCreate(X01Match match, X01Leg currentLeg);
+    Optional<X01LegRoundEntry> getCurrentLegRoundOrCreate(X01Match match, X01Leg currentLeg);
 
     boolean isMatchConcluded(X01Match match);
 

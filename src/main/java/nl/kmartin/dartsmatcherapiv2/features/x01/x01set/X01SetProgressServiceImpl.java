@@ -11,7 +11,10 @@ import nl.kmartin.dartsmatcherapiv2.utils.NumberUtils;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class X01SetProgressServiceImpl implements IX01SetProgressService {
@@ -58,7 +61,7 @@ public class X01SetProgressServiceImpl implements IX01SetProgressService {
         return set.getLegs().entrySet().stream()
                 .filter(legEntry -> legEntry.getValue().getWinner() == null) // get legs without result
                 .findFirst() // Get the lowest numbered leg
-                .map(e -> new X01LegEntry(e.getKey(), e.getValue())); // Map it to X01LegEntry
+                .map(X01LegEntry::new); // Map it to X01LegEntry
     }
 
     /**

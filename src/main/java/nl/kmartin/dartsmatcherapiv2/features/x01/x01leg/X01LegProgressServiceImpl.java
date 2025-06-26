@@ -2,10 +2,7 @@ package nl.kmartin.dartsmatcherapiv2.features.x01.x01leg;
 
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceNotFoundException;
 import nl.kmartin.dartsmatcherapiv2.features.x01.common.X01ValidationUtils;
-import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Leg;
-import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01LegRound;
-import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01LegRoundScore;
-import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
+import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
 import nl.kmartin.dartsmatcherapiv2.utils.NumberUtils;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
@@ -48,14 +45,15 @@ public class X01LegProgressServiceImpl implements IX01LegProgressService {
      * @return Optional X01LegRound entry for the lowest round in play, otherwise empty.
      */
     @Override
-    public Optional<Map.Entry<Integer, X01LegRound>> getCurrentLegRound(X01Leg leg, List<X01MatchPlayer> players) {
+    public Optional<X01LegRoundEntry> getCurrentLegRound(X01Leg leg, List<X01MatchPlayer> players) {
         if (X01ValidationUtils.isRoundsEmpty(leg) || X01ValidationUtils.isPlayersEmpty(players))
             return Optional.empty();
 
         // Filter rounds with missing player scores and get the lowest round number.
         return leg.getRounds().entrySet().stream()
                 .filter(entry -> players.stream().anyMatch(matchPlayer -> entry.getValue().getScores().get(matchPlayer.getPlayerId()) == null))
-                .min(Map.Entry.comparingByKey());
+                .min(Map.Entry.comparingByKey())
+                .map(X01LegRoundEntry::new);
     }
 
     /**
@@ -65,7 +63,7 @@ public class X01LegProgressServiceImpl implements IX01LegProgressService {
      * @return Optional X01LegRound entry for the added round.
      */
     @Override
-    public Optional<Map.Entry<Integer, X01LegRound>> createNextLegRound(X01Leg leg) {
+    public Optional<X01LegRoundEntry> createNextLegRound(X01Leg leg) {
         if (leg == null) return Optional.empty();
 
         // Get existing round numbers.
@@ -76,10 +74,10 @@ public class X01LegProgressServiceImpl implements IX01LegProgressService {
         if (nextRoundNumber == -1) return Optional.empty();
 
         // Create and add a new leg round to the leg.
-        X01LegRound newLegRound = new X01LegRound(new LinkedHashMap<>());
+        X01LegRoundEntry newLegRoundEntry = new X01LegRoundEntry(nextRoundNumber, new X01LegRound(new LinkedHashMap<>()));
 
-        leg.getRounds().put(nextRoundNumber, newLegRound);
-        return Optional.of(Map.entry(nextRoundNumber, newLegRound));
+        leg.getRounds().put(newLegRoundEntry.roundNumber(), newLegRoundEntry.round());
+        return Optional.of(newLegRoundEntry);
     }
 
     /**
@@ -123,9 +121,7 @@ public class X01LegProgressServiceImpl implements IX01LegProgressService {
         // Iterate rounds in descending order (highest round first)
         for (Map.Entry<Integer, X01LegRound> entry : leg.getRounds().descendingMap().entrySet()) {
             X01LegRoundScore score = entry.getValue().getScores().get(throwerId);
-            if (score != null) {
-                return Optional.of(score);
-            }
+            if (score != null) return Optional.of(score);
         }
 
         return Optional.empty();

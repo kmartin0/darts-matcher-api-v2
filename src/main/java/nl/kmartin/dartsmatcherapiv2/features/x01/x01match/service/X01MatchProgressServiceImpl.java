@@ -103,7 +103,7 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
     public Set<Integer> getSetNumbers(X01Match match) {
         if (X01ValidationUtils.isSetsEmpty(match)) return Collections.emptySet();
 
-        // Map the set numbers and collect to an set of integers
+        // Map the set numbers and collect to a set of integers
         return match.getSets().stream()
                 .map(X01Set::getSet)
                 .collect(Collectors.toSet());
@@ -160,16 +160,16 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
      * @return Optional X01LegRound entry for the current leg round in play.
      */
     @Override
-    public Optional<Map.Entry<Integer, X01LegRound>> getCurrentLegRoundOrCreate(X01Match match, X01Leg currentLeg) {
+    public Optional<X01LegRoundEntry> getCurrentLegRoundOrCreate(X01Match match, X01Leg currentLeg) {
         if (match == null || currentLeg == null) return Optional.empty();
 
         // First find the current leg round in the active list of rounds from the current leg.
-        Optional<Map.Entry<Integer, X01LegRound>> curLegRound = legProgressService.getCurrentLegRound(currentLeg, match.getPlayers());
+        Optional<X01LegRoundEntry> curLegRoundEntry = legProgressService.getCurrentLegRound(currentLeg, match.getPlayers());
 
         // If there is no current leg round and the leg isn't concluded, create the next leg round.
-        return curLegRound.isEmpty() && !legProgressService.isLegConcluded(currentLeg)
+        return curLegRoundEntry.isEmpty() && !legProgressService.isLegConcluded(currentLeg)
                 ? legProgressService.createNextLegRound(currentLeg)
-                : curLegRound;
+                : curLegRoundEntry;
     }
 
     /**
@@ -236,13 +236,13 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
         // Get the current set, leg and round.
         Optional<X01Set> currentSet = getCurrentSetOrCreate(match);
         Optional<X01LegEntry> currentLegEntry = currentSet.flatMap(set -> getCurrentLegOrCreate(match, set));
-        Optional<Map.Entry<Integer, X01LegRound>> currentLegRoundEntry = currentLegEntry.flatMap(legEntry -> getCurrentLegRoundOrCreate(match, legEntry.leg()));
+        Optional<X01LegRoundEntry> currentLegRoundEntry = currentLegEntry.flatMap(legEntry -> getCurrentLegRoundOrCreate(match, legEntry.leg()));
 
         // Get the current thrower for the current round
         Optional<ObjectId> throwsFirstInCurrentLeg = currentLegEntry.map(legEntry -> legEntry.leg().getThrowsFirst());
         Optional<ObjectId> currentThrower = currentLegRoundEntry.flatMap(roundEntry ->
                 throwsFirstInCurrentLeg.map(throwsFirst ->
-                        legRoundService.getCurrentThrowerInRound(roundEntry.getValue(), throwsFirst, match.getPlayers())
+                        legRoundService.getCurrentThrowerInRound(roundEntry.round(), throwsFirst, match.getPlayers())
                 )
         );
 
@@ -250,7 +250,7 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
         match.setMatchProgress(new X01MatchProgress(
                 currentSet.map(X01Set::getSet).orElse(null),
                 currentLegEntry.map(X01LegEntry::legNumber).orElse(null),
-                currentLegRoundEntry.map(Map.Entry::getKey).orElse(null),
+                currentLegRoundEntry.map(X01LegRoundEntry::roundNumber).orElse(null),
                 currentThrower.orElse(null)
         ));
     }

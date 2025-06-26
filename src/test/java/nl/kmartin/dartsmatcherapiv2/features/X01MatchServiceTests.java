@@ -21,7 +21,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
@@ -83,7 +82,7 @@ public class X01MatchServiceTests {
         Mockito.when(x01MatchRepository.findById(createdMatch.getId())).thenReturn(Optional.of(createdMatch));
         Mockito.when(matchProgressService.getCurrentSetOrCreate(x01Match)).thenReturn(Optional.of(new X01Set()));
         Mockito.when(matchProgressService.getCurrentLegOrCreate(Mockito.any(), Mockito.any())).thenReturn(Optional.of(new X01LegEntry(1, new X01Leg())));
-        Mockito.when(matchProgressService.getCurrentLegRoundOrCreate(Mockito.any(), Mockito.any())).thenReturn(Optional.of(Map.entry(1, new X01LegRound())));
+        Mockito.when(matchProgressService.getCurrentLegRoundOrCreate(Mockito.any(), Mockito.any())).thenReturn(Optional.of(new X01LegRoundEntry(1, new X01LegRound())));
 
         X01Turn x01Turn = new X01Turn(60, 3, 0);
 

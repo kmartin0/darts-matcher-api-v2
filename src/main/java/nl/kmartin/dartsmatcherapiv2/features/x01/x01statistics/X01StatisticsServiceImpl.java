@@ -8,7 +8,10 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.x01scorestatistics.IX01ScoreSta
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.Optional;
 
 @Service
 public class X01StatisticsServiceImpl implements IX01StatisticsService {
@@ -80,7 +83,9 @@ public class X01StatisticsServiceImpl implements IX01StatisticsService {
         if (rounds == null || leg == null || players == null) return;
 
         // Process and update player statistics based on the scores from all rounds
-        rounds.entrySet().forEach(round -> processRoundScores(round.getValue().getScores(), leg, round, players, trackDoubles));
+        rounds.entrySet().stream()
+                .map(X01LegRoundEntry::new)
+                .forEach(roundEntry -> processRoundScores(roundEntry.round().getScores(), leg, roundEntry, players, trackDoubles));
     }
 
     /**
@@ -92,7 +97,7 @@ public class X01StatisticsServiceImpl implements IX01StatisticsService {
      * @param players       {@link List<X01MatchPlayer>} the players for which the statistics need to be updated
      */
     private void processRoundScores(Map<ObjectId, X01LegRoundScore> roundScores, X01Leg leg,
-                                    Map.Entry<Integer, X01LegRound> legRoundEntry, List<X01MatchPlayer> players,
+                                    X01LegRoundEntry legRoundEntry, List<X01MatchPlayer> players,
                                     boolean trackDoubles) {
         if (roundScores == null || leg == null || legRoundEntry == null || players == null) return;
 
@@ -122,13 +127,13 @@ public class X01StatisticsServiceImpl implements IX01StatisticsService {
      * @param legRoundEntry Map entry for the round from which the score originates
      * @param playerScore   {@link X01LegRoundScore} the object containing the score and associated statistics for the player's turn
      */
-    private void processPlayerScore(X01MatchPlayer player, X01Leg leg, Map.Entry<Integer, X01LegRound> legRoundEntry,
+    private void processPlayerScore(X01MatchPlayer player, X01Leg leg, X01LegRoundEntry legRoundEntry,
                                     X01LegRoundScore playerScore, boolean trackDoubles) {
         if (player == null || leg == null || legRoundEntry == null || playerScore == null) return;
 
         // Get the player's current statistics
         X01Statistics playerStats = player.getStatistics();
-        boolean isScoreCheckout = legService.isPlayerCheckoutRound(leg, legRoundEntry.getKey(), player.getPlayerId());
+        boolean isScoreCheckout = legService.isPlayerCheckoutRound(leg, legRoundEntry.roundNumber(), player.getPlayerId());
 
         // Update score stats
         scoreStatisticsService.updateScoreStatistics(playerStats.getScoreStatistics(), playerScore);
@@ -140,7 +145,7 @@ public class X01StatisticsServiceImpl implements IX01StatisticsService {
         // Update average stats
         X01AverageStatistics playerAverageStats = playerStats.getAverageStats();
         Integer checkoutDartsUsed = isScoreCheckout ? leg.getCheckoutDartsUsed() : null;
-        averageStatisticsService.updateAverageStats(playerAverageStats, playerScore, legRoundEntry.getKey(), checkoutDartsUsed);
+        averageStatisticsService.updateAverageStats(playerAverageStats, playerScore, legRoundEntry.roundNumber(), checkoutDartsUsed);
     }
 
     /**

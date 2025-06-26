@@ -1,13 +1,11 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01set;
 
-import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Leg;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01LegEntry;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Set;
 import org.bson.types.ObjectId;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 

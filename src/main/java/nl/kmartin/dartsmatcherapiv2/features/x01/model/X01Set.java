@@ -49,7 +49,7 @@ public class X01Set {
     @JsonProperty("legs")
     public List<X01LegEntry> getLegEntries() {
         return legs.entrySet().stream()
-                .map(e -> new X01LegEntry(e.getKey(), e.getValue()))
+                .map(X01LegEntry::new)
                 .collect(Collectors.toList());
     }
 
