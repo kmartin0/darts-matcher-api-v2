@@ -3,7 +3,6 @@ package nl.kmartin.dartsmatcherapiv2.features.x01.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.ResultType;

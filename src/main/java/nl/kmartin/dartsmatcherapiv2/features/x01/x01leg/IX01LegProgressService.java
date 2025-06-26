@@ -1,6 +1,9 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01leg;
 
-import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
+import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Leg;
+import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01LegRoundEntry;
+import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01LegRoundScore;
+import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
 import org.bson.types.ObjectId;
 
 import java.util.List;
