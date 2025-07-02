@@ -23,6 +23,7 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.x01scorestatistics.X01ScoreStat
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01set.*;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01statistics.IX01StatisticsService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01statistics.X01StatisticsServiceImpl;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -30,10 +31,12 @@ public class X01FeatureTestFactory {
 
     private final IX01MatchRepository matchRepositoryMock;
     private final MessageResolver messageResolverMock;
+    private final ApplicationEventPublisher eventPublisherMock;
 
-    public X01FeatureTestFactory(IX01MatchRepository matchRepositoryMock, MessageResolver messageResolverMock) {
+    public X01FeatureTestFactory(IX01MatchRepository matchRepositoryMock, MessageResolver messageResolverMock, ApplicationEventPublisher eventPublisherMock) {
         this.matchRepositoryMock = matchRepositoryMock;
         this.messageResolverMock = messageResolverMock;
+        this.eventPublisherMock = eventPublisherMock;
     }
 
     public IX01MatchService createMatchService() {
@@ -45,7 +48,9 @@ public class X01FeatureTestFactory {
                 createStatisticsService(),
                 createSetProgressService(),
                 createLegService(),
-                createLegRoundService()
+                createLegRoundService(),
+                createDartBotService(),
+                eventPublisherMock
         );
     }
 
@@ -127,7 +132,6 @@ public class X01FeatureTestFactory {
 
     public IX01DartBotService createDartBotService() {
         return new X01DartBotServiceImpl(
-                createMatchService(),
                 createMatchProgressService(),
                 createDartBotThrowSimulator(),
                 messageResolverMock,

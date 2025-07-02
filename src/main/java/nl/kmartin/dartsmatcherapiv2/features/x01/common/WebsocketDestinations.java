@@ -12,7 +12,6 @@ public class WebsocketDestinations {
     public static final String X01_DELETE_MATCH = "/matches/x01/{matchId}/delete";
     public static final String X01_RESET_MATCH = "/matches/x01/{matchId}/reset";
     public static final String X01_ADD_TURN = "/matches/x01/{matchId}/turn/add";
-    public static final String X01_TURN_DART_BOT = "/matches/{matchId}/x01/turn/dart-bot";
     public static final String X01_EDIT_TURN = "/matches/x01/{matchId}/turn/edit";
     public static final String X01_DELETE_LAST_TURN = "/matches/x01/{matchId}/turn/delete-last";
 

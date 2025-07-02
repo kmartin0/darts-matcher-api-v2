@@ -1,8 +1,8 @@
 package nl.kmartin.dartsmatcherapiv2.exceptionhandler;
 
 import jakarta.validation.ConstraintViolationException;
-import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ForbiddenException;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.InvalidArgumentsException;
+import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ProcessingLimitReachedException;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceAlreadyExistsException;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceNotFoundException;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.response.ApiErrorCode;
@@ -48,23 +48,6 @@ public class GlobalExceptionHandler {
         ErrorResponse responseBody = new ErrorResponse(
                 apiErrorCode,
                 messageResolver.getMessage("exception.internal")
-        );
-
-        return new ResponseEntity<>(responseBody, apiErrorCode.getHttpStatus());
-    }
-
-    /**
-     * Handler for all forbidden exceptions.
-     *
-     * @param e ForbiddenException The exception that was thrown
-     * @return ResponseEntity<ErrorResponse> containing the error details
-     */
-    @ExceptionHandler({ForbiddenException.class})
-    public ResponseEntity<ErrorResponse> handleForbiddenException(ForbiddenException e) {
-        ApiErrorCode apiErrorCode = ApiErrorCode.PERMISSION_DENIED;
-        ErrorResponse responseBody = new ErrorResponse(
-                apiErrorCode,
-                e.getDescription()
         );
 
         return new ResponseEntity<>(responseBody, apiErrorCode.getHttpStatus());
@@ -248,6 +231,23 @@ public class GlobalExceptionHandler {
                 apiErrorCode,
                 messageResolver.getMessage("exception.resource.already.exists", e.getResourceType()),
                 new TargetError(e.getTarget(), messageResolver.getMessage("message.resource.already.exists", e.getValue()))
+        );
+
+        return new ResponseEntity<>(responseBody, apiErrorCode.getHttpStatus());
+    }
+
+    /**
+     * Handler for reaching a processing limit.
+     *
+     * @param e ProcessingLimitReachedException The exception that was thrown
+     * @return ResponseEntity<ErrorResponse> containing the error details
+     */
+    @ExceptionHandler({ProcessingLimitReachedException.class})
+    public ResponseEntity<ErrorResponse> handleProcessingLimitReachedException(ProcessingLimitReachedException e) {
+        ApiErrorCode apiErrorCode = ApiErrorCode.PROCESSING_LIMIT_REACHED;
+        ErrorResponse responseBody = new ErrorResponse(
+                apiErrorCode,
+                messageResolver.getMessage("exception.processing.limit.reached", e.getResourceType(), e.getIdentifier())
         );
 
         return new ResponseEntity<>(responseBody, apiErrorCode.getHttpStatus());

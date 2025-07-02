@@ -18,7 +18,6 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
-@Primary
 public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
 
     private final IX01SetService setService;

@@ -12,8 +12,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.*;
 
@@ -30,16 +30,19 @@ public class X01DartBotTests {
     @Mock
     private MessageResolver messageResolver;
 
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
+
     private IX01DartBotService dartBotService;
 
     @BeforeEach
     void setUp() {
-        X01FeatureTestFactory featureTestFactory = new X01FeatureTestFactory(matchRepository, messageResolver);
+        X01FeatureTestFactory featureTestFactory = new X01FeatureTestFactory(matchRepository, messageResolver, eventPublisher);
         dartBotService = featureTestFactory.createDartBotService();
     }
 
     @Test
-    void isMatchServiceOk() {
+    void isDartBotServiceInitialized() {
         Assertions.assertNotNull(dartBotService);
     }
 
@@ -47,8 +50,6 @@ public class X01DartBotTests {
     void testDartBotLegs() {
         final ObjectId dartBotId = new ObjectId();
         final X01Match match = createTestMatch(dartBotId);
-
-        Mockito.when(matchRepository.findById(Mockito.any())).thenReturn(Optional.of(match));
 
         for (int targetAvg = MAX_AVG_TO_TEST; targetAvg > MIN_AVG_TO_TEST; targetAvg--) {
             executeTestForTargetAvg(match, dartBotId, targetAvg);
@@ -89,7 +90,7 @@ public class X01DartBotTests {
                 break;
             }
             match.getMatchProgress().setCurrentRound(round);
-            X01Turn x01Turn = dartBotService.createDartBotTurn(match.getId());
+            X01Turn x01Turn = dartBotService.createDartBotTurn(match);
             X01LegRoundScore roundScore = new X01LegRoundScore(x01Turn.getDoublesMissed(), x01Turn.getScore());
 
             currentLeg.getRounds().put(round++, new X01LegRound(new LinkedHashMap<>(Map.of(dartBotId, roundScore))));

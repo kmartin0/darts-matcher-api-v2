@@ -12,27 +12,24 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.common.MessageResolver;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegResultService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service.IX01MatchProgressService;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service.IX01MatchService;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class X01DartBotServiceImpl implements IX01DartBotService {
 
-    private final IX01MatchService matchService;
     private final IX01MatchProgressService matchProgressService;
     private final IX01DartBotThrowSimulator dartBotThrowSimulatorService;
     private final MessageResolver messageResolver;
     private final IX01LegResultService legResultService;
 
-    public X01DartBotServiceImpl(IX01MatchService matchService,
-                                 IX01MatchProgressService matchProgressService,
+    public X01DartBotServiceImpl(IX01MatchProgressService matchProgressService,
                                  IX01DartBotThrowSimulator dartBotThrowSimulatorService,
                                  MessageResolver messageResolver, IX01LegResultService legResultService) {
-        this.matchService = matchService;
         this.matchProgressService = matchProgressService;
         this.dartBotThrowSimulatorService = dartBotThrowSimulatorService;
         this.messageResolver = messageResolver;
@@ -47,19 +44,20 @@ public class X01DartBotServiceImpl implements IX01DartBotService {
      *
      * If the current thrower is not a dart bot, this method will throw an invalid arguments exception.
      *
-     * @param matchId {@link ObjectId} the ID of the match for which to create the turn.
+     * @param match {@link X01Match} the match for which to create the turn.
      * @return {@link X01Turn} the turn created for the dart bot (if the current thrower is a dart bot).
      */
     @Override
-    public X01Turn createDartBotTurn(@NotNull ObjectId matchId) {
-        // Get the match and dart bot for this turn.
-        X01Match match = matchService.getMatch(matchId);
+    public X01Turn createDartBotTurn(@NotNull X01Match match) {
         X01MatchPlayer dartBotPlayer = getCurrentDartBotPlayer(match);
 
         // Get the current leg for the match.
-        X01SetEntry currentSetEntry = matchProgressService.getCurrentSetOrCreate(match).orElse(null);
-        X01LegEntry currentLegEntry = matchProgressService.getCurrentLegOrCreate(match, currentSetEntry.set())
-                .orElseThrow(() -> new InvalidArgumentsException(new TargetError("currentLeg", messageResolver.getMessage(MessageKeys.EXCEPTION_INVALID_ARGUMENTS))));
+        Optional<X01SetEntry> currentSetEntry = matchProgressService.getCurrentSetOrCreate(match);
+        X01LegEntry currentLegEntry = currentSetEntry
+                .flatMap(setEntry -> matchProgressService.getCurrentLegOrCreate(match, setEntry.set()))
+                .orElseThrow(() -> new InvalidArgumentsException(
+                        new TargetError("currentLeg", messageResolver.getMessage(MessageKeys.EXCEPTION_INVALID_ARGUMENTS))
+                ));
 
         // Create the round score object for this turn.
         X01DartBotLegState dartBotLegState = createDartBotLegState(match, dartBotPlayer, currentLegEntry.leg());

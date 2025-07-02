@@ -49,8 +49,9 @@ public class MessageKeys {
     public static final String EXCEPTION_BODY_NOT_READABLE = "exception.body.not.readable";
     // Parameters: 0 (resource type)
     public static final String EXCEPTION_RESOURCE_ALREADY_EXISTS = "exception.resource.already.exists";
+    // Parameters: 0 (resource type), 1 (identifier)
+    public static final String EXCEPTION_PROCESSING_LIMIT_REACHED = "exception.processing.limit.reached";
     public static final String EXCEPTION_SERVICE_UNAVAILABLE = "exception.service.unavailable";
-    public static final String EXCEPTION_FORBIDDEN = "exception.forbidden";
 
     public static class Params {
         public static final String NAME = "name";

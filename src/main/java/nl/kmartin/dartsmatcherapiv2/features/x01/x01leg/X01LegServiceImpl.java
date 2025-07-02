@@ -18,7 +18,6 @@ import java.util.TreeMap;
 import java.util.stream.IntStream;
 
 @Service
-@Primary
 public class X01LegServiceImpl implements IX01LegService {
 
     private final MessageResolver messageResolver;

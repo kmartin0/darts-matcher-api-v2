@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.TreeMap;
 
 @Service
-@Primary
 public class X01SetServiceImpl implements IX01SetService {
 
     /**

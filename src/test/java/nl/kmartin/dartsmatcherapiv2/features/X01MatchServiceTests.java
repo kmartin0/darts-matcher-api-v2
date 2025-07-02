@@ -2,6 +2,7 @@ package nl.kmartin.dartsmatcherapiv2.features;
 
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.PlayerType;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01dartbot.IX01DartBotService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leground.IX01LegRoundService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.api.IX01MatchRepository;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,10 +54,27 @@ public class X01MatchServiceTests {
     @Mock
     IX01LegRoundService legRoundService;
 
+    @Mock
+    IX01DartBotService dartBotService;
+
+    @Mock
+    ApplicationEventPublisher eventPublisher;
+
 
     @BeforeEach
     void setUp() {
-        this.x01MatchService = new X01MatchServiceImpl(x01MatchRepository, matchSetupService, matchResultService, matchProgressService, statisticsService, setProgressService, legService, legRoundService);
+        this.x01MatchService = new X01MatchServiceImpl(
+                x01MatchRepository,
+                matchSetupService,
+                matchResultService,
+                matchProgressService,
+                statisticsService,
+                setProgressService,
+                legService,
+                legRoundService,
+                dartBotService,
+                eventPublisher
+        );
     }
 
     @Test

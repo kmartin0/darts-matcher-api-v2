@@ -13,7 +13,6 @@ import java.util.Iterator;
 import java.util.List;
 
 @Service
-@Primary
 public class X01LegRoundServiceImpl implements IX01LegRoundService {
 
     /**
