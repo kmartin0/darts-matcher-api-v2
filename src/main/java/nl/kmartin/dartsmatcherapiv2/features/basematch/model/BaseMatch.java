@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import nl.kmartin.dartsmatcherapiv2.validators.noduplicatematchplayername.NoDuplicateMatchPlayerName;
 import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.time.Instant;
@@ -17,6 +18,9 @@ import java.util.ArrayList;
 public abstract class BaseMatch<PlayerType extends MatchPlayer> {
     @MongoId
     private ObjectId id;
+
+    @Version
+    private Integer version;
 
     private Instant startDate;
 
@@ -32,8 +36,9 @@ public abstract class BaseMatch<PlayerType extends MatchPlayer> {
 
     private MatchType matchType;
 
-    public BaseMatch(ObjectId id, Instant startDate, Instant endDate, MatchStatus matchStatus, ArrayList<PlayerType> players, MatchType matchType) {
+    public BaseMatch(ObjectId id, Integer version, Instant startDate, Instant endDate, MatchStatus matchStatus, ArrayList<PlayerType> players, MatchType matchType) {
         this.id = id;
+        this.version = version;
         this.startDate = startDate;
         this.endDate = endDate;
         this.matchStatus = matchStatus;

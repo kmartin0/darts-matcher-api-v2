@@ -18,6 +18,7 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.x01statistics.IX01StatisticsSer
 import org.bson.types.ObjectId;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -59,6 +60,7 @@ public class X01MatchServiceImpl implements IX01MatchService {
      * @return X01Match the saved match
      */
     @Override
+    @Transactional
     public X01Match createMatch(@NotNull @Valid X01Match match) {
         // Initialize properties for the new match.
         matchSetupService.setupMatch(match);
@@ -75,6 +77,7 @@ public class X01MatchServiceImpl implements IX01MatchService {
      * @throws ResourceNotFoundException when there is no match that has the matchId
      */
     @Override
+    @Transactional(readOnly = true)
     public X01Match getMatch(@NotNull ObjectId matchId) throws ResourceNotFoundException {
         return matchRepository.findById(matchId).orElseThrow(() -> new ResourceNotFoundException(X01Match.class, matchId));
     }
@@ -86,6 +89,7 @@ public class X01MatchServiceImpl implements IX01MatchService {
      * @param matchId ObjectId the id of the X01Match to be checked
      */
     @Override
+    @Transactional(readOnly = true)
     public void checkMatchExists(ObjectId matchId) {
         if (!matchRepository.existsById(matchId)) throw new ResourceNotFoundException(X01Match.class, matchId);
     }
@@ -99,6 +103,7 @@ public class X01MatchServiceImpl implements IX01MatchService {
      * @return {@link X01Match} The updated match
      */
     @Override
+    @Transactional
     public X01Match addTurn(@NotNull ObjectId matchId, @NotNull @Valid X01Turn turn) {
         // Find the match
         X01Match match = this.getMatch(matchId);
@@ -119,6 +124,7 @@ public class X01MatchServiceImpl implements IX01MatchService {
      * @return {@link X01Match} The updated match
      */
     @Override
+    @Transactional
     public X01Match editTurn(@NotNull ObjectId matchId, @NotNull @Valid X01EditTurn editTurn) {
         // Find the match
         X01Match match = this.getMatch(matchId);
@@ -149,6 +155,7 @@ public class X01MatchServiceImpl implements IX01MatchService {
      * @return {@link X01Match} The updated match after deleting the last turn.
      */
     @Override
+    @Transactional
     public X01Match deleteLastTurn(@NotNull ObjectId matchId) {
         // Find the match
         X01Match x01Match = this.getMatch(matchId);
@@ -166,6 +173,7 @@ public class X01MatchServiceImpl implements IX01MatchService {
      * @param matchId the {@link ObjectId} of the match to be deleted
      */
     @Override
+    @Transactional
     public void deleteMatch(ObjectId matchId) {
         this.matchRepository.deleteById(matchId);
         this.eventPublisher.publishEvent(new X01MatchEvent.X01DeleteMatchEvent(matchId));
@@ -178,6 +186,7 @@ public class X01MatchServiceImpl implements IX01MatchService {
      * @return {@link X01Match} object of the reset match
      */
     @Override
+    @Transactional
     public X01Match resetMatch(ObjectId matchId) {
         // Find the match
         X01Match match = this.getMatch(matchId);
@@ -196,6 +205,7 @@ public class X01MatchServiceImpl implements IX01MatchService {
      * @param turn  {@link X01Turn} The turn of a player
      */
     private void addTurnToCurrentPlayer(@NotNull X01Match match, @NotNull @Valid X01Turn turn) {
+        X01MatchProgress matchProgress = match.getMatchProgress();
         // Get the current set
         X01SetEntry currentSetEntry = matchProgressService.getCurrentSetOrCreate(match)
                 .orElseThrow(() -> new ResourceNotFoundException(X01Set.class, null));

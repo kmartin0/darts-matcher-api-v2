@@ -94,8 +94,8 @@ public class X01MatchServiceTests {
         player1.setPlayerType(PlayerType.HUMAN);
 
         x01Match.setPlayers(new ArrayList<>(Arrays.asList(player1, player2)));
-
-
+        x01Match.setMatchProgress(new X01MatchProgress(1, 1, 1, player1.getPlayerId()));
+        
         // When
         X01Match createdMatch = x01MatchService.createMatch(x01Match);
         Mockito.when(x01MatchRepository.findById(createdMatch.getId())).thenReturn(Optional.of(createdMatch));

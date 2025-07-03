@@ -2,7 +2,7 @@ package nl.kmartin.dartsmatcherapiv2.features;
 
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.PlayerType;
 import nl.kmartin.dartsmatcherapiv2.features.testutils.X01FeatureTestFactory;
-import nl.kmartin.dartsmatcherapiv2.features.x01.common.MessageResolver;
+import nl.kmartin.dartsmatcherapiv2.common.MessageResolver;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01dartbot.IX01DartBotService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.api.IX01MatchRepository;

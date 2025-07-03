@@ -3,7 +3,7 @@ package nl.kmartin.dartsmatcherapiv2.features.testutils;
 import nl.kmartin.dartsmatcherapiv2.features.dartboard.DartboardServiceImpl;
 import nl.kmartin.dartsmatcherapiv2.features.dartboard.IDartboardService;
 import nl.kmartin.dartsmatcherapiv2.features.dartboard.model.Dartboard;
-import nl.kmartin.dartsmatcherapiv2.features.x01.common.MessageResolver;
+import nl.kmartin.dartsmatcherapiv2.common.MessageResolver;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01averagestatistics.IX01AverageStatisticsService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01averagestatistics.X01AverageStatisticsServiceImpl;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01checkout.IX01CheckoutService;

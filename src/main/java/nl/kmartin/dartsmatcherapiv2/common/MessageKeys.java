@@ -1,4 +1,4 @@
-package nl.kmartin.dartsmatcherapiv2.features.x01.common;
+package nl.kmartin.dartsmatcherapiv2.common;
 
 public class MessageKeys {
     private MessageKeys() {
@@ -36,6 +36,7 @@ public class MessageKeys {
     public static final String MESSAGE_X01_DART_BOT_PLAYER_NOT_BOT = "message.x01.dart.bot.player.not.bot";
     public static final String MESSAGE_X01_PLAYER_NOT_FOUND = "message.x01.player.not.found";
     public static final String MESSAGE_X01_DART_BOT_CURRENT_THROWER_ERROR = "message.x01.dart.bot.current.thrower.error";
+    public static final String MESSAGE_RESOURCE_NOT_FOUND = "message.resource.not.found";
 
     /**
      * Developer-facing Exceptions (exception.*)
@@ -49,6 +50,7 @@ public class MessageKeys {
     public static final String EXCEPTION_BODY_NOT_READABLE = "exception.body.not.readable";
     // Parameters: 0 (resource type)
     public static final String EXCEPTION_RESOURCE_ALREADY_EXISTS = "exception.resource.already.exists";
+    public static final String EXCEPTION_CONFLICT = "exception.conflict";
     // Parameters: 0 (resource type), 1 (identifier)
     public static final String EXCEPTION_PROCESSING_LIMIT_REACHED = "exception.processing.limit.reached";
     public static final String EXCEPTION_SERVICE_UNAVAILABLE = "exception.service.unavailable";
@@ -57,5 +59,10 @@ public class MessageKeys {
         public static final String NAME = "name";
         public static final String SCORE = "score";
         public static final String DARTS = "darts";
+    }
+
+    public static String forResourceType(Class<?> resource) {
+        String prefix = "resource.type";
+        return prefix + "." + resource.getSimpleName();
     }
 }

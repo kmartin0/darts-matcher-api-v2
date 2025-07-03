@@ -1,4 +1,4 @@
-package nl.kmartin.dartsmatcherapiv2.features.x01.common;
+package nl.kmartin.dartsmatcherapiv2.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

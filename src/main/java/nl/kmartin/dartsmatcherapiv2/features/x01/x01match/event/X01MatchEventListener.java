@@ -1,6 +1,6 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01match.event;
 
-import nl.kmartin.dartsmatcherapiv2.features.x01.common.WebsocketDestinations;
+import nl.kmartin.dartsmatcherapiv2.common.WebsocketDestinations;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;

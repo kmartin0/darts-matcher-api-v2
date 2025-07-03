@@ -20,7 +20,7 @@ public class ErrorResponse implements Serializable {
     // The HTTP Status Code
     private int code;
 
-    // (Optional) Additional error information that the client code can use to handle
+    // (Optional) Additional user-friendly error information that the client code can use to handle
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Map<String, String> details;
 

@@ -2,13 +2,12 @@ package nl.kmartin.dartsmatcherapiv2.features.x01.x01leg;
 
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.InvalidArgumentsException;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.response.TargetError;
-import nl.kmartin.dartsmatcherapiv2.features.x01.common.MessageKeys;
-import nl.kmartin.dartsmatcherapiv2.features.x01.common.MessageResolver;
+import nl.kmartin.dartsmatcherapiv2.common.MessageKeys;
+import nl.kmartin.dartsmatcherapiv2.common.MessageResolver;
 import nl.kmartin.dartsmatcherapiv2.features.x01.common.X01ValidationUtils;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01checkout.IX01CheckoutService;
 import org.bson.types.ObjectId;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

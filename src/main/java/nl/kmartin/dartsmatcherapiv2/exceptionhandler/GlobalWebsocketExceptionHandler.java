@@ -1,6 +1,7 @@
 package nl.kmartin.dartsmatcherapiv2.exceptionhandler;
 
 import jakarta.validation.ConstraintViolationException;
+import nl.kmartin.dartsmatcherapiv2.common.MessageKeys;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.InvalidArgumentsException;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ProcessingLimitReachedException;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceAlreadyExistsException;
@@ -9,12 +10,14 @@ import nl.kmartin.dartsmatcherapiv2.exceptionhandler.response.ApiErrorCode;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.response.ErrorResponse;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.response.TargetError;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.response.WebSocketErrorResponse;
-import nl.kmartin.dartsmatcherapiv2.features.x01.common.MessageResolver;
-import nl.kmartin.dartsmatcherapiv2.features.x01.common.WebsocketDestinations;
+import nl.kmartin.dartsmatcherapiv2.common.MessageResolver;
+import nl.kmartin.dartsmatcherapiv2.common.WebsocketDestinations;
 import nl.kmartin.dartsmatcherapiv2.utils.ErrorUtil;
+import nl.kmartin.dartsmatcherapiv2.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.dao.DataAccessResourceFailureException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.converter.MessageConversionException;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
@@ -44,8 +47,8 @@ public class GlobalWebsocketExceptionHandler {
 
         return new WebSocketErrorResponse(
                 ApiErrorCode.INTERNAL,
-                stompHeaderAccessor.getDestination(),
-                messageResolver.getMessage("exception.internal")
+                messageResolver.getMessage("exception.internal"),
+                stompHeaderAccessor.getDestination()
         );
     }
 
@@ -94,11 +97,15 @@ public class GlobalWebsocketExceptionHandler {
     @MessageExceptionHandler(ResourceNotFoundException.class)
     @SendToUser(destinations = WebsocketDestinations.ERROR_QUEUE, broadcast = false)
     public WebSocketErrorResponse handleResourceNotFoundException(ResourceNotFoundException e, StompHeaderAccessor stompHeaderAccessor) {
+        String resourceSimpleName = e.getResourceClass().getSimpleName();
+        String userResourceType = messageResolver.getMessage(MessageKeys.forResourceType(e.getResourceClass()));
+        String userMessage = messageResolver.getMessage(MessageKeys.MESSAGE_RESOURCE_NOT_FOUND, userResourceType);
 
         return new WebSocketErrorResponse(
                 ApiErrorCode.RESOURCE_NOT_FOUND,
+                messageResolver.getMessage("exception.resource.not.found", resourceSimpleName, e.getIdentifier()),
                 stompHeaderAccessor.getDestination(),
-                messageResolver.getMessage("exception.resource.not.found", e.getResourceType(), e.getIdentifier())
+                new TargetError(StringUtils.pascalToCamelCase(resourceSimpleName), userMessage)
         );
     }
 
@@ -132,49 +139,27 @@ public class GlobalWebsocketExceptionHandler {
         );
     }
 
-    /**
-     * Handler for reaching a processing limit.
-     *
-     * @param e ProcessingLimitReachedException The exception that was thrown
-     * @return ResponseEntity<ErrorResponse> containing the error details
-     */
-    @ExceptionHandler({ProcessingLimitReachedException.class})
-    public ResponseEntity<ErrorResponse> handleProcessingLimitReachedException(ProcessingLimitReachedException e) {
-        ApiErrorCode apiErrorCode = ApiErrorCode.PROCESSING_LIMIT_REACHED;
-        ErrorResponse responseBody = new ErrorResponse(
-                apiErrorCode,
-                messageResolver.getMessage("exception.processing.limit.reached")
-        );
-
-        return new ResponseEntity<>(responseBody, apiErrorCode.getHttpStatus());
-    }
-
     // Handler for sending malformed data or invalid data types (e.g. invalid json, using array instead of string).
     @ExceptionHandler({MethodArgumentTypeMismatchException.class})
     @SendToUser(destinations = WebsocketDestinations.ERROR_QUEUE, broadcast = false)
-    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(MethodArgumentTypeMismatchException e) {
-        e.printStackTrace();
+    public WebSocketErrorResponse handleHttpMessageNotReadableException(MethodArgumentTypeMismatchException e, StompHeaderAccessor stompHeaderAccessor) {
 
-        ApiErrorCode apiErrorCode = ApiErrorCode.MESSAGE_NOT_READABLE;
-        ErrorResponse responseBody = new ErrorResponse(
-                apiErrorCode,
-                messageResolver.getMessage("exception.body.not.readable")
+        return new WebSocketErrorResponse(
+                ApiErrorCode.MESSAGE_NOT_READABLE,
+                messageResolver.getMessage("exception.body.not.readable"),
+                stompHeaderAccessor.getDestination()
         );
-
-        return new ResponseEntity<>(responseBody, apiErrorCode.getHttpStatus());
     }
-
 
     //	 Handler for when a Message can't be deserialized to the corresponding object (e.g. object requires int but gets an array).
     @MessageExceptionHandler({MessageConversionException.class, ConversionFailedException.class})
     @SendToUser(destinations = WebsocketDestinations.ERROR_QUEUE, broadcast = false)
     public WebSocketErrorResponse handleMessageConversionException(Exception e, StompHeaderAccessor stompHeaderAccessor) {
-        e.printStackTrace();
 
         return new WebSocketErrorResponse(
                 ApiErrorCode.MESSAGE_NOT_READABLE,
-                stompHeaderAccessor.getDestination(),
-                messageResolver.getMessage("exception.body.not.readable")
+                messageResolver.getMessage("exception.body.not.readable"),
+                stompHeaderAccessor.getDestination()
         );
     }
 
@@ -185,8 +170,19 @@ public class GlobalWebsocketExceptionHandler {
 
         return new WebSocketErrorResponse(
                 ApiErrorCode.UNAVAILABLE,
-                stompHeaderAccessor.getDestination(),
-                messageResolver.getMessage("exception.service.unavailable")
+                messageResolver.getMessage("exception.service.unavailable"),
+                stompHeaderAccessor.getDestination()
+        );
+    }
+
+    @MessageExceptionHandler(OptimisticLockingFailureException.class)
+    @SendToUser(destinations = WebsocketDestinations.ERROR_QUEUE, broadcast = false)
+    public WebSocketErrorResponse handleOptimisticLockingFailureException(OptimisticLockingFailureException e, StompHeaderAccessor stompHeaderAccessor) {
+
+        return new WebSocketErrorResponse(
+                ApiErrorCode.CONFLICT,
+                messageResolver.getMessage(MessageKeys.EXCEPTION_CONFLICT),
+                stompHeaderAccessor.getDestination()
         );
     }
 }

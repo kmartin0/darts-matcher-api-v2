@@ -1,6 +1,6 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01checkout;
 
-import nl.kmartin.dartsmatcherapiv2.features.x01.common.RestEndpoints;
+import nl.kmartin.dartsmatcherapiv2.common.RestEndpoints;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Checkout;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

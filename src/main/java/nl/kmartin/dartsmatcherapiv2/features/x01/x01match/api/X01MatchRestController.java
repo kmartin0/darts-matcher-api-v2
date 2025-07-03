@@ -1,7 +1,7 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01match.api;
 
 import jakarta.validation.Valid;
-import nl.kmartin.dartsmatcherapiv2.features.x01.common.RestEndpoints;
+import nl.kmartin.dartsmatcherapiv2.common.RestEndpoints;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01EditTurn;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Match;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Turn;

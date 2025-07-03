@@ -5,13 +5,13 @@ import lombok.Getter;
 @Getter
 public class ResourceNotFoundException extends RuntimeException {
 	// the type of the requested resource.
-	private final String resourceType;
+	private final Class<?> resourceClass;
 
 	// The id of the requested resource.
 	private final Object identifier;
 
-	public ResourceNotFoundException(Class<?> resourceType, Object identifier) {
-		this.resourceType = resourceType.getSimpleName();
+	public ResourceNotFoundException(Class<?> resourceClass, Object identifier) {
+		this.resourceClass = resourceClass;
 		this.identifier = identifier;
 	}
 }

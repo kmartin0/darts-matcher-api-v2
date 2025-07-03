@@ -1,6 +1,7 @@
 package nl.kmartin.dartsmatcherapiv2.exceptionhandler;
 
 import jakarta.validation.ConstraintViolationException;
+import nl.kmartin.dartsmatcherapiv2.common.MessageKeys;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.InvalidArgumentsException;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ProcessingLimitReachedException;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceAlreadyExistsException;
@@ -8,11 +9,13 @@ import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceNotFoundE
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.response.ApiErrorCode;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.response.ErrorResponse;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.response.TargetError;
-import nl.kmartin.dartsmatcherapiv2.features.x01.common.MessageResolver;
+import nl.kmartin.dartsmatcherapiv2.common.MessageResolver;
 import nl.kmartin.dartsmatcherapiv2.utils.ErrorUtil;
+import nl.kmartin.dartsmatcherapiv2.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.dao.DataAccessResourceFailureException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpMediaTypeException;
@@ -191,9 +194,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({ResourceNotFoundException.class})
     public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException e) {
         ApiErrorCode apiErrorCode = ApiErrorCode.RESOURCE_NOT_FOUND;
+        String resourceSimpleName = e.getResourceClass().getSimpleName();
+
+        String userResourceType = messageResolver.getMessage(MessageKeys.forResourceType(e.getResourceClass()));
+        String userMessage = messageResolver.getMessage(MessageKeys.MESSAGE_RESOURCE_NOT_FOUND, userResourceType);
+
         ErrorResponse responseBody = new ErrorResponse(
                 apiErrorCode,
-                messageResolver.getMessage("exception.resource.not.found", e.getResourceType(), e.getIdentifier())
+                messageResolver.getMessage("exception.resource.not.found", resourceSimpleName, e.getIdentifier()),
+                new TargetError(StringUtils.pascalToCamelCase(resourceSimpleName), userMessage)
         );
 
         return new ResponseEntity<>(responseBody, apiErrorCode.getHttpStatus());
@@ -266,6 +275,18 @@ public class GlobalExceptionHandler {
         ErrorResponse responseBody = new ErrorResponse(
                 apiErrorCode,
                 messageResolver.getMessage("exception.service.unavailable")
+        );
+
+        return new ResponseEntity<>(responseBody, apiErrorCode.getHttpStatus());
+    }
+
+    @ExceptionHandler({OptimisticLockingFailureException.class})
+    public ResponseEntity<ErrorResponse> handleOptimisticLockingFailureException(OptimisticLockingFailureException e) {
+        ApiErrorCode apiErrorCode = ApiErrorCode.CONFLICT;
+
+        ErrorResponse responseBody = new ErrorResponse(
+                apiErrorCode,
+                messageResolver.getMessage(MessageKeys.EXCEPTION_CONFLICT)
         );
 
         return new ResponseEntity<>(responseBody, apiErrorCode.getHttpStatus());
