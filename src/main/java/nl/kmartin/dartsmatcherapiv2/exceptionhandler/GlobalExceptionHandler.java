@@ -2,6 +2,7 @@ package nl.kmartin.dartsmatcherapiv2.exceptionhandler;
 
 import jakarta.validation.ConstraintViolationException;
 import nl.kmartin.dartsmatcherapiv2.common.MessageKeys;
+import nl.kmartin.dartsmatcherapiv2.common.MessageResolver;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.InvalidArgumentsException;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ProcessingLimitReachedException;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceAlreadyExistsException;
@@ -9,7 +10,6 @@ import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceNotFoundE
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.response.ApiErrorCode;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.response.ErrorResponse;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.response.TargetError;
-import nl.kmartin.dartsmatcherapiv2.common.MessageResolver;
 import nl.kmartin.dartsmatcherapiv2.utils.ErrorUtil;
 import nl.kmartin.dartsmatcherapiv2.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

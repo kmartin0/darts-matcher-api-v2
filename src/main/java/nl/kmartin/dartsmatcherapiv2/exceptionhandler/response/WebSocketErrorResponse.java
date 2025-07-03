@@ -3,8 +3,6 @@ package nl.kmartin.dartsmatcherapiv2.exceptionhandler.response;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Map;
-
 @Getter
 @Setter
 public class WebSocketErrorResponse extends ErrorResponse {

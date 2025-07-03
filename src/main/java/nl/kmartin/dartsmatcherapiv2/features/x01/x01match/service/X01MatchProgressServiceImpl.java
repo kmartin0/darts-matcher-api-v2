@@ -9,7 +9,6 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.x01set.IX01SetProgressService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01set.IX01SetService;
 import nl.kmartin.dartsmatcherapiv2.utils.NumberUtils;
 import org.bson.types.ObjectId;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;

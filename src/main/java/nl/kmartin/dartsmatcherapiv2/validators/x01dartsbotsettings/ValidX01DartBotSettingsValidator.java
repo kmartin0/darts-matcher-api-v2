@@ -2,8 +2,8 @@ package nl.kmartin.dartsmatcherapiv2.validators.x01dartsbotsettings;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import nl.kmartin.dartsmatcherapiv2.features.basematch.model.PlayerType;
 import nl.kmartin.dartsmatcherapiv2.common.MessageKeys;
+import nl.kmartin.dartsmatcherapiv2.features.basematch.model.PlayerType;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01DartBotSettings;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
