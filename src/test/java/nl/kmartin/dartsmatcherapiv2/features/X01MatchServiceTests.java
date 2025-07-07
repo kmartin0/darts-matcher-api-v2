@@ -6,10 +6,7 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.x01dartbot.IX01DartBotService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leground.IX01LegRoundService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.api.IX01MatchRepository;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service.IX01MatchProgressService;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service.IX01MatchResultService;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service.IX01MatchService;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service.X01MatchServiceImpl;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service.*;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01matchsetup.IX01MatchSetupService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01set.IX01SetProgressService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01statistics.IX01StatisticsService;
@@ -19,7 +16,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,7 +54,7 @@ public class X01MatchServiceTests {
     IX01DartBotService dartBotService;
 
     @Mock
-    ApplicationEventPublisher eventPublisher;
+    IX01MatchPublishService matchPublishService;
 
 
     @BeforeEach
@@ -73,7 +69,7 @@ public class X01MatchServiceTests {
                 legService,
                 legRoundService,
                 dartBotService,
-                eventPublisher
+                matchPublishService
         );
     }
 
@@ -95,7 +91,7 @@ public class X01MatchServiceTests {
 
         x01Match.setPlayers(new ArrayList<>(Arrays.asList(player1, player2)));
         x01Match.setMatchProgress(new X01MatchProgress(1, 1, 1, player1.getPlayerId()));
-        
+
         // When
         X01Match createdMatch = x01MatchService.createMatch(x01Match);
         Mockito.when(x01MatchRepository.findById(createdMatch.getId())).thenReturn(Optional.of(createdMatch));

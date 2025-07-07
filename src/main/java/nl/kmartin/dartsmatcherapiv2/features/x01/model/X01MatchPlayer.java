@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.MatchPlayer;
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.PlayerType;
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.ResultType;
-import nl.kmartin.dartsmatcherapiv2.validators.x01dartsbotsettings.ValidX01DartBotSettings;
+import nl.kmartin.dartsmatcherapiv2.validators.validx01dartbotsettings.ValidX01DartBotSettings;
 import org.bson.types.ObjectId;
 
 @Data

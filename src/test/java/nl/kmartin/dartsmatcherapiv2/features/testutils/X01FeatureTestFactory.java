@@ -50,7 +50,7 @@ public class X01FeatureTestFactory {
                 createLegService(),
                 createLegRoundService(),
                 createDartBotService(),
-                eventPublisherMock
+                createMatchPublishService()
         );
     }
 
@@ -162,5 +162,9 @@ public class X01FeatureTestFactory {
 
     public IX01DartBotAccuracyCalculator createDartBotAccuracyCalculator() {
         return new X01DartBotAccuracyCalculatorImpl();
+    }
+
+    public IX01MatchPublishService createMatchPublishService() {
+        return new X01MatchPublishServiceImpl(eventPublisherMock);
     }
 }

@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class X01StatisticsServiceImpl implements IX01StatisticsService {
@@ -42,50 +44,60 @@ public class X01StatisticsServiceImpl implements IX01StatisticsService {
         // Reset the statistics for all players
         resetPlayerStatistics(match.getPlayers());
 
+        // Convert the players list to a players map for quicker access.
+        Map<ObjectId, X01MatchPlayer> playersMap = match.getPlayers()
+                .stream()
+                .collect(Collectors.toMap(X01MatchPlayer::getPlayerId, Function.identity()));
+
         // Process and update the player statistics using the data of all the sets
-        processSets(match.getSets(), match.getPlayers(), match.getMatchSettings().isTrackDoubles());
+        processSets(match.getSets(), match.getMatchSettings().isTrackDoubles(), playersMap);
     }
 
     /**
      * Process and update the player statistics from the data of all the sets
      *
-     * @param sets    NavigableMap<Integer, X01Set> the map of sets containing the player turns
-     * @param players {@link List<X01MatchPlayer>} the players for which the statistics need to be updated
+     * @param sets         NavigableMap<Integer, X01Set> the map of sets containing the player turns
+     * @param trackDoubles boolean whether to track doubles missed
+     * @param playersMap   Map<ObjectId, X01MatchPlayer> the players for which the statistics need to be updated
      */
-    private void processSets(NavigableMap<Integer, X01Set> sets, List<X01MatchPlayer> players, boolean trackDoubles) {
-        if (sets == null || players == null) return;
+    private void processSets(NavigableMap<Integer, X01Set> sets, boolean trackDoubles,
+                             Map<ObjectId, X01MatchPlayer> playersMap) {
+        if (sets == null || playersMap == null) return;
 
         // Process and update the player statistics using the data of all the legs
-        sets.values().forEach(set -> processLegs(set.getLegs(), players, trackDoubles));
+        sets.values().forEach(set -> processLegs(set.getLegs(), trackDoubles, playersMap));
     }
 
     /**
      * Process and update the player statistics using the data of all the legs
      *
-     * @param legs    {@link List<X01Leg>} the list of legs containing the player turns
-     * @param players {@link List<X01MatchPlayer>} the players for which the statistics need to be updated
+     * @param legs         {@link List<X01Leg>} the list of legs containing the player turns
+     * @param trackDoubles boolean whether to track doubles missed
+     * @param playersMap   Map<ObjectId, X01MatchPlayer> the players for which the statistics need to be updated
      */
-    private void processLegs(NavigableMap<Integer, X01Leg> legs, List<X01MatchPlayer> players, boolean trackDoubles) {
-        if (legs == null || players == null) return;
+    private void processLegs(NavigableMap<Integer, X01Leg> legs, boolean trackDoubles, Map<ObjectId, X01MatchPlayer> playersMap) {
+        if (legs == null || playersMap == null) return;
 
         // Process and update the player statistics using the data of all the leg rounds
-        legs.values().forEach(leg -> processLegRounds(leg.getRounds(), leg, players, trackDoubles));
+        legs.values().forEach(leg -> processLegRounds(leg.getRounds(), leg, trackDoubles, playersMap));
     }
 
     /**
      * Process and update the player statistics using the data of all the leg rounds
      *
-     * @param rounds  {@link List<X01LegRound>} the list of leg rounds containing the player turns
-     * @param leg     {@link X01Leg} the leg from which the rounds originate
-     * @param players {@link List<X01MatchPlayer>} the players for which the statistics need to be updated
+     * @param rounds       {@link List<X01LegRound>} the list of leg rounds containing the player turns
+     * @param leg          {@link X01Leg} the leg from which the rounds originate
+     * @param trackDoubles boolean whether to track doubles missed
+     * @param playersMap   Map<ObjectId, X01MatchPlayer> the players for which the statistics need to be updated
      */
-    private void processLegRounds(NavigableMap<Integer, X01LegRound> rounds, X01Leg leg, List<X01MatchPlayer> players, boolean trackDoubles) {
-        if (rounds == null || leg == null || players == null) return;
+    private void processLegRounds(NavigableMap<Integer, X01LegRound> rounds, X01Leg leg,
+                                  boolean trackDoubles, Map<ObjectId, X01MatchPlayer> playersMap) {
+        if (rounds == null || leg == null || playersMap == null) return;
 
         // Process and update player statistics based on the scores from all rounds
         rounds.entrySet().stream()
                 .map(X01LegRoundEntry::new)
-                .forEach(roundEntry -> processRoundScores(roundEntry.round().getScores(), leg, roundEntry, players, trackDoubles));
+                .forEach(roundEntry -> processRoundScores(roundEntry.round().getScores(), leg, roundEntry, trackDoubles, playersMap));
     }
 
     /**
@@ -94,17 +106,17 @@ public class X01StatisticsServiceImpl implements IX01StatisticsService {
      * @param roundScores   Map<ObjectId, X01LegRoundScore> the player scores made in a round
      * @param leg           {@link X01Leg} the leg from which the scores originate
      * @param legRoundEntry Map entry for the round from which the score originates
-     * @param players       {@link List<X01MatchPlayer>} the players for which the statistics need to be updated
+     * @param trackDoubles  boolean whether to track doubles missed
+     * @param playersMap    Map<ObjectId, X01MatchPlayer> the players for which the statistics need to be updated
      */
     private void processRoundScores(Map<ObjectId, X01LegRoundScore> roundScores, X01Leg leg,
-                                    X01LegRoundEntry legRoundEntry, List<X01MatchPlayer> players,
-                                    boolean trackDoubles) {
-        if (roundScores == null || leg == null || legRoundEntry == null || players == null) return;
+                                    X01LegRoundEntry legRoundEntry, boolean trackDoubles, Map<ObjectId, X01MatchPlayer> playersMap) {
+        if (roundScores == null || leg == null || legRoundEntry == null || playersMap == null) return;
 
         // Update the player statistics for all players that scored in this round
         roundScores.forEach((playerId, roundScore) -> {
             // Find the player that scored this turn
-            Optional<X01MatchPlayer> playerOpt = findPlayerById(players, playerId);
+            Optional<X01MatchPlayer> playerOpt = Optional.ofNullable(playersMap.get(playerId));
 
             // Check if the player from this turn exists.
             if (playerOpt.isPresent()) {
@@ -146,20 +158,6 @@ public class X01StatisticsServiceImpl implements IX01StatisticsService {
         X01AverageStatistics playerAverageStats = playerStats.getAverageStats();
         Integer checkoutDartsUsed = isScoreCheckout ? leg.getCheckoutDartsUsed() : null;
         averageStatisticsService.updateAverageStats(playerAverageStats, playerScore, legRoundEntry.roundNumber(), checkoutDartsUsed);
-    }
-
-    /**
-     * Finds a player by their unique player ID from a list of match players.
-     *
-     * @param matchPlayers {@link List<X01MatchPlayer>} the list of players participating in the match.
-     * @param playerId     {@link ObjectId} the unique ID of the player to find.
-     * @return {@link Optional<X01MatchPlayer>} an Optional containing the player if found, or an empty Optional if no player matches the given ID.
-     */
-    private Optional<X01MatchPlayer> findPlayerById(List<X01MatchPlayer> matchPlayers, ObjectId playerId) {
-        // Find the first player with the playerId
-        return matchPlayers.stream()
-                .filter(player -> player.getPlayerId().equals(playerId))
-                .findFirst();
     }
 
     /**

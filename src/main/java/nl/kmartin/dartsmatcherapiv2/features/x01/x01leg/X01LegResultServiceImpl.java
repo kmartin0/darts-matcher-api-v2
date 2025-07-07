@@ -84,7 +84,6 @@ public class X01LegResultServiceImpl implements IX01LegResultService {
         }
     }
 
-
     /**
      * Calculates the remaining score for a player in a leg.
      *

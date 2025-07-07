@@ -11,12 +11,6 @@ import java.util.List;
 import java.util.Set;
 
 public class NoDuplicateMatchPlayerNameValidator implements ConstraintValidator<NoDuplicateMatchPlayerName, List<? extends MatchPlayer>> {
-
-    @Override
-    public void initialize(NoDuplicateMatchPlayerName constraintAnnotation) {
-        ConstraintValidator.super.initialize(constraintAnnotation);
-    }
-
     @Override
     public boolean isValid(List<? extends MatchPlayer> matchPlayers, ConstraintValidatorContext constraintContext) {
         // null values are handled by other validators (@NotNull)

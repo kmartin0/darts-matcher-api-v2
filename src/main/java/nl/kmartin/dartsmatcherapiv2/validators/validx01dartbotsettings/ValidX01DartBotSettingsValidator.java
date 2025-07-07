@@ -1,4 +1,4 @@
-package nl.kmartin.dartsmatcherapiv2.validators.x01dartsbotsettings;
+package nl.kmartin.dartsmatcherapiv2.validators.validx01dartbotsettings;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -9,12 +9,6 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 
 public class ValidX01DartBotSettingsValidator implements ConstraintValidator<ValidX01DartBotSettings, X01MatchPlayer> {
-
-    @Override
-    public void initialize(ValidX01DartBotSettings constraintAnnotation) {
-        ConstraintValidator.super.initialize(constraintAnnotation);
-    }
-
     @Override
     public boolean isValid(X01MatchPlayer x01MatchPlayer, ConstraintValidatorContext constraintValidatorContext) {
         // null values are handled by other validators (@NotNull)

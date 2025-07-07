@@ -65,6 +65,7 @@ public class X01DartBotServiceImpl implements IX01DartBotService {
 
         Integer checkoutDartsUsed = dartBotLegState.getRemainingPoints() == 0 ? dartBotLegState.getDartsUsedInRound() : null;
 
+
         // Create and return an X01Turn object using the values from the created round score for this turn
         return new X01Turn(roundScore.getScore(), checkoutDartsUsed, roundScore.getDoublesMissed());
     }

@@ -1,4 +1,4 @@
-package nl.kmartin.dartsmatcherapiv2.common;
+package nl.kmartin.dartsmatcherapiv2.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

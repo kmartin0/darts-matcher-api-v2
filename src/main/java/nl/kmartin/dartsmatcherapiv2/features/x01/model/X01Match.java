@@ -37,10 +37,10 @@ public class X01Match extends BaseMatch<X01MatchPlayer> {
     @Valid
     private X01MatchProgress matchProgress;
 
-    public X01Match(ObjectId id, Integer version, Instant startDate, Instant endDate, MatchStatus matchStatus,
+    public X01Match(ObjectId id, Integer version, Integer publishedVersion, Instant startDate, Instant endDate, MatchStatus matchStatus,
                     ArrayList<X01MatchPlayer> players, MatchType matchType, X01MatchSettings matchSettings,
                     NavigableMap<Integer, X01Set> sets, X01MatchProgress matchProgress) {
-        super(id, version, startDate, endDate, matchStatus, players, matchType);
+        super(id, version, publishedVersion, startDate, endDate, matchStatus, players, matchType);
         this.matchSettings = matchSettings;
         this.setSets(sets);
         this.matchProgress = matchProgress;

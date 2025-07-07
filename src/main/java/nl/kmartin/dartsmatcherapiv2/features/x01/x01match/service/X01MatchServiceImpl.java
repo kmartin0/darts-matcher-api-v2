@@ -1,8 +1,8 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service;
 
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ProcessingLimitReachedException;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceNotFoundException;
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.PlayerType;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
@@ -16,7 +16,6 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.x01matchsetup.IX01MatchSetupSer
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01set.IX01SetProgressService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01statistics.IX01StatisticsService;
 import org.bson.types.ObjectId;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,12 +34,13 @@ public class X01MatchServiceImpl implements IX01MatchService {
     private final IX01LegService legService;
     private final IX01LegRoundService legRoundService;
     private final IX01DartBotService dartBotService;
-    private final ApplicationEventPublisher eventPublisher;
+    private final IX01MatchPublishService matchPublishService;
 
     public X01MatchServiceImpl(IX01MatchRepository matchRepository, IX01MatchSetupService matchSetupService,
                                IX01MatchResultService matchResultService, IX01MatchProgressService matchProgressService,
                                IX01StatisticsService statisticsService, IX01SetProgressService setProgressService,
-                               IX01LegService legService, IX01LegRoundService legRoundService, IX01DartBotService dartBotService, ApplicationEventPublisher eventPublisher) {
+                               IX01LegService legService, IX01LegRoundService legRoundService, IX01DartBotService dartBotService,
+                               IX01MatchPublishService matchPublishService) {
         this.matchRepository = matchRepository;
         this.matchSetupService = matchSetupService;
         this.matchResultService = matchResultService;
@@ -50,7 +50,7 @@ public class X01MatchServiceImpl implements IX01MatchService {
         this.legService = legService;
         this.legRoundService = legRoundService;
         this.dartBotService = dartBotService;
-        this.eventPublisher = eventPublisher;
+        this.matchPublishService = matchPublishService;
     }
 
     /**
@@ -66,7 +66,8 @@ public class X01MatchServiceImpl implements IX01MatchService {
         matchSetupService.setupMatch(match);
 
         // Save the match to the repository and return it.
-        return saveMatchAndProcessBotTurns(match, X01MatchEventType.PROCESS_MATCH);
+        saveMatchAndProcessBotTurns(match, X01MatchEventType.PROCESS_MATCH);
+        return match;
     }
 
     /**
@@ -112,7 +113,8 @@ public class X01MatchServiceImpl implements IX01MatchService {
         addTurnToCurrentPlayer(match, turn);
 
         // Add the turn to the match and save the updated match to the repository.
-        return saveMatchAndProcessBotTurns(match, X01MatchEventType.ADD_HUMAN_TURN);
+        saveMatchAndProcessBotTurns(match, X01MatchEventType.ADD_HUMAN_TURN);
+        return match;
     }
 
     /**
@@ -143,7 +145,8 @@ public class X01MatchServiceImpl implements IX01MatchService {
         });
 
         // Save the updated match to the repository.
-        return saveMatchAndProcessBotTurns(match, X01MatchEventType.EDIT_TURN);
+        saveMatchAndProcessBotTurns(match, X01MatchEventType.EDIT_TURN);
+        return match;
     }
 
     /**
@@ -158,13 +161,14 @@ public class X01MatchServiceImpl implements IX01MatchService {
     @Transactional
     public X01Match deleteLastTurn(@NotNull ObjectId matchId) {
         // Find the match
-        X01Match x01Match = this.getMatch(matchId);
+        X01Match match = this.getMatch(matchId);
 
         // Delete the last round score
-        matchProgressService.removeLastScoreFromMatch(x01Match);
+        matchProgressService.removeLastScoreFromMatch(match);
 
         // Save the updated match to the repository.
-        return saveMatchAndProcessBotTurns(x01Match, X01MatchEventType.DELETE_LAST_TURN);
+        saveMatchAndProcessBotTurns(match, X01MatchEventType.DELETE_LAST_TURN);
+        return match;
     }
 
     /**
@@ -176,7 +180,7 @@ public class X01MatchServiceImpl implements IX01MatchService {
     @Transactional
     public void deleteMatch(ObjectId matchId) {
         this.matchRepository.deleteById(matchId);
-        this.eventPublisher.publishEvent(new X01MatchEvent.X01DeleteMatchEvent(matchId));
+        this.matchPublishService.publish(new X01MatchEvent.X01DeleteMatchEvent(matchId));
     }
 
     /**
@@ -195,7 +199,8 @@ public class X01MatchServiceImpl implements IX01MatchService {
         matchSetupService.setupMatch(match);
 
         // Save the reset match to the repository.
-        return saveMatchAndProcessBotTurns(match, X01MatchEventType.RESET_MATCH);
+        saveMatchAndProcessBotTurns(match, X01MatchEventType.RESET_MATCH);
+        return match;
     }
 
     /**
@@ -205,7 +210,6 @@ public class X01MatchServiceImpl implements IX01MatchService {
      * @param turn  {@link X01Turn} The turn of a player
      */
     private void addTurnToCurrentPlayer(@NotNull X01Match match, @NotNull @Valid X01Turn turn) {
-        X01MatchProgress matchProgress = match.getMatchProgress();
         // Get the current set
         X01SetEntry currentSetEntry = matchProgressService.getCurrentSetOrCreate(match)
                 .orElseThrow(() -> new ResourceNotFoundException(X01Set.class, null));
@@ -232,79 +236,38 @@ public class X01MatchServiceImpl implements IX01MatchService {
      *
      * @param match     {@link X01Match} the match to be saved and processed
      * @param eventType {@link X01MatchEventType} the type of the operation that triggered the save
-     * @return {@link X01Match} The updated match after processing bot turns
      */
-    private X01Match saveMatchAndProcessBotTurns(X01Match match, X01MatchEventType eventType) {
-        // Save the match.
-        match = saveMatch(match, eventType);
+    private void saveMatchAndProcessBotTurns(X01Match match, X01MatchEventType eventType) {
+        // Update, Save and Broadcast the match.
+        saveMatch(match, eventType);
 
-        // Create and add bot turns until the curren thrower is not a bot.
-        match = processBotTurns(match);
-
-        // Return the updated match.
-        return match;
-    }
-
-    /**
-     * processes Dart Bot turns until the current thrower is no longer a bot.
-     * The match is saved after each turn to allow websocket subscribers to observe and react to
-     * changes in the match state, such as new turns being added.
-     *
-     * To prevent infinite loops or excessive processing, a maximum limit on processed bot turns is enforced.
-     * If the limit is exceeded, a {@link ProcessingLimitReachedException} is thrown.
-     *
-     * @param match {@link X01Match} the match to be saved and processed
-     * @return {@link X01Match} The updated match after processing bot turns
-     */
-    private X01Match processBotTurns(X01Match match) {
-        final int processingLimit = 500;
-        int turnsProcessed = 0;
-
-        // Create and add bot turns until the curren thrower is not a bot.
-        while (isCurrentThrowerDartBot(match)) {
-            // Generate the bot turn, add it to the current player and save the match.
-            X01Turn botTurn = dartBotService.createDartBotTurn(match);
-            addTurnToCurrentPlayer(match, botTurn);
-            match = saveMatch(match, X01MatchEventType.ADD_BOT_TURN);
-
-            // For safety throw a processing limit reached exception if the limit of iterations is reached to avoid
-            // a potential infinite loop or excessive processing.
-            turnsProcessed++;
-            if (turnsProcessed >= processingLimit)
-                throw new ProcessingLimitReachedException(X01Match.class, match.getId().toString());
+        // If it's a dart bots' turn. Create and Add the bot turn and then Update, Save and Broadcast the match.
+        if (isCurrentThrowerDartBot(match)) {
+            X01Turn dartBotTurn = dartBotService.createDartBotTurn(match);
+            addTurnToCurrentPlayer(match, dartBotTurn);
+            saveMatch(match, X01MatchEventType.ADD_BOT_TURN);
+            if (isCurrentThrowerDartBot(match))
+                throw new IllegalStateException("Invalid match state: two bot turns in a row are not allowed (matchId=" + match.getId() + ")");
         }
-
-        return match;
     }
 
     /**
-     * Updates and saves a match, then publishes an event to notify subscribers
-     * about the updated match state.
+     * Saves the given X01Match object by updating it, persisting it,
+     * and publishing the corresponding match event based on the event type.
      *
-     * @param match     {@link X01Match} to update and save
-     * @param eventType {@link X01MatchEventType} the type of the operation that triggered the save
-     * @return {@link X01Match} the updated and saved match
+     * @param match     the X01Match object to be saved and published
+     * @param eventType the type of event indicating the nature of the save operation
      */
-    private X01Match saveMatch(X01Match match, X01MatchEventType eventType) {
+    private void saveMatch(X01Match match, X01MatchEventType eventType) {
         // Update the match
         updateMatch(match);
 
-        // Save the match
-        match = matchRepository.save(match);
+        // Save the Match
+        matchRepository.save(match);
 
-        // Publish the match
-        X01MatchEvent event = switch (eventType) {
-            case PROCESS_MATCH -> new X01MatchEvent.X01ProcessMatchEvent(match);
-            case ADD_HUMAN_TURN -> new X01MatchEvent.X01AddHumanTurnEvent(match);
-            case ADD_BOT_TURN -> new X01MatchEvent.X01AddBotTurnEvent(match);
-            case EDIT_TURN -> new X01MatchEvent.X01EditTurnEvent(match);
-            case DELETE_LAST_TURN -> new X01MatchEvent.X01DeleteLastTurnEvent(match);
-            case RESET_MATCH -> new X01MatchEvent.X01ResetMatchEvent(match);
-            default -> throw new IllegalArgumentException("Invalid event type for this operation: " + eventType);
-        };
-        eventPublisher.publishEvent(event);
-
-        return match;
+        // Publish the match event.
+        X01MatchEvent publishEvent = createSaveEventFromType(match, eventType);
+        this.matchPublishService.publish(publishEvent);
     }
 
     /**
@@ -322,6 +285,29 @@ public class X01MatchServiceImpl implements IX01MatchService {
 
         // Update Match Progress
         matchProgressService.updateMatchProgress(match);
+
+        // Update the publishing version
+        match.setBroadcastVersion(match.getBroadcastVersion() + 1);
+    }
+
+    /**
+     * Creates an X01MatchEvent object based on the provided 'save' event type.
+     *
+     * @param match     the X01Match associated with the event
+     * @param eventType the type of event to create
+     * @return an instance of X01MatchEvent corresponding to the eventType
+     * @throws IllegalArgumentException if the eventType is not valid for this operation
+     */
+    private X01MatchEvent createSaveEventFromType(X01Match match, X01MatchEventType eventType) {
+        return switch (eventType) {
+            case PROCESS_MATCH -> new X01MatchEvent.X01ProcessMatchEvent(match);
+            case ADD_HUMAN_TURN -> new X01MatchEvent.X01AddHumanTurnEvent(match);
+            case ADD_BOT_TURN -> new X01MatchEvent.X01AddBotTurnEvent(match);
+            case EDIT_TURN -> new X01MatchEvent.X01EditTurnEvent(match);
+            case DELETE_LAST_TURN -> new X01MatchEvent.X01DeleteLastTurnEvent(match);
+            case RESET_MATCH -> new X01MatchEvent.X01ResetMatchEvent(match);
+            default -> throw new IllegalArgumentException("Invalid event type for this operation: " + eventType);
+        };
     }
 
     /**
