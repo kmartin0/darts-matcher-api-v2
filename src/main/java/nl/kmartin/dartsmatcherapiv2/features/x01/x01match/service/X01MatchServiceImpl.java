@@ -203,6 +203,18 @@ public class X01MatchServiceImpl implements IX01MatchService {
         return match;
     }
 
+    @Override
+    @Transactional
+    public X01Match reprocessMatch(ObjectId matchId) {
+        // Find the match
+        X01Match match = this.getMatch(matchId);
+
+        // Update calculated match fields (winner, statistics etc.), process bot turns and save it to the repository.
+        this.saveMatchAndProcessBotTurns(match, X01MatchEventType.PROCESS_MATCH);
+
+        return match;
+    }
+
     /**
      * Verifies and adds the current player's turn to the current round of the match.
      *

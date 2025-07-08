@@ -67,4 +67,10 @@ public class X01MatchRestController {
     public X01Match resetMatch(@PathVariable ObjectId matchId) {
         return matchService.resetMatch(matchId);
     }
+
+    @PostMapping(path = RestEndpoints.X01_REPROCESS_MATCH, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public X01Match reprocessMatch(@PathVariable ObjectId matchId) {
+        return matchService.reprocessMatch(matchId);
+    }
 }

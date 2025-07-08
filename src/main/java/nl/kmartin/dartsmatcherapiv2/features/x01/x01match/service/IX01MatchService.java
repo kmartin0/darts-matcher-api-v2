@@ -24,4 +24,6 @@ public interface IX01MatchService {
     void deleteMatch(ObjectId matchId);
 
     X01Match resetMatch(ObjectId matchId);
+
+    X01Match reprocessMatch(ObjectId matchId);
 }

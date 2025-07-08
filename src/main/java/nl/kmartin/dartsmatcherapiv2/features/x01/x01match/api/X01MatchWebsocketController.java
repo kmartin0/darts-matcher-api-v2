@@ -58,4 +58,10 @@ public class X01MatchWebsocketController {
         X01Match resetMatch = matchService.resetMatch(matchId);
         return new X01MatchEvent.X01ResetMatchEvent(resetMatch);
     }
+
+    @MessageMapping(WebsocketDestinations.X01_REPROCESS_MATCH)
+    public X01MatchEvent.X01ProcessMatchEvent reprocessMatch(@DestinationVariable ObjectId matchId) {
+        X01Match reProcessedMatch = matchService.reprocessMatch(matchId);
+        return new X01MatchEvent.X01ProcessMatchEvent(reProcessedMatch);
+    }
 }
