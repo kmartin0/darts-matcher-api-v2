@@ -250,16 +250,22 @@ public class X01MatchServiceImpl implements IX01MatchService {
      * @param eventType {@link X01MatchEventType} the type of the operation that triggered the save
      */
     private void saveMatchAndProcessBotTurns(X01Match match, X01MatchEventType eventType) {
+        // A match containing 1 bot should have a maximum of 2 bot turns in a row.
+        final int MAX_BOT_TURNS = 2;
+
         // Update, Save and Broadcast the match.
         saveMatch(match, eventType);
 
         // If it's a dart bots' turn. Create and Add the bot turn and then Update, Save and Broadcast the match.
-        if (isCurrentThrowerDartBot(match)) {
+        int botTurnsProcessed = 0;
+        while (isCurrentThrowerDartBot(match)) {
+            if (botTurnsProcessed >= MAX_BOT_TURNS)
+                throw new IllegalStateException("Invalid match state: three bot turns in a row are not allowed (matchId=" + match.getId() + ")");
+
             X01Turn dartBotTurn = dartBotService.createDartBotTurn(match);
             addTurnToCurrentPlayer(match, dartBotTurn);
             saveMatch(match, X01MatchEventType.ADD_BOT_TURN);
-            if (isCurrentThrowerDartBot(match))
-                throw new IllegalStateException("Invalid match state: two bot turns in a row are not allowed (matchId=" + match.getId() + ")");
+            botTurnsProcessed++;
         }
     }
 
