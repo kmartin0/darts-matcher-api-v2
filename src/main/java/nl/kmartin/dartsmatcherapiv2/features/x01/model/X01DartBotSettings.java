@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class X01DartBotSettings {
-    public static final int MINIMUM_BOT_AVG = 1;
+    public static final int MINIMUM_BOT_AVG = 3;
     public static final int MAXIMUM_BOT_AVG = 167;
 
     @Min(MINIMUM_BOT_AVG)
