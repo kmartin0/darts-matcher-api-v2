@@ -9,6 +9,7 @@ public class X01MatchPublishServiceImpl implements IX01MatchPublishService{
     private final ApplicationEventPublisher eventPublisher;
 
     public X01MatchPublishServiceImpl(ApplicationEventPublisher eventPublisher) {
+
         this.eventPublisher = eventPublisher;
     }
 
