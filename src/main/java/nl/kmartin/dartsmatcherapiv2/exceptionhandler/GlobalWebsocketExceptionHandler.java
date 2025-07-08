@@ -5,7 +5,6 @@ import nl.kmartin.dartsmatcherapiv2.common.MessageKeys;
 import nl.kmartin.dartsmatcherapiv2.common.MessageResolver;
 import nl.kmartin.dartsmatcherapiv2.common.WebsocketDestinations;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.InvalidArgumentsException;
-import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ProcessingLimitReachedException;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceAlreadyExistsException;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceNotFoundException;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.response.ApiErrorCode;
@@ -45,7 +44,7 @@ public class GlobalWebsocketExceptionHandler {
 
         return new WebSocketErrorResponse(
                 ApiErrorCode.INTERNAL,
-                messageResolver.getMessage("exception.internal"),
+                messageResolver.getMessage(MessageKeys.EXCEPTION_INTERNAL),
                 stompHeaderAccessor.getDestination()
         );
     }
@@ -58,7 +57,7 @@ public class GlobalWebsocketExceptionHandler {
 
         return new WebSocketErrorResponse(
                 ApiErrorCode.INVALID_ARGUMENTS,
-                messageResolver.getMessage("exception.invalid.arguments"),
+                messageResolver.getMessage(MessageKeys.EXCEPTION_INVALID_ARGUMENTS),
                 stompHeaderAccessor.getDestination(),
                 errors.toArray(new TargetError[0])
         );
@@ -72,7 +71,7 @@ public class GlobalWebsocketExceptionHandler {
 
         return new WebSocketErrorResponse(
                 ApiErrorCode.INVALID_ARGUMENTS,
-                messageResolver.getMessage("exception.invalid.arguments"),
+                messageResolver.getMessage(MessageKeys.EXCEPTION_INVALID_ARGUMENTS),
                 stompHeaderAccessor.getDestination(),
                 errors.toArray(new TargetError[0])
         );
@@ -85,7 +84,7 @@ public class GlobalWebsocketExceptionHandler {
 
         return new WebSocketErrorResponse(
                 ApiErrorCode.INVALID_ARGUMENTS,
-                messageResolver.getMessage("exception.invalid.arguments"),
+                messageResolver.getMessage(MessageKeys.EXCEPTION_INVALID_ARGUMENTS),
                 stompHeaderAccessor.getDestination(),
                 e.getErrors().toArray(new TargetError[0])
         );
@@ -101,7 +100,7 @@ public class GlobalWebsocketExceptionHandler {
 
         return new WebSocketErrorResponse(
                 ApiErrorCode.RESOURCE_NOT_FOUND,
-                messageResolver.getMessage("exception.resource.not.found", resourceSimpleName, e.getIdentifier()),
+                messageResolver.getMessage(MessageKeys.EXCEPTION_RESOURCE_NOT_FOUND, resourceSimpleName, e.getIdentifier()),
                 stompHeaderAccessor.getDestination(),
                 new TargetError(StringUtils.pascalToCamelCase(resourceSimpleName), userMessage)
         );
@@ -114,26 +113,9 @@ public class GlobalWebsocketExceptionHandler {
 
         return new WebSocketErrorResponse(
                 ApiErrorCode.ALREADY_EXISTS,
-                messageResolver.getMessage("exception.resource.already.exists", e.getResourceType()),
+                messageResolver.getMessage(MessageKeys.EXCEPTION_RESOURCE_ALREADY_EXISTS, e.getResourceType()),
                 stompHeaderAccessor.getDestination(),
-                new TargetError(e.getTarget(), messageResolver.getMessage("message.resource.already.exists", e.getValue()))
-        );
-    }
-
-    /**
-     * Handler for reaching a processing limit.
-     *
-     * @param e ProcessingLimitReachedException The exception that was thrown
-     * @return WebSocketErrorResponse containing the error details
-     */
-    @MessageExceptionHandler(ProcessingLimitReachedException.class)
-    @SendToUser(destinations = WebsocketDestinations.ERROR_QUEUE, broadcast = false)
-    public WebSocketErrorResponse handleProcessingLimitReachedException(ProcessingLimitReachedException e, StompHeaderAccessor stompHeaderAccessor) {
-
-        return new WebSocketErrorResponse(
-                ApiErrorCode.PROCESSING_LIMIT_REACHED,
-                messageResolver.getMessage("exception.processing.limit.reached", e.getResourceType(), e.getIdentifier()),
-                stompHeaderAccessor.getDestination()
+                new TargetError(e.getTarget(), messageResolver.getMessage(MessageKeys.MESSAGE_RESOURCE_ALREADY_EXISTS, e.getValue()))
         );
     }
 
@@ -144,7 +126,7 @@ public class GlobalWebsocketExceptionHandler {
 
         return new WebSocketErrorResponse(
                 ApiErrorCode.MESSAGE_NOT_READABLE,
-                messageResolver.getMessage("exception.body.not.readable"),
+                messageResolver.getMessage(MessageKeys.EXCEPTION_BODY_NOT_READABLE),
                 stompHeaderAccessor.getDestination()
         );
     }
@@ -156,7 +138,7 @@ public class GlobalWebsocketExceptionHandler {
 
         return new WebSocketErrorResponse(
                 ApiErrorCode.MESSAGE_NOT_READABLE,
-                messageResolver.getMessage("exception.body.not.readable"),
+                messageResolver.getMessage(MessageKeys.EXCEPTION_BODY_NOT_READABLE),
                 stompHeaderAccessor.getDestination()
         );
     }
@@ -168,7 +150,7 @@ public class GlobalWebsocketExceptionHandler {
 
         return new WebSocketErrorResponse(
                 ApiErrorCode.UNAVAILABLE,
-                messageResolver.getMessage("exception.service.unavailable"),
+                messageResolver.getMessage(MessageKeys.EXCEPTION_SERVICE_UNAVAILABLE),
                 stompHeaderAccessor.getDestination()
         );
     }

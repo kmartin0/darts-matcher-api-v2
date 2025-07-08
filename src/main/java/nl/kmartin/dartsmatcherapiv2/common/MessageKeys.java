@@ -5,16 +5,16 @@ public class MessageKeys {
     }
 
     /**
-     * Bean Validation Messages (wrapped with {})
+     * Bean Validation Messages
      */
-    public static final String VALIDATION_NOT_NULL = "{javax.validation.constraints.NotNull.message}";
-    public static final String VALIDATION_NOT_BLANK = "{javax.validation.constraints.NotBlank.message}";
-    public static final String VALIDATION_NULL = "{javax.validation.constraints.Null.message}";
-    public static final String VALIDATION_EMAIL = "{javax.validation.constraints.Email.message}";
-    public static final String VALIDATION_NOT_EMPTY = "{javax.validation.constraints.NotEmpty.message}";
-    public static final String VALIDATION_MIN = "{javax.validation.constraints.Min.message}";
-    public static final String VALIDATION_MAX = "{javax.validation.constraints.Max.message}";
-    public static final String VALIDATION_LENGTH = "{org.hibernate.validator.constraints.Length.message}";
+    public static final String VALIDATION_NOT_NULL = "javax.validation.constraints.NotNull.message";
+    public static final String VALIDATION_NOT_BLANK = "javax.validation.constraints.NotBlank.message";
+    public static final String VALIDATION_NULL = "javax.validation.constraints.Null.message";
+    public static final String VALIDATION_EMAIL = "javax.validation.constraints.Email.message";
+    public static final String VALIDATION_NOT_EMPTY = "javax.validation.constraints.NotEmpty.message";
+    public static final String VALIDATION_MIN = "javax.validation.constraints.Min.message";
+    public static final String VALIDATION_MAX = "javax.validation.constraints.Max.message";
+    public static final String VALIDATION_LENGTH = "org.hibernate.validator.constraints.Length.message";
 
     /**
      * User-facing Messages (message.*)

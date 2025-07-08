@@ -4,7 +4,6 @@ import jakarta.validation.ConstraintViolationException;
 import nl.kmartin.dartsmatcherapiv2.common.MessageKeys;
 import nl.kmartin.dartsmatcherapiv2.common.MessageResolver;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.InvalidArgumentsException;
-import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ProcessingLimitReachedException;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceAlreadyExistsException;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceNotFoundException;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.response.ApiErrorCode;
@@ -50,7 +49,7 @@ public class GlobalExceptionHandler {
         ApiErrorCode apiErrorCode = ApiErrorCode.INTERNAL;
         ErrorResponse responseBody = new ErrorResponse(
                 apiErrorCode,
-                messageResolver.getMessage("exception.internal")
+                messageResolver.getMessage(MessageKeys.EXCEPTION_INTERNAL)
         );
 
         return new ResponseEntity<>(responseBody, apiErrorCode.getHttpStatus());
@@ -69,7 +68,7 @@ public class GlobalExceptionHandler {
 
         ErrorResponse responseBody = new ErrorResponse(
                 apiErrorCode,
-                messageResolver.getMessage("exception.invalid.arguments"),
+                messageResolver.getMessage(MessageKeys.EXCEPTION_INVALID_ARGUMENTS),
                 errors.toArray(new TargetError[0])
         );
 
@@ -88,7 +87,7 @@ public class GlobalExceptionHandler {
         ApiErrorCode apiErrorCode = ApiErrorCode.INVALID_ARGUMENTS;
         ErrorResponse responseBody = new ErrorResponse(
                 apiErrorCode,
-                messageResolver.getMessage("exception.invalid.arguments"),
+                messageResolver.getMessage(MessageKeys.EXCEPTION_INVALID_ARGUMENTS),
                 errors.toArray(new TargetError[0])
         );
 
@@ -107,7 +106,7 @@ public class GlobalExceptionHandler {
 
         ErrorResponse responseBody = new ErrorResponse(
                 apiErrorCode,
-                messageResolver.getMessage("exception.invalid.arguments"),
+                messageResolver.getMessage(MessageKeys.EXCEPTION_INVALID_ARGUMENTS),
                 e.getErrors().toArray(new TargetError[0])
         );
 
@@ -127,8 +126,8 @@ public class GlobalExceptionHandler {
 
         ErrorResponse responseBody = new ErrorResponse(
                 apiErrorCode,
-                messageResolver.getMessage("exception.invalid.arguments"),
-                new TargetError(e.getParameterName(), messageResolver.getMessage("javax.validation.constraints.NotNull.message"))
+                messageResolver.getMessage(MessageKeys.EXCEPTION_INVALID_ARGUMENTS),
+                new TargetError(e.getParameterName(), messageResolver.getMessage(MessageKeys.VALIDATION_NOT_NULL))
         );
 
         return new ResponseEntity<>(responseBody, apiErrorCode.getHttpStatus());
@@ -179,7 +178,7 @@ public class GlobalExceptionHandler {
         ApiErrorCode apiErrorCode = ApiErrorCode.URI_NOT_FOUND;
         ErrorResponse responseBody = new ErrorResponse(
                 ApiErrorCode.URI_NOT_FOUND,
-                messageResolver.getMessage("exception.uri.not.found", e.getRequestURL())
+                messageResolver.getMessage(MessageKeys.EXCEPTION_URI_NOT_FOUND, e.getRequestURL())
         );
 
         return new ResponseEntity<>(responseBody, apiErrorCode.getHttpStatus());
@@ -201,7 +200,7 @@ public class GlobalExceptionHandler {
 
         ErrorResponse responseBody = new ErrorResponse(
                 apiErrorCode,
-                messageResolver.getMessage("exception.resource.not.found", resourceSimpleName, e.getIdentifier()),
+                messageResolver.getMessage(MessageKeys.EXCEPTION_RESOURCE_NOT_FOUND, resourceSimpleName, e.getIdentifier()),
                 new TargetError(StringUtils.pascalToCamelCase(resourceSimpleName), userMessage)
         );
 
@@ -221,7 +220,7 @@ public class GlobalExceptionHandler {
         ApiErrorCode apiErrorCode = ApiErrorCode.MESSAGE_NOT_READABLE;
         ErrorResponse responseBody = new ErrorResponse(
                 apiErrorCode,
-                messageResolver.getMessage("exception.body.not.readable")
+                messageResolver.getMessage(MessageKeys.EXCEPTION_BODY_NOT_READABLE)
         );
 
         return new ResponseEntity<>(responseBody, apiErrorCode.getHttpStatus());
@@ -238,25 +237,8 @@ public class GlobalExceptionHandler {
         ApiErrorCode apiErrorCode = ApiErrorCode.ALREADY_EXISTS;
         ErrorResponse responseBody = new ErrorResponse(
                 apiErrorCode,
-                messageResolver.getMessage("exception.resource.already.exists", e.getResourceType()),
-                new TargetError(e.getTarget(), messageResolver.getMessage("message.resource.already.exists", e.getValue()))
-        );
-
-        return new ResponseEntity<>(responseBody, apiErrorCode.getHttpStatus());
-    }
-
-    /**
-     * Handler for reaching a processing limit.
-     *
-     * @param e ProcessingLimitReachedException The exception that was thrown
-     * @return ResponseEntity<ErrorResponse> containing the error details
-     */
-    @ExceptionHandler({ProcessingLimitReachedException.class})
-    public ResponseEntity<ErrorResponse> handleProcessingLimitReachedException(ProcessingLimitReachedException e) {
-        ApiErrorCode apiErrorCode = ApiErrorCode.PROCESSING_LIMIT_REACHED;
-        ErrorResponse responseBody = new ErrorResponse(
-                apiErrorCode,
-                messageResolver.getMessage("exception.processing.limit.reached", e.getResourceType(), e.getIdentifier())
+                messageResolver.getMessage(MessageKeys.EXCEPTION_RESOURCE_ALREADY_EXISTS, e.getResourceType()),
+                new TargetError(e.getTarget(), messageResolver.getMessage(MessageKeys.MESSAGE_RESOURCE_ALREADY_EXISTS, e.getValue()))
         );
 
         return new ResponseEntity<>(responseBody, apiErrorCode.getHttpStatus());
@@ -274,7 +256,7 @@ public class GlobalExceptionHandler {
 
         ErrorResponse responseBody = new ErrorResponse(
                 apiErrorCode,
-                messageResolver.getMessage("exception.service.unavailable")
+                messageResolver.getMessage(MessageKeys.EXCEPTION_SERVICE_UNAVAILABLE)
         );
 
         return new ResponseEntity<>(responseBody, apiErrorCode.getHttpStatus());
