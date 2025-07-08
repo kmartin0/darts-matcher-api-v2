@@ -29,6 +29,7 @@
     <properties>
         <java.version>17</java.version>
         <lombok.version>1.18.36</lombok.version>
+        <logback-encoder.version>7.4</logback-encoder.version>
     </properties>
     <dependencies>
         <!-- Database -->
@@ -86,6 +87,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+
+        <!-- Logging -->
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>${logback-encoder.version}</version>
         </dependency>
     </dependencies>
 

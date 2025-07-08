@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Include Spring Boot's default logging settings -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <!--
+    Console appender (plain text):
+    Outputs logs to the console using a pattern specified by CONSOLE_LOG_PATTERN from defaults.xml
+    -->
+    <appender name="CONSOLE_PLAIN" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!--
+    File appender (JSON format):
+    Writes logs in JSON using Logstash encoder to logs/app.log file
+    -->
+    <appender name="FILE_JSON" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- Main log file path -->
+        <file>logs/app.log</file>
+
+        <!-- JSON encoder from Logstash Logback Encoder library with a pretty print decorator -->
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <jsonGeneratorDecorator class="net.logstash.logback.decorate.PrettyPrintingJsonGeneratorDecorator"/>
+        </encoder>
+
+        <!-- Rolling policy:
+            - archives logs daily or when they exceed 10MB
+            - Keeps up to 14 archived logs
+            - Max total disk usage capped at 1GB
+        -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/archived/app.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>14</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <!--
+    Logging configuration for "dev" and "test" Spring profiles:
+        - Logs to console only
+        - Sets logging level for Spring web framework to DEBUG
+    -->
+    <springProfile name="dev,test">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE_PLAIN"/>
+        </root>
+        <logger name="org.springframework.web" level="DEBUG"/>
+    </springProfile>
+
+    <!--
+    Logging configuration for "prod" profile:
+    - Logs to JSON file
+    - Sets logging level to INFO
+    -->
+    <springProfile name="prod">
+        <root level="INFO">
+            <appender-ref ref="FILE_JSON"/>
+        </root>
+    </springProfile>
+</configuration>
