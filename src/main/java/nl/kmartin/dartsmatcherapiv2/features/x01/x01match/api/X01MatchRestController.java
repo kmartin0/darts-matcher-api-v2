@@ -7,8 +7,6 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Match;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Turn;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service.IX01MatchService;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;

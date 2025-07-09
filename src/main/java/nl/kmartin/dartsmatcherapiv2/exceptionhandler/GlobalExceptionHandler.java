@@ -11,6 +11,8 @@ import nl.kmartin.dartsmatcherapiv2.exceptionhandler.response.ErrorResponse;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.response.TargetError;
 import nl.kmartin.dartsmatcherapiv2.utils.ErrorUtil;
 import nl.kmartin.dartsmatcherapiv2.utils.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.dao.DataAccessResourceFailureException;
@@ -25,11 +27,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.ArrayList;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
     private final MessageResolver messageResolver;
 
     @Autowired
@@ -45,7 +49,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler({Exception.class})
     public ResponseEntity<ErrorResponse> handleRunTimeException(Exception e) {
-        e.printStackTrace();
+        logger.error("handleRunTimeException", e);
         ApiErrorCode apiErrorCode = ApiErrorCode.INTERNAL;
         ErrorResponse responseBody = new ErrorResponse(
                 apiErrorCode,
@@ -63,6 +67,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler({MethodArgumentNotValidException.class})
     public ResponseEntity<ErrorResponse> handleMethodArgumentsInvalidException(MethodArgumentNotValidException e) {
+        logger.error("handleMethodArgumentsInvalidException", e);
+
         ArrayList<TargetError> errors = ErrorUtil.extractFieldErrors(e);
         ApiErrorCode apiErrorCode = ApiErrorCode.INVALID_ARGUMENTS;
 
@@ -83,6 +89,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler({ConstraintViolationException.class})
     public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException e) {
+        logger.error("handleConstraintViolationException", e);
+
         ArrayList<TargetError> errors = ErrorUtil.extractTargetErrors(e);
         ApiErrorCode apiErrorCode = ApiErrorCode.INVALID_ARGUMENTS;
         ErrorResponse responseBody = new ErrorResponse(
@@ -102,6 +110,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler({InvalidArgumentsException.class})
     public ResponseEntity<ErrorResponse> handleInvalidArgumentException(InvalidArgumentsException e) {
+        logger.error("handleInvalidArgumentException", e);
+
         ApiErrorCode apiErrorCode = ApiErrorCode.INVALID_ARGUMENTS;
 
         ErrorResponse responseBody = new ErrorResponse(
@@ -121,6 +131,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler({MissingServletRequestParameterException.class})
     public ResponseEntity<ErrorResponse> handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
+        logger.error("handleMissingServletRequestParameterException", e);
 
         ApiErrorCode apiErrorCode = ApiErrorCode.INVALID_ARGUMENTS;
 
@@ -141,6 +152,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler({HttpMediaTypeException.class})
     public ResponseEntity<ErrorResponse> handleHttpMediaTypeException(HttpMediaTypeException e) {
+        logger.error("handleHttpMediaTypeException", e);
+
         ApiErrorCode apiErrorCode = ApiErrorCode.UNSUPPORTED_MEDIA_TYPE;
         ErrorResponse responseBody = new ErrorResponse(
                 apiErrorCode,
@@ -158,6 +171,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler({HttpRequestMethodNotSupportedException.class})
     public ResponseEntity<ErrorResponse> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+        logger.error("handleHttpRequestMethodNotSupportedException", e);
+
         ApiErrorCode apiErrorCode = ApiErrorCode.METHOD_NOT_ALLOWED;
         ErrorResponse responseBody = new ErrorResponse(
                 apiErrorCode,
@@ -170,15 +185,25 @@ public class GlobalExceptionHandler {
     /**
      * Handler for accessing url that doesn't exist
      *
-     * @param e NoHandlerFoundException The exception that was thrown
+     * @param e Exception The exception that was thrown: NoHandlerFoundException or NoResourceFoundException
      * @return ResponseEntity<ErrorResponse> containing the error details
      */
-    @ExceptionHandler({NoHandlerFoundException.class})
-    public ResponseEntity<ErrorResponse> handleNoHandlerFoundExceptionException(NoHandlerFoundException e) {
+    @ExceptionHandler({NoHandlerFoundException.class, NoResourceFoundException.class})
+    public ResponseEntity<ErrorResponse> handleNoMappingFoundException(Exception e) {
+        logger.error("handleNoMappingFoundException", e);
+
+        // Get request URL from exception
+        String requestUrl = (e instanceof NoHandlerFoundException ex) ? ex.getRequestURL()
+                : (e instanceof NoResourceFoundException ex) ? ex.getResourcePath()
+                : "";
+
+        // noHandler will prefix with forward slash, check for consistency.
+        if (!requestUrl.startsWith("/")) requestUrl = "/" + requestUrl;
+
         ApiErrorCode apiErrorCode = ApiErrorCode.URI_NOT_FOUND;
         ErrorResponse responseBody = new ErrorResponse(
                 ApiErrorCode.URI_NOT_FOUND,
-                messageResolver.getMessage(MessageKeys.EXCEPTION_URI_NOT_FOUND, e.getRequestURL())
+                messageResolver.getMessage(MessageKeys.EXCEPTION_URI_NOT_FOUND, requestUrl)
         );
 
         return new ResponseEntity<>(responseBody, apiErrorCode.getHttpStatus());
@@ -192,6 +217,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler({ResourceNotFoundException.class})
     public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException e) {
+        logger.error("handleResourceNotFoundException", e);
+
         ApiErrorCode apiErrorCode = ApiErrorCode.RESOURCE_NOT_FOUND;
         String resourceSimpleName = e.getResourceClass().getSimpleName();
 
@@ -215,7 +242,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler({HttpMessageNotReadableException.class, MethodArgumentTypeMismatchException.class, ConversionFailedException.class})
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(Exception e) {
-        e.printStackTrace();
+        logger.error("handleHttpMessageNotReadableException", e);
 
         ApiErrorCode apiErrorCode = ApiErrorCode.MESSAGE_NOT_READABLE;
         ErrorResponse responseBody = new ErrorResponse(
@@ -234,6 +261,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler({ResourceAlreadyExistsException.class})
     public ResponseEntity<ErrorResponse> handleResourceAlreadyExistsException(ResourceAlreadyExistsException e) {
+        logger.error("handleResourceAlreadyExistsException", e);
+
         ApiErrorCode apiErrorCode = ApiErrorCode.ALREADY_EXISTS;
         ErrorResponse responseBody = new ErrorResponse(
                 apiErrorCode,
@@ -252,6 +281,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler({DataAccessResourceFailureException.class})
     public ResponseEntity<ErrorResponse> handleDataAccessResourceFailureException(DataAccessResourceFailureException e) {
+        logger.error("handleDataAccessResourceFailureException", e);
+
         ApiErrorCode apiErrorCode = ApiErrorCode.UNAVAILABLE;
 
         ErrorResponse responseBody = new ErrorResponse(
@@ -264,6 +295,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({OptimisticLockingFailureException.class})
     public ResponseEntity<ErrorResponse> handleOptimisticLockingFailureException(OptimisticLockingFailureException e) {
+        logger.error("handleOptimisticLockingFailureException", e);
+
         ApiErrorCode apiErrorCode = ApiErrorCode.CONFLICT;
 
         ErrorResponse responseBody = new ErrorResponse(

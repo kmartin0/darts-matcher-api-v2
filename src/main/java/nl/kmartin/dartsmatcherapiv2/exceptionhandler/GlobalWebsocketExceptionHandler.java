@@ -12,6 +12,8 @@ import nl.kmartin.dartsmatcherapiv2.exceptionhandler.response.TargetError;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.response.WebSocketErrorResponse;
 import nl.kmartin.dartsmatcherapiv2.utils.ErrorUtil;
 import nl.kmartin.dartsmatcherapiv2.utils.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.dao.DataAccessResourceFailureException;
@@ -22,13 +24,13 @@ import org.springframework.messaging.handler.annotation.support.MethodArgumentNo
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.ArrayList;
 
 @ControllerAdvice
 public class GlobalWebsocketExceptionHandler {
+    private static final Logger logger = LoggerFactory.getLogger(GlobalWebsocketExceptionHandler.class);
     private final MessageResolver messageResolver;
 
     @Autowired
@@ -40,7 +42,7 @@ public class GlobalWebsocketExceptionHandler {
     @MessageExceptionHandler(Exception.class)
     @SendToUser(destinations = WebsocketDestinations.ERROR_QUEUE, broadcast = false)
     public WebSocketErrorResponse handleRunTimeException(Exception e, StompHeaderAccessor stompHeaderAccessor) {
-        e.printStackTrace();
+        logger.error("handleRunTimeException", e);
 
         return new WebSocketErrorResponse(
                 ApiErrorCode.INTERNAL,
@@ -53,6 +55,8 @@ public class GlobalWebsocketExceptionHandler {
     @MessageExceptionHandler(MethodArgumentNotValidException.class)
     @SendToUser(destinations = WebsocketDestinations.ERROR_QUEUE, broadcast = false)
     public WebSocketErrorResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException e, StompHeaderAccessor stompHeaderAccessor) {
+        logger.error("handleMethodArgumentNotValidException", e);
+
         ArrayList<TargetError> errors = ErrorUtil.extractFieldErrors(e);
 
         return new WebSocketErrorResponse(
@@ -67,6 +71,8 @@ public class GlobalWebsocketExceptionHandler {
     @MessageExceptionHandler(ConstraintViolationException.class)
     @SendToUser(destinations = WebsocketDestinations.ERROR_QUEUE, broadcast = false)
     public WebSocketErrorResponse handleConstraintViolationException(ConstraintViolationException e, StompHeaderAccessor stompHeaderAccessor) {
+        logger.error("handleConstraintViolationException", e);
+
         ArrayList<TargetError> errors = ErrorUtil.extractTargetErrors(e);
 
         return new WebSocketErrorResponse(
@@ -81,6 +87,7 @@ public class GlobalWebsocketExceptionHandler {
     @MessageExceptionHandler(InvalidArgumentsException.class)
     @SendToUser(destinations = WebsocketDestinations.ERROR_QUEUE, broadcast = false)
     public WebSocketErrorResponse handleInvalidArgumentException(InvalidArgumentsException e, StompHeaderAccessor stompHeaderAccessor) {
+        logger.error("handleInvalidArgumentException", e);
 
         return new WebSocketErrorResponse(
                 ApiErrorCode.INVALID_ARGUMENTS,
@@ -94,6 +101,8 @@ public class GlobalWebsocketExceptionHandler {
     @MessageExceptionHandler(ResourceNotFoundException.class)
     @SendToUser(destinations = WebsocketDestinations.ERROR_QUEUE, broadcast = false)
     public WebSocketErrorResponse handleResourceNotFoundException(ResourceNotFoundException e, StompHeaderAccessor stompHeaderAccessor) {
+        logger.error("handleResourceNotFoundException", e);
+
         String resourceSimpleName = e.getResourceClass().getSimpleName();
         String userResourceType = messageResolver.getMessage(MessageKeys.forResourceType(e.getResourceClass()));
         String userMessage = messageResolver.getMessage(MessageKeys.MESSAGE_RESOURCE_NOT_FOUND, userResourceType);
@@ -110,6 +119,7 @@ public class GlobalWebsocketExceptionHandler {
     @MessageExceptionHandler(ResourceAlreadyExistsException.class)
     @SendToUser(destinations = WebsocketDestinations.ERROR_QUEUE, broadcast = false)
     public WebSocketErrorResponse handleResourceAlreadyExistsException(ResourceAlreadyExistsException e, StompHeaderAccessor stompHeaderAccessor) {
+        logger.error("handleResourceAlreadyExistsException", e);
 
         return new WebSocketErrorResponse(
                 ApiErrorCode.ALREADY_EXISTS,
@@ -120,9 +130,10 @@ public class GlobalWebsocketExceptionHandler {
     }
 
     // Handler for sending malformed data or invalid data types (e.g. invalid json, using array instead of string).
-    @ExceptionHandler({MethodArgumentTypeMismatchException.class})
+    @MessageExceptionHandler(MethodArgumentTypeMismatchException.class)
     @SendToUser(destinations = WebsocketDestinations.ERROR_QUEUE, broadcast = false)
     public WebSocketErrorResponse handleHttpMessageNotReadableException(MethodArgumentTypeMismatchException e, StompHeaderAccessor stompHeaderAccessor) {
+        logger.error("handleHttpMessageNotReadableException", e);
 
         return new WebSocketErrorResponse(
                 ApiErrorCode.MESSAGE_NOT_READABLE,
@@ -135,6 +146,7 @@ public class GlobalWebsocketExceptionHandler {
     @MessageExceptionHandler({MessageConversionException.class, ConversionFailedException.class})
     @SendToUser(destinations = WebsocketDestinations.ERROR_QUEUE, broadcast = false)
     public WebSocketErrorResponse handleMessageConversionException(Exception e, StompHeaderAccessor stompHeaderAccessor) {
+        logger.error("handleMessageConversionException", e);
 
         return new WebSocketErrorResponse(
                 ApiErrorCode.MESSAGE_NOT_READABLE,
@@ -147,6 +159,7 @@ public class GlobalWebsocketExceptionHandler {
     @MessageExceptionHandler(DataAccessResourceFailureException.class)
     @SendToUser(destinations = WebsocketDestinations.ERROR_QUEUE, broadcast = false)
     public WebSocketErrorResponse handleDataAccessResourceFailureException(DataAccessResourceFailureException e, StompHeaderAccessor stompHeaderAccessor) {
+        logger.error("handleDataAccessResourceFailureException", e);
 
         return new WebSocketErrorResponse(
                 ApiErrorCode.UNAVAILABLE,
@@ -158,6 +171,7 @@ public class GlobalWebsocketExceptionHandler {
     @MessageExceptionHandler(OptimisticLockingFailureException.class)
     @SendToUser(destinations = WebsocketDestinations.ERROR_QUEUE, broadcast = false)
     public WebSocketErrorResponse handleOptimisticLockingFailureException(OptimisticLockingFailureException e, StompHeaderAccessor stompHeaderAccessor) {
+        logger.error("handleOptimisticLockingFailureException", e);
 
         return new WebSocketErrorResponse(
                 ApiErrorCode.CONFLICT,
