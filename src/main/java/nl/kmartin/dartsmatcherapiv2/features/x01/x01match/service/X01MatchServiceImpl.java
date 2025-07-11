@@ -227,7 +227,7 @@ public class X01MatchServiceImpl implements IX01MatchService {
                 .orElseThrow(() -> new ResourceNotFoundException(X01Set.class, null));
 
         // Get the current leg
-        X01LegEntry currentLegEntry = matchProgressService.getCurrentLegOrCreate(match, currentSetEntry.set())
+        X01LegEntry currentLegEntry = matchProgressService.getCurrentLegOrCreate(match, currentSetEntry)
                 .orElseThrow(() -> new ResourceNotFoundException(X01Leg.class, null));
 
         // Get the current leg round

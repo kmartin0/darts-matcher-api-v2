@@ -1,6 +1,6 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01leground;
 
-import nl.kmartin.dartsmatcherapiv2.features.x01.common.X01ValidationUtils;
+import nl.kmartin.dartsmatcherapiv2.features.x01.common.X01MatchUtils;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01LegRound;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
 import org.bson.types.ObjectId;
@@ -53,7 +53,7 @@ public class X01LegRoundServiceImpl implements IX01LegRoundService {
      */
     @Override
     public List<X01MatchPlayer> getPlayersToThrowInRound(X01LegRound legRound, List<X01MatchPlayer> players) {
-        if (legRound == null || X01ValidationUtils.isPlayersEmpty(players)) return Collections.emptyList();
+        if (legRound == null || X01MatchUtils.isPlayersEmpty(players)) return Collections.emptyList();
 
         // Find players that haven't scored and map to a list.
         return players.stream()
@@ -96,7 +96,7 @@ public class X01LegRoundServiceImpl implements IX01LegRoundService {
     @Override
     public boolean removeLastScoreFromRound(X01LegRound legRound) {
         // Nothing to remove
-        if (X01ValidationUtils.isScoresEmpty(legRound)) return false;
+        if (X01MatchUtils.isScoresEmpty(legRound)) return false;
 
         // Iterate through the scores map keys. When the last key is reached, remove it and return true.
         Iterator<ObjectId> it = legRound.getScores().keySet().iterator();

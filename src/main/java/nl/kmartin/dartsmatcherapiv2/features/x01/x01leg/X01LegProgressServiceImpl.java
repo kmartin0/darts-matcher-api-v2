@@ -1,7 +1,7 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01leg;
 
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceNotFoundException;
-import nl.kmartin.dartsmatcherapiv2.features.x01.common.X01ValidationUtils;
+import nl.kmartin.dartsmatcherapiv2.features.x01.common.X01MatchUtils;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leground.IX01LegRoundService;
 import nl.kmartin.dartsmatcherapiv2.utils.NumberUtils;
@@ -31,7 +31,7 @@ public class X01LegProgressServiceImpl implements IX01LegProgressService {
         ResourceNotFoundException notFoundException = new ResourceNotFoundException(X01LegRound.class, roundNumber);
 
         // If the round can't exist. Early exit.
-        if (X01ValidationUtils.isRoundsEmpty(leg) || roundNumber < 1) {
+        if (X01MatchUtils.isRoundsEmpty(leg) || roundNumber < 1) {
             if (throwIfNotFound) throw notFoundException;
             else return Optional.empty();
         }
@@ -55,7 +55,7 @@ public class X01LegProgressServiceImpl implements IX01LegProgressService {
      */
     @Override
     public Optional<X01LegRoundEntry> getCurrentLegRound(X01Leg leg, List<X01MatchPlayer> players) {
-        if (X01ValidationUtils.isRoundsEmpty(leg) || X01ValidationUtils.isPlayersEmpty(players))
+        if (X01MatchUtils.isRoundsEmpty(leg) || X01MatchUtils.isPlayersEmpty(players))
             return Optional.empty();
 
         // Filter rounds with missing player scores and get the lowest round number.
@@ -97,7 +97,7 @@ public class X01LegProgressServiceImpl implements IX01LegProgressService {
      */
     @Override
     public Set<Integer> getLegRoundNumbers(X01Leg leg) {
-        if (X01ValidationUtils.isRoundsEmpty(leg)) return Collections.emptySet();
+        if (X01MatchUtils.isRoundsEmpty(leg)) return Collections.emptySet();
 
         // Map all round numbers to a set of integers.
         return leg.getRounds().keySet();
@@ -111,7 +111,7 @@ public class X01LegProgressServiceImpl implements IX01LegProgressService {
      */
     @Override
     public Optional<X01LegRoundEntry> getLastRound(X01Leg leg) {
-        if (X01ValidationUtils.isRoundsEmpty(leg)) return Optional.empty();
+        if (X01MatchUtils.isRoundsEmpty(leg)) return Optional.empty();
 
         return Optional.ofNullable(leg.getRounds().lastEntry()).map(X01LegRoundEntry::new);
     }
@@ -125,7 +125,7 @@ public class X01LegProgressServiceImpl implements IX01LegProgressService {
      */
     @Override
     public Optional<X01LegRoundScore> getLastScoreForPlayer(X01Leg leg, ObjectId throwerId) {
-        if (X01ValidationUtils.isRoundsEmpty(leg) || throwerId == null) return Optional.empty();
+        if (X01MatchUtils.isRoundsEmpty(leg) || throwerId == null) return Optional.empty();
 
         // Iterate rounds in descending order (highest round first)
         for (Map.Entry<Integer, X01LegRound> entry : leg.getRounds().descendingMap().entrySet()) {

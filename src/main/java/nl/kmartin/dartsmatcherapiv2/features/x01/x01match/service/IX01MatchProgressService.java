@@ -16,7 +16,7 @@ public interface IX01MatchProgressService {
 
     Optional<X01SetEntry> getCurrentSetOrCreate(X01Match match);
 
-    Optional<X01LegEntry> getCurrentLegOrCreate(X01Match match, X01Set currentSet);
+    Optional<X01LegEntry> getCurrentLegOrCreate(X01Match match, X01SetEntry currentSetEntry);
 
     Optional<X01LegRoundEntry> getCurrentLegRoundOrCreate(X01Match match, X01Leg currentLeg);
 

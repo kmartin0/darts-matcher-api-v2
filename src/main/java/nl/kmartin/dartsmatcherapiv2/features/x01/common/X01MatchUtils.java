@@ -9,8 +9,8 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
-public class X01ValidationUtils {
-    private X01ValidationUtils() {}
+public class X01MatchUtils {
+    private X01MatchUtils() {}
 
     public static boolean isSetsEmpty(X01Match match) {
         return match == null || CollectionUtils.isEmpty(match.getSets());

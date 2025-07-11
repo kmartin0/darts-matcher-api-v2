@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.BaseMatch;
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.MatchStatus;
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.MatchType;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 @Document(collection = "matches")
 @TypeAlias("X01Match")
 public class X01Match extends BaseMatch<X01MatchPlayer> {

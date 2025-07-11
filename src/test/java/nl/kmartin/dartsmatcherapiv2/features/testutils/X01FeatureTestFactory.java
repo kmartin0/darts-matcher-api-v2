@@ -21,6 +21,8 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.x01matchsetup.X01MatchSetupServ
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01scorestatistics.IX01ScoreStatisticsService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01scorestatistics.X01ScoreStatisticsServiceImpl;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01set.*;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01standings.IX01StandingsService;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01standings.X01StandingsServiceImpl;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01statistics.IX01StatisticsService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01statistics.X01StatisticsServiceImpl;
 import org.springframework.context.ApplicationEventPublisher;
@@ -55,7 +57,7 @@ public class X01FeatureTestFactory {
     }
 
     public IX01MatchResultService createMatchResultService() {
-        return new X01MatchResultServiceImpl(createSetResultService(), createSetProgressService());
+        return new X01MatchResultServiceImpl(createSetResultService(), createSetProgressService(), createStandingsService());
     }
 
     public IX01MatchProgressService createMatchProgressService() {
@@ -63,7 +65,8 @@ public class X01FeatureTestFactory {
                 createSetService(),
                 createSetProgressService(),
                 createLegProgressService(),
-                createLegRoundService()
+                createLegRoundService(),
+                createStandingsService()
         );
     }
 
@@ -72,11 +75,11 @@ public class X01FeatureTestFactory {
     }
 
     public IX01SetResultService createSetResultService() {
-        return new X01SetResultServiceImpl(createLegProgressService(), createLegResultService());
+        return new X01SetResultServiceImpl(createLegProgressService(), createLegResultService(), createStandingsService());
     }
 
     public IX01SetProgressService createSetProgressService() {
-        return new X01SetProgressServiceImpl(createLegService(), createLegProgressService());
+        return new X01SetProgressServiceImpl(createLegService(), createLegProgressService(), createStandingsService());
     }
 
     public IX01LegService createLegService() {
@@ -166,5 +169,9 @@ public class X01FeatureTestFactory {
 
     public IX01MatchPublishService createMatchPublishService() {
         return new X01MatchPublishServiceImpl(eventPublisherMock);
+    }
+
+    public IX01StandingsService createStandingsService() {
+        return new X01StandingsServiceImpl();
     }
 }

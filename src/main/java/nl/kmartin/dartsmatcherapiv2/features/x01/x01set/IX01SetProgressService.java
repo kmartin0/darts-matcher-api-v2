@@ -1,8 +1,6 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01set;
 
-import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01LegEntry;
-import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
-import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Set;
+import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
 import org.bson.types.ObjectId;
 
 import java.util.List;
@@ -14,7 +12,7 @@ public interface IX01SetProgressService {
 
     Optional<X01LegEntry> getCurrentLeg(X01Set set);
 
-    Optional<X01LegEntry> createNextLeg(X01Set set, List<X01MatchPlayer> players, int bestOfLegs, ObjectId throwsFirstInSet);
+    Optional<X01LegEntry> createNextLeg(X01SetEntry setEntry, List<X01MatchPlayer> players, X01BestOf bestOf, ObjectId throwsFirstInSet);
 
     Set<Integer> getLegNumbers(X01Set set);
 

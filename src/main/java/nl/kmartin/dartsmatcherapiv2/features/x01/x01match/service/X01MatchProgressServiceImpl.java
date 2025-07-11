@@ -1,12 +1,13 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service;
 
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceNotFoundException;
-import nl.kmartin.dartsmatcherapiv2.features.x01.common.X01ValidationUtils;
+import nl.kmartin.dartsmatcherapiv2.features.x01.common.X01MatchUtils;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegProgressService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leground.IX01LegRoundService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01set.IX01SetProgressService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01set.IX01SetService;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01standings.IX01StandingsService;
 import nl.kmartin.dartsmatcherapiv2.utils.NumberUtils;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
@@ -23,13 +24,15 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
     private final IX01SetProgressService setProgressService;
     private final IX01LegProgressService legProgressService;
     private final IX01LegRoundService legRoundService;
+    private final IX01StandingsService standingsService;
 
     public X01MatchProgressServiceImpl(IX01SetService setService, IX01SetProgressService setProgressService,
-                                       IX01LegProgressService legProgressService, IX01LegRoundService legRoundService) {
+                                       IX01LegProgressService legProgressService, IX01LegRoundService legRoundService, IX01StandingsService standingsService) {
         this.setService = setService;
         this.setProgressService = setProgressService;
         this.legProgressService = legProgressService;
         this.legRoundService = legRoundService;
+        this.standingsService = standingsService;
     }
 
     /**
@@ -43,7 +46,7 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
     public Optional<X01SetEntry> getSet(X01Match match, int setNumber, boolean throwIfNotFound) {
         ResourceNotFoundException notFoundException = new ResourceNotFoundException(X01Set.class, setNumber);
 
-        if (X01ValidationUtils.isSetsEmpty(match) || setNumber < 1) {
+        if (X01MatchUtils.isSetsEmpty(match) || setNumber < 1) {
             if (throwIfNotFound) throw notFoundException;
             else return Optional.empty();
         }
@@ -65,7 +68,7 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
      */
     @Override
     public Optional<X01SetEntry> getCurrentSet(X01Match match) {
-        if (X01ValidationUtils.isSetsEmpty(match)) return Optional.empty();
+        if (X01MatchUtils.isSetsEmpty(match)) return Optional.empty();
 
         return match.getSets().entrySet().stream()
                 .filter(e -> e.getValue().getResult() == null || e.getValue().getResult().isEmpty()) // Set without result
@@ -87,7 +90,9 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
         Set<Integer> existingSetNumbers = getSetNumbers(match);
 
         // Find the next available set number (ensure it doesn't exceed the best of sets)
-        int nextSetNumber = NumberUtils.findNextNumber(existingSetNumbers, match.getMatchSettings().getBestOf().getSets());
+        X01BestOf bestOf = match.getMatchSettings().getBestOf();
+        int maxSets = standingsService.getMaxToPlay(bestOf.getSets(), bestOf.getClearByTwoSetsRule());
+        int nextSetNumber = NumberUtils.findNextNumber(existingSetNumbers, maxSets);
         if (nextSetNumber == -1) return Optional.empty();
 
         // Create and add the next set to the sets.
@@ -104,7 +109,7 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
      */
     @Override
     public Set<Integer> getSetNumbers(X01Match match) {
-        if (X01ValidationUtils.isSetsEmpty(match)) return Collections.emptySet();
+        if (X01MatchUtils.isSetsEmpty(match)) return Collections.emptySet();
 
         // Map the set numbers and collect to a set of integers
         return match.getSets().keySet();
@@ -135,20 +140,21 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
      * added to the current set.
      *
      * @param match      {@link X01Match}  the match for which the current leg needs to be determined
-     * @param currentSet {@link X01Set} the current set in play.
+     * @param currentSetEntry {@link X01SetEntry} the current set in play.
      * @return {@link Optional<X01LegEntry>} the current leg in play.
      */
     @Override
-    public Optional<X01LegEntry> getCurrentLegOrCreate(X01Match match, X01Set currentSet) {
-        if (match == null || currentSet == null) return Optional.empty();
+    public Optional<X01LegEntry> getCurrentLegOrCreate(X01Match match, X01SetEntry currentSetEntry) {
+        if (match == null || currentSetEntry == null || currentSetEntry.set() == null) return Optional.empty();
+        X01Set currentSet = currentSetEntry.set();
 
         // First find the current leg in the active list of legs from the current set.
-        int bestOfLegs = match.getMatchSettings().getBestOf().getLegs();
         Optional<X01LegEntry> curLegEntry = setProgressService.getCurrentLeg(currentSet);
 
         // If there is no current leg and the set isn't concluded, create the next leg.
+        X01BestOf bestOf = match.getMatchSettings().getBestOf();
         return curLegEntry.isEmpty() && !setProgressService.isSetConcluded(currentSet, match.getPlayers())
-                ? setProgressService.createNextLeg(currentSet, match.getPlayers(), bestOfLegs, currentSet.getThrowsFirst())
+                ? setProgressService.createNextLeg(currentSetEntry, match.getPlayers(), bestOf, currentSet.getThrowsFirst())
                 : curLegEntry;
     }
 
@@ -220,7 +226,7 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
 
         // Get the current set, leg and round.
         Optional<X01SetEntry> currentSetEntry = getCurrentSetOrCreate(match);
-        Optional<X01LegEntry> currentLegEntry = currentSetEntry.flatMap(setEntry -> getCurrentLegOrCreate(match, setEntry.set()));
+        Optional<X01LegEntry> currentLegEntry = currentSetEntry.flatMap(setEntry -> getCurrentLegOrCreate(match, setEntry));
         Optional<X01LegRoundEntry> currentLegRoundEntry = currentLegEntry.flatMap(legEntry -> getCurrentLegRoundOrCreate(match, legEntry.leg()));
 
         // Get the current thrower for the current round

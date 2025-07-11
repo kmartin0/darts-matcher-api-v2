@@ -1,6 +1,6 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01leg;
 
-import nl.kmartin.dartsmatcherapiv2.features.x01.common.X01ValidationUtils;
+import nl.kmartin.dartsmatcherapiv2.features.x01.common.X01MatchUtils;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Leg;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01LegRound;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01LegRoundScore;
@@ -33,7 +33,7 @@ public class X01LegResultServiceImpl implements IX01LegResultService {
     public void updateLegResult(X01Leg leg, List<X01MatchPlayer> players, int x01) {
         // If the leg is null exit early, if the players are null clear the winner and exit early.
         if (leg == null) return;
-        if (X01ValidationUtils.isPlayersEmpty(players)) {
+        if (X01MatchUtils.isPlayersEmpty(players)) {
             leg.setWinner(null);
             return;
         }
@@ -63,7 +63,7 @@ public class X01LegResultServiceImpl implements IX01LegResultService {
     @Override
     public void removeScoresAfterWinner(X01Leg leg, ObjectId legWinner) {
         // If there is no leg winner. No trimming needs to happen.
-        if (X01ValidationUtils.isRoundsEmpty(leg) || legWinner == null) return;
+        if (X01MatchUtils.isRoundsEmpty(leg) || legWinner == null) return;
 
         // Iterate through the rounds in reverse order (latest round first)
         Iterator<X01LegRound> reverseRoundsIterator = leg.getRounds().descendingMap().values().iterator();
@@ -95,7 +95,7 @@ public class X01LegResultServiceImpl implements IX01LegResultService {
     @Override
     public int calculateRemainingScore(X01Leg leg, int x01, ObjectId playerId) {
         // When no rounds exist, the player has no throws so his remaining score is the starting score
-        if (X01ValidationUtils.isRoundsEmpty(leg) || playerId == null) return x01;
+        if (X01MatchUtils.isRoundsEmpty(leg) || playerId == null) return x01;
 
         // For every round map the player score and sum these up.
         int totalScored = leg.getRounds().values().stream()
@@ -118,7 +118,7 @@ public class X01LegResultServiceImpl implements IX01LegResultService {
     @Override
     public int calculateDartsUsed(X01Leg leg, ObjectId playerId) {
         // When no rounds exist, the player has no darts used.
-        if (X01ValidationUtils.isRoundsEmpty(leg) || playerId == null) return 0;
+        if (X01MatchUtils.isRoundsEmpty(leg) || playerId == null) return 0;
 
         // If the player has won the leg, get the checkout round.
         Optional<Integer> checkoutRoundNumber = leg.getWinner() == null

@@ -78,7 +78,9 @@ public class X01MatchServiceTests {
         // Given
         Mockito.when(x01MatchRepository.save(Mockito.any(X01Match.class))).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
         X01Match x01Match = new X01Match();
-        X01MatchSettings x01MatchSettings = new X01MatchSettings(501, false, new X01BestOf(5, 1));
+        X01ClearByTwoRule clearByTwoRule = new X01ClearByTwoRule(false, 0);
+        X01BestOf bestOf = new X01BestOf(1, 5, clearByTwoRule, clearByTwoRule, clearByTwoRule);
+        X01MatchSettings x01MatchSettings = new X01MatchSettings(501, false, bestOf);
         x01Match.setMatchSettings(x01MatchSettings);
 
         X01MatchPlayer player1 = new X01MatchPlayer();

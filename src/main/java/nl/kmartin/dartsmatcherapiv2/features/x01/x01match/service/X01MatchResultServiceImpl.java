@@ -3,13 +3,11 @@ package nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service;
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.MatchPlayer;
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.MatchStatus;
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.ResultType;
-import nl.kmartin.dartsmatcherapiv2.features.x01.common.StandingsUtils;
-import nl.kmartin.dartsmatcherapiv2.features.x01.common.X01ValidationUtils;
-import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Match;
-import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
-import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Set;
+import nl.kmartin.dartsmatcherapiv2.features.x01.common.X01MatchUtils;
+import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01set.IX01SetProgressService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01set.IX01SetResultService;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01standings.IX01StandingsService;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -22,10 +20,12 @@ public class X01MatchResultServiceImpl implements IX01MatchResultService {
 
     private final IX01SetResultService setResultService;
     private final IX01SetProgressService setProgressService;
+    private final IX01StandingsService standingsService;
 
-    public X01MatchResultServiceImpl(IX01SetResultService setResultService, IX01SetProgressService setProgressService) {
+    public X01MatchResultServiceImpl(IX01SetResultService setResultService, IX01SetProgressService setProgressService, IX01StandingsService standingsService) {
         this.setResultService = setResultService;
         this.setProgressService = setProgressService;
+        this.standingsService = standingsService;
     }
 
     /**
@@ -65,14 +65,14 @@ public class X01MatchResultServiceImpl implements IX01MatchResultService {
      */
     @Override
     public void updateSetResults(X01Match match) {
-        if (X01ValidationUtils.isSetsEmpty(match)) return;
+        if (X01MatchUtils.isSetsEmpty(match)) return;
 
         List<X01MatchPlayer> players = match.getPlayers();
         int x01 = match.getMatchSettings().getX01();
-        int bestOfLegs = match.getMatchSettings().getBestOf().getLegs();
+        X01BestOf bestOf = match.getMatchSettings().getBestOf();
 
         // For each set update the leg results and after update the set result
-        match.getSets().values().forEach(set -> setResultService.updateSetResult(set, bestOfLegs, players, x01));
+        match.getSets().entrySet().forEach(setEntry -> setResultService.updateSetResult(new X01SetEntry(setEntry), bestOf, players, x01));
     }
 
     /**
@@ -87,36 +87,44 @@ public class X01MatchResultServiceImpl implements IX01MatchResultService {
         if (match == null) return Collections.emptyList();
 
         // Get the standings for the match.
-        Map<ObjectId, Long> matchStandings = getMatchStandings(match);
+        TreeMap<Integer, List<ObjectId>> matchStandings = getMatchStandings(match);
 
-        // Get the player(s) that have won the match
-        int remainingSets = calcRemainingSets(match);
-        return StandingsUtils.determineWinners(matchStandings, remainingSets);
+        // Get the parameters for determine winners method.
+        int setsPlayed = calcSetsPlayed(match);
+        int bestOfSets = match.getMatchSettings().getBestOf().getSets();
+        X01ClearByTwoRule clearByTwoSetsRule = match.getMatchSettings().getBestOf().getClearByTwoSetsRule();
+
+        // Create the winners list.
+        return standingsService.determineWinners(matchStandings, setsPlayed, bestOfSets, clearByTwoSetsRule);
     }
 
     /**
-     * Determines the number of sets each player has won for a given match
+     * Determines the number of sets each player has won for a given match, stored in a tree map. where:
+     * - key is number of set wins
+     * - value is list of player ids who have the number of wins
      *
      * @param match {@link X01Match} the match for which standings need to be calculated
-     * @return Map<ObjectId, Long> containing the number of sets each player has won
+     * @return TreeMap<Integer, List<ObjectId>> containing the number of sets each player has won
      */
     @Override
-    public Map<ObjectId, Long> getMatchStandings(X01Match match) {
-        if (match == null) return new HashMap<>();
+    public TreeMap<Integer, List<ObjectId>> getMatchStandings(X01Match match) {
+        if (match == null) return new TreeMap<>();
 
-        // Initialize standings map with all players and 0 wins
-        Map<ObjectId, Long> standings = match.getPlayers().stream()
+        // Step 1: Initialize a map containing the number of wins for each player. Initialized with an entry of 0 wins per player.
+        Map<ObjectId, Long> winsPerPlayer = match.getPlayers().stream()
                 .collect(Collectors.toMap(MatchPlayer::getPlayerId, player -> 0L));
 
-        // Update the map with the number of wins from the sets for each player
+        // Step 2: Iterate through sets, for each won or draw set. Update win count map for the players that have won or drawn.
         match.getSets().values().stream()
-                .filter(set -> set.getResult() != null && !set.getResult().isEmpty())  // Filter out sets with no result
-                .flatMap(set -> set.getResult().entrySet().stream())  // Continue with the results map
-                .filter(resultEntry -> resultEntry.getValue() == ResultType.WIN || resultEntry.getValue() == ResultType.DRAW)  // Filter for WIN or DRAW
-                .forEach(resultEntry -> standings.merge(resultEntry.getKey(), 1L, Long::sum));  // Increment the score for the player
+                .filter(set -> set.getResult() != null && !set.getResult().isEmpty())
+                .flatMap(set -> set.getResult().entrySet().stream())
+                .filter(resultEntry -> resultEntry.getValue() == ResultType.WIN || resultEntry.getValue() == ResultType.DRAW)
+                .forEach(resultEntry ->
+                        winsPerPlayer.merge(resultEntry.getKey(), 1L, Long::sum)
+                );
 
-        // Return the standings map
-        return standings;
+        // Step 3: Group players by number of wins in a tree map.
+        return standingsService.groupByWinCounts(winsPerPlayer);
     }
 
     /**
@@ -131,7 +139,7 @@ public class X01MatchResultServiceImpl implements IX01MatchResultService {
      */
     @Override
     public void removeSetsAfterWinner(X01Match match, List<ObjectId> matchWinners) {
-        if (X01ValidationUtils.isSetsEmpty(match) || CollectionUtils.isEmpty(matchWinners)) return;
+        if (X01MatchUtils.isSetsEmpty(match) || CollectionUtils.isEmpty(matchWinners)) return;
 
         // Iterate over the sets in reverse order.
         Iterator<X01Set> reverseSetsIterator = match.getSets().descendingMap().values().iterator();
@@ -151,12 +159,12 @@ public class X01MatchResultServiceImpl implements IX01MatchResultService {
     }
 
     /**
-     * Determine the number of sets that are yet to be played in a match
+     * Determines the number of sets that have been concluded in a match (doesn't include sets still in progress).
      *
-     * @param match {@link X01Match} the match for which the remaining sets need to be determined
-     * @return int the maximum number of sets that can still be played
+     * @param match {@link X01Match} the match to calculate the sets played in.
+     * @return int the number of sets that have been concluded in a match (doesn't include sets still in progress).
      */
-    private int calcRemainingSets(X01Match match) {
+    private int calcSetsPlayed(X01Match match) {
         if (match == null) return 0;
 
         // Count the number of concluded sets
@@ -164,9 +172,7 @@ public class X01MatchResultServiceImpl implements IX01MatchResultService {
                 .filter(set -> setProgressService.isSetConcluded(set, match.getPlayers()))
                 .count();
 
-        // Determine the number of remaining sets and return them. Ensuring they are not negative.
-        int bestOfSets = match.getMatchSettings().getBestOf().getSets();
-        int remainingSets = bestOfSets - (int) completedSets;
-        return Math.max(remainingSets, 0);
+        // Return the number of completed sets
+        return (int) completedSets;
     }
 }

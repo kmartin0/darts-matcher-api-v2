@@ -54,7 +54,7 @@ public class X01DartBotServiceImpl implements IX01DartBotService {
         // Get the current leg for the match.
         Optional<X01SetEntry> currentSetEntry = matchProgressService.getCurrentSetOrCreate(match);
         X01LegEntry currentLegEntry = currentSetEntry
-                .flatMap(setEntry -> matchProgressService.getCurrentLegOrCreate(match, setEntry.set()))
+                .flatMap(setEntry -> matchProgressService.getCurrentLegOrCreate(match, setEntry))
                 .orElseThrow(() -> new InvalidArgumentsException(
                         new TargetError("currentLeg", messageResolver.getMessage(MessageKeys.EXCEPTION_INVALID_ARGUMENTS))
                 ));

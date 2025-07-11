@@ -125,7 +125,9 @@ public class X01DartBotTests {
     private X01Match createTestMatch(ObjectId starter) {
         X01Match match = new X01Match();
         match.setId(new ObjectId());
-        match.setMatchSettings(new X01MatchSettings(501, true, new X01BestOf(1, 1)));
+        X01ClearByTwoRule clearByTwoRule = new X01ClearByTwoRule(false, 0);
+        X01BestOf bestOf = new X01BestOf(1, 1, clearByTwoRule, clearByTwoRule, clearByTwoRule);
+        match.setMatchSettings(new X01MatchSettings(501, true, bestOf));
         match.setMatchProgress(new X01MatchProgress(1, 1, 1, starter));
         return match;
     }

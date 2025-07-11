@@ -4,7 +4,7 @@ import nl.kmartin.dartsmatcherapiv2.common.MessageKeys;
 import nl.kmartin.dartsmatcherapiv2.common.MessageResolver;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.InvalidArgumentsException;
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.response.TargetError;
-import nl.kmartin.dartsmatcherapiv2.features.x01.common.X01ValidationUtils;
+import nl.kmartin.dartsmatcherapiv2.features.x01.common.X01MatchUtils;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01checkout.IX01CheckoutService;
 import org.bson.types.ObjectId;
@@ -157,7 +157,7 @@ public class X01LegServiceImpl implements IX01LegService {
      */
     @Override
     public ObjectId calcThrowsFirstInLeg(int legNumber, ObjectId throwsFirstInSet, List<X01MatchPlayer> players) {
-        if (X01ValidationUtils.isPlayersEmpty(players)) {
+        if (X01MatchUtils.isPlayersEmpty(players)) {
             throw new IllegalArgumentException("Cannot calculate first thrower from a null or empty player list.");
         }
 

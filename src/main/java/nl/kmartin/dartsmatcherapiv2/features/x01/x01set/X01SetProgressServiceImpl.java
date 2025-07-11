@@ -1,13 +1,11 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01set;
 
 import nl.kmartin.dartsmatcherapiv2.exceptionhandler.exception.ResourceNotFoundException;
-import nl.kmartin.dartsmatcherapiv2.features.x01.common.X01ValidationUtils;
-import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Leg;
-import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01LegEntry;
-import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
-import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Set;
+import nl.kmartin.dartsmatcherapiv2.features.x01.common.X01MatchUtils;
+import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegProgressService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegService;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01standings.IX01StandingsService;
 import nl.kmartin.dartsmatcherapiv2.utils.NumberUtils;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
@@ -19,10 +17,12 @@ public class X01SetProgressServiceImpl implements IX01SetProgressService {
 
     private final IX01LegService legService;
     private final IX01LegProgressService legProgressService;
+    private final IX01StandingsService standingsService;
 
-    public X01SetProgressServiceImpl(IX01LegService legService, IX01LegProgressService legProgressService) {
+    public X01SetProgressServiceImpl(IX01LegService legService, IX01LegProgressService legProgressService, IX01StandingsService standingsService) {
         this.legService = legService;
         this.legProgressService = legProgressService;
+        this.standingsService = standingsService;
     }
 
     /**
@@ -36,7 +36,7 @@ public class X01SetProgressServiceImpl implements IX01SetProgressService {
     public Optional<X01LegEntry> getLeg(X01Set set, int legNumber, boolean throwIfNotFound) {
         ResourceNotFoundException notFoundException = new ResourceNotFoundException(X01Leg.class, legNumber);
 
-        if (X01ValidationUtils.isLegsEmpty(set) || legNumber < 1) {
+        if (X01MatchUtils.isLegsEmpty(set) || legNumber < 1) {
             if (throwIfNotFound) throw notFoundException;
             else return Optional.empty();
         }
@@ -58,7 +58,7 @@ public class X01SetProgressServiceImpl implements IX01SetProgressService {
      */
     @Override
     public Optional<X01LegEntry> getCurrentLeg(X01Set set) {
-        if (X01ValidationUtils.isLegsEmpty(set)) return Optional.empty();
+        if (X01MatchUtils.isLegsEmpty(set)) return Optional.empty();
 
         return set.getLegs().entrySet().stream()
                 .filter(legEntry -> legEntry.getValue().getWinner() == null) // get legs without result
@@ -69,26 +69,27 @@ public class X01SetProgressServiceImpl implements IX01SetProgressService {
     /**
      * Creates the next leg for a list of legs but doesn't exceed the maximum number of legs.
      *
-     * @param set              {@link X01Set} the set in which a leg has to be added to.
+     * @param setEntry              {@link X01SetEntry} the set in which a leg has to be added to.
      * @param players          {@link List<X01MatchPlayer>} the match players.
-     * @param bestOfLegs       int the maximum number of legs.
+     * @param bestOf       {@link X01BestOf} the best of setting for the match.
      * @param throwsFirstInSet {@link ObjectId} the player that throws first in the set.
      * @return {@link Optional<X01LegEntry>} the created leg, empty when the maximum number of legs was reached.
      */
     @Override
-    public Optional<X01LegEntry> createNextLeg(X01Set set, List<X01MatchPlayer> players, int bestOfLegs, ObjectId throwsFirstInSet) {
-        if (set == null) return Optional.empty();
+    public Optional<X01LegEntry> createNextLeg(X01SetEntry setEntry, List<X01MatchPlayer> players, X01BestOf bestOf, ObjectId throwsFirstInSet) {
+        if (setEntry == null || setEntry.set() == null) return Optional.empty();
 
         // Get existing leg numbers
-        Set<Integer> existingLetNumbers = getLegNumbers(set);
+        Set<Integer> existingLetNumbers = getLegNumbers(setEntry.set());
 
         // Find the next available leg number (ensure it doesn't exceed the best of legs)
-        int nextLegNumber = NumberUtils.findNextNumber(existingLetNumbers, bestOfLegs);
+        int maxLegs = standingsService.getMaxToPlay(bestOf.getLegs(), bestOf.getClearByTwoLegsRuleForSet(setEntry.setNumber()));
+        int nextLegNumber = NumberUtils.findNextNumber(existingLetNumbers, maxLegs);
         if (nextLegNumber == -1) return Optional.empty();
 
         // Create and add the next leg to the legs.
         X01LegEntry newLegEntry = legService.createNewLeg(nextLegNumber, throwsFirstInSet, players);
-        set.getLegs().put(newLegEntry.legNumber(), newLegEntry.leg());
+        setEntry.set().getLegs().put(newLegEntry.legNumber(), newLegEntry.leg());
         return Optional.of(newLegEntry);
     }
 
@@ -100,7 +101,7 @@ public class X01SetProgressServiceImpl implements IX01SetProgressService {
      */
     @Override
     public Set<Integer> getLegNumbers(X01Set set) {
-        if (X01ValidationUtils.isLegsEmpty(set)) return Collections.emptySet();
+        if (X01MatchUtils.isLegsEmpty(set)) return Collections.emptySet();
 
         // Map the leg numbers and collect to an integer set
         return set.getLegs().keySet();
@@ -115,7 +116,7 @@ public class X01SetProgressServiceImpl implements IX01SetProgressService {
      */
     @Override
     public boolean isSetConcluded(X01Set set, List<X01MatchPlayer> players) {
-        if (set == null || set.getResult() == null || X01ValidationUtils.isPlayersEmpty(players)) return false;
+        if (set == null || set.getResult() == null || X01MatchUtils.isPlayersEmpty(players)) return false;
 
         return players.stream().allMatch(player -> set.getResult().get(player.getPlayerId()) != null);
     }
