@@ -8,13 +8,13 @@ public class WebsocketDestinations {
     }
 
     // X01Match Sockets
-    public static final String X01_GET_MATCH = "/matches/x01/{matchId}";
-    public static final String X01_DELETE_MATCH = "/matches/x01/{matchId}/delete";
-    public static final String X01_RESET_MATCH = "/matches/x01/{matchId}/reset";
-    public static final String X01_REPROCESS_MATCH = "/matches/x01/{matchId}/reprocess";
-    public static final String X01_ADD_TURN = "/matches/x01/{matchId}/turn/add";
-    public static final String X01_EDIT_TURN = "/matches/x01/{matchId}/turn/edit";
-    public static final String X01_DELETE_LAST_TURN = "/matches/x01/{matchId}/turn/delete-last";
+    public static final String X01_GET_MATCH = "/x01/matches/{matchId}";
+    public static final String X01_DELETE_MATCH = "/x01/matches/{matchId}/delete";
+    public static final String X01_RESET_MATCH = "/x01/matches/{matchId}/reset";
+    public static final String X01_REPROCESS_MATCH = "/x01/matches/{matchId}/reprocess";
+    public static final String X01_ADD_TURN = "/x01/matches/{matchId}/turn/add";
+    public static final String X01_EDIT_TURN = "/x01/matches/{matchId}/turn/edit";
+    public static final String X01_DELETE_LAST_TURN = "/x01/matches/{matchId}/turn/delete-last";
 
     // Error queue
     public static final String ERROR_QUEUE = "/queue/errors";
