@@ -21,6 +21,9 @@ public class X01BestOf {
     @Max(49)
     private int legs;
 
+    @NotNull
+    private X01BestOfType bestOfType;
+
     @Valid
     @NotNull
     private X01ClearByTwoRule clearByTwoSetsRule;
