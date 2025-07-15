@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 public class X01MatchRestController {
 
@@ -30,6 +32,12 @@ public class X01MatchRestController {
     @ResponseStatus(HttpStatus.OK)
     public X01Match getMatch(@PathVariable ObjectId matchId) {
         return matchService.getMatch(matchId);
+    }
+
+    @GetMapping(path = RestEndpoints.X01_GET_MATCHES, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public List<X01Match> getMatches(@RequestParam("ids") List<ObjectId> ids) {
+        return matchService.getMatches(ids);
     }
 
     @GetMapping(path = RestEndpoints.X01_MATCH_EXISTS, produces = MediaType.APPLICATION_JSON_VALUE)

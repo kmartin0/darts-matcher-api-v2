@@ -8,10 +8,14 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Match;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01Turn;
 import org.bson.types.ObjectId;
 
+import java.util.List;
+
 public interface IX01MatchService {
     X01Match createMatch(@NotNull @Valid X01Match match);
 
     X01Match getMatch(@NotNull ObjectId matchId) throws ResourceNotFoundException;
+
+    List<X01Match> getMatches(List<ObjectId> matchIds);
 
     void checkMatchExists(ObjectId matchId);
 

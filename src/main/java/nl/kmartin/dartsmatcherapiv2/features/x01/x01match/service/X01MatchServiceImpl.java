@@ -20,7 +20,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class X01MatchServiceImpl implements IX01MatchService {
@@ -81,6 +85,25 @@ public class X01MatchServiceImpl implements IX01MatchService {
     @Transactional(readOnly = true)
     public X01Match getMatch(@NotNull ObjectId matchId) throws ResourceNotFoundException {
         return matchRepository.findById(matchId).orElseThrow(() -> new ResourceNotFoundException(X01Match.class, matchId));
+    }
+
+    /**
+     * Retrieves a list of {@link X01Match} entities matching the given list of match IDs. Will return the list of matches
+     * in the same order it received the match ids. Matches that weren't found won't be included in the list.
+     *
+     * @param matchIds a non-null list of {@link ObjectId} values representing match identifiers.
+     * @return a list of {@link X01Match} objects corresponding to the provided IDs.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<X01Match> getMatches(@NotNull List<ObjectId> matchIds) {
+        Map<ObjectId, X01Match> matchMap = matchRepository.findAllById(matchIds).stream()
+                .collect(Collectors.toMap(X01Match::getId, Function.identity()));
+
+        return matchIds.stream()
+                .map(matchMap::get)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     /**
