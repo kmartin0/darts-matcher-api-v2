@@ -1,0 +1,14 @@
+services:
+  darts-matcher-api-v2:
+    restart: always
+    image: darts-matcher-api-v2
+    container_name: darts-matcher-api-v2
+    build:
+      context: .
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      # The 'directConnection=true' option is specifically for when mongo replica set is hosted on localhost
+      # and the docker container is run on the same machine.
+      - DB_URI=mongodb://host.docker.internal:27017/darts-matcher-v2?replicaSet=rs0&directConnection=true
+    ports:
+      - "8080:8080"
