@@ -1,0 +1,32 @@
+# Local build output directories and artifacts
+target/
+
+# IDE and editor specific files
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# git files
+.git/
+.gitignore
+.gitattributes
+
+# Log files
+logs/
+*.log
+*.tmp
+*.bak
+
+# Docker files
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Documentation and other non-source files
+HELP.md
+readme.md
