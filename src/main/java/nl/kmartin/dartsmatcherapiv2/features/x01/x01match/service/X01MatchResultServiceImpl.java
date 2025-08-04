@@ -12,6 +12,7 @@ import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,31 +32,31 @@ public class X01MatchResultServiceImpl implements IX01MatchResultService {
     /**
      * First updates the set results. Then for each match player their results for a match.
      *
-     * @param x01Match {@link X01Match} the match to be updated
+     * @param match {@link X01Match} the match to be updated
      */
     @Override
-    public void updateMatchResult(X01Match x01Match) {
-        if (x01Match == null) return;
+    public void updateMatchResult(X01Match match) {
+        if (match == null) return;
 
         // First update all set results.
-        updateSetResults(x01Match);
+        updateSetResults(match);
 
         // Get the player(s) that have won the match
-        List<ObjectId> matchWinners = getMatchWinners(x01Match);
+        List<ObjectId> matchWinners = getMatchWinners(match);
 
         // If multiple players have won the set, that means they have drawn.
         ResultType winOrDrawType = matchWinners.size() > 1 ? ResultType.DRAW : ResultType.WIN;
 
         // Set the individual results for each player
-        x01Match.getPlayers().forEach(player -> player.setResultType(
+        match.getPlayers().forEach(player -> player.setResultType(
                 matchWinners.isEmpty() ? null : (matchWinners.contains(player.getPlayerId()) ? winOrDrawType : ResultType.LOSS)
         ));
 
         // Cleanup trailing sets that may linger beyond the final set.
-        removeSetsAfterWinner(x01Match, matchWinners);
+        removeSetsAfterWinner(match, matchWinners);
 
-        // When there are match winners the match is concluded
-        x01Match.setMatchStatus(matchWinners.isEmpty() ? MatchStatus.IN_PLAY : MatchStatus.CONCLUDED);
+        // Update the match state.
+        updateMatchState(match, matchWinners);
     }
 
     /**
@@ -104,7 +105,7 @@ public class X01MatchResultServiceImpl implements IX01MatchResultService {
      * - value is list of player ids who have the number of wins
      *
      * @param match {@link X01Match} the match for which standings need to be calculated
-     * @return TreeMap<Integer, List<ObjectId>> containing the number of sets each player has won
+     * @return TreeMap<Integer, List < ObjectId>> containing the number of sets each player has won
      */
     @Override
     public TreeMap<Integer, List<ObjectId>> getMatchStandings(X01Match match) {
@@ -174,5 +175,27 @@ public class X01MatchResultServiceImpl implements IX01MatchResultService {
 
         // Return the number of completed sets
         return (int) completedSets;
+    }
+
+    /**
+     * Update the match status and the end date depending on if there are match winners or not.
+     * - Match is in play if there are no winners.
+     * - Match is concluded if there are winners.
+     *
+     * @param match        {@link X01Match} the match to be updated
+     * @param matchWinners {@link List<ObjectId>} the list containing the match winners
+     */
+    private void updateMatchState(X01Match match, List<ObjectId> matchWinners) {
+        // No winners mean the match is in play and no end date should be set.
+        if (matchWinners.isEmpty()) {
+            match.setEndDate(null);
+            match.setMatchStatus(MatchStatus.IN_PLAY);
+        } else {
+            // Only update the end date if the previous match status was in play.
+            if (match.getMatchStatus() == MatchStatus.IN_PLAY || match.getEndDate() == null) {
+                match.setEndDate(Instant.now());
+            }
+            match.setMatchStatus(MatchStatus.CONCLUDED);
+        }
     }
 }

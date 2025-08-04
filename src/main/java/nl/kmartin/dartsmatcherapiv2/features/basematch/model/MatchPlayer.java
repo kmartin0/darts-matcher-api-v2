@@ -17,7 +17,7 @@ public class MatchPlayer {
 
     @NotNull
     @NotEmpty
-    @Length(min = 3, max = 40)
+    @Length(min = 3, max = 30)
     private String playerName;
 
     @NotNull

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.TreeMap;
 
 public interface IX01MatchResultService {
-    void updateMatchResult(X01Match x01Match);
+    void updateMatchResult(X01Match match);
 
     void updateSetResults(X01Match match);
 
