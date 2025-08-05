@@ -4,6 +4,7 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01averagestatistics.IX01AverageStatisticsService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01checkoutstatistics.IX01CheckoutStatisticsService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegService;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01resultstatistics.IX01ResultStatisticsService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01scorestatistics.IX01ScoreStatisticsService;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
@@ -17,15 +18,17 @@ import java.util.stream.Collectors;
 
 @Service
 public class X01StatisticsServiceImpl implements IX01StatisticsService {
+    private final IX01ResultStatisticsService resultStatisticsService;
     private final IX01ScoreStatisticsService scoreStatisticsService;
     private final IX01CheckoutStatisticsService checkoutStatisticsService;
     private final IX01AverageStatisticsService averageStatisticsService;
     private final IX01LegService legService;
 
-    public X01StatisticsServiceImpl(IX01ScoreStatisticsService scoreStatisticsService,
+    public X01StatisticsServiceImpl(IX01ResultStatisticsService resultStatisticsService, IX01ScoreStatisticsService scoreStatisticsService,
                                     IX01CheckoutStatisticsService checkoutStatisticsService,
                                     IX01AverageStatisticsService averageStatisticsService,
                                     IX01LegService legService) {
+        this.resultStatisticsService = resultStatisticsService;
         this.scoreStatisticsService = scoreStatisticsService;
         this.checkoutStatisticsService = checkoutStatisticsService;
         this.averageStatisticsService = averageStatisticsService;
@@ -65,7 +68,10 @@ public class X01StatisticsServiceImpl implements IX01StatisticsService {
         if (sets == null || playersMap == null) return;
 
         // Process and update the player statistics using the data of all the legs
-        sets.values().forEach(set -> processLegs(set.getLegs(), trackDoubles, playersMap));
+        sets.values().forEach(set -> {
+            this.resultStatisticsService.updateSetsWonStatistics(set, playersMap);
+            processLegs(set.getLegs(), trackDoubles, playersMap);
+        });
     }
 
     /**
@@ -79,7 +85,10 @@ public class X01StatisticsServiceImpl implements IX01StatisticsService {
         if (legs == null || playersMap == null) return;
 
         // Process and update the player statistics using the data of all the leg rounds
-        legs.values().forEach(leg -> processLegRounds(leg.getRounds(), leg, trackDoubles, playersMap));
+        legs.values().forEach(leg -> {
+            this.resultStatisticsService.updateLegsWonStatistics(leg, playersMap);
+            processLegRounds(leg.getRounds(), leg, trackDoubles, playersMap);
+        });
     }
 
     /**

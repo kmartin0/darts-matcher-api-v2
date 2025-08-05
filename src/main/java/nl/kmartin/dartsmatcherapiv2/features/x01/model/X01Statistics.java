@@ -8,6 +8,9 @@ import lombok.Data;
 @AllArgsConstructor
 public class X01Statistics {
     @Valid
+    private X01ResultStatistics resultStatistics;
+
+    @Valid
     private X01AverageStatistics averageStats;
 
     @Valid
@@ -17,12 +20,16 @@ public class X01Statistics {
     private X01ScoreStatistics scoreStatistics;
 
     public X01Statistics() {
+        this.setResultStatistics(new X01ResultStatistics());
         this.setAverageStats(new X01AverageStatistics());
         this.setCheckoutStats(new X01CheckoutStatistics());
         this.setScoreStatistics(new X01ScoreStatistics());
     }
 
     public void reset() {
+        if (this.resultStatistics == null) this.resultStatistics = new X01ResultStatistics();
+        else this.resultStatistics.reset();
+
         if (this.averageStats == null) this.averageStats = new X01AverageStatistics();
         else this.averageStats.reset();
 
