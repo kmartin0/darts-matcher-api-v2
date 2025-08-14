@@ -18,6 +18,9 @@ public class X01LegRoundScore {
     @Max(180)
     private int score;
 
+    @Min(0)
+    private int remaining;
+
     public X01LegRoundScore(X01Turn turn, boolean trackDoubles) {
         this.doublesMissed = trackDoubles
                 ? (turn.getDoublesMissed() != null ? turn.getDoublesMissed() : 0)

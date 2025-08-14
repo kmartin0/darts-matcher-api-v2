@@ -73,6 +73,7 @@ public class X01LegServiceImpl implements IX01LegService {
         // Add the score to the round.
         X01LegRoundScore roundScore = new X01LegRoundScore(turn, trackDoubles);
         x01LegRound.get().round().getScores().put(throwerId, roundScore);
+        legResultService.updateRemaining(leg, throwerId, x01);
         if (turn.getCheckoutDartsUsed() != null) leg.setCheckoutDartsUsed(turn.getCheckoutDartsUsed());
 
         // Verify if the rounds are legal after adding the new score.
@@ -80,8 +81,7 @@ public class X01LegServiceImpl implements IX01LegService {
 
         // When the round is not legal. Set the score to zero and checkout darts used to null
         if (!isPlayerRoundsLegal) {
-            roundScore.setScore(0);
-            leg.setCheckoutDartsUsed(null);
+            this.handleIllegalRound(roundScore, leg, throwerId, x01);
         }
 
         // Update the leg result
@@ -131,7 +131,7 @@ public class X01LegServiceImpl implements IX01LegService {
     @Override
     public boolean validateLegForPlayer(X01Leg leg, int x01, ObjectId throwerId) {
         // Get the remaining score for the player
-        int remaining = legResultService.calculateRemainingScore(leg, x01, throwerId);
+        int remaining = legResultService.getRemainingForPlayer(leg, throwerId, x01);
 
         // The remaining score cannot be 1 or below 0
         if (checkoutService.isRemainingBust(remaining)) return false;
@@ -173,4 +173,17 @@ public class X01LegServiceImpl implements IX01LegService {
         return players.get(throwsFirstIndex).getPlayerId();
     }
 
+    /**
+     * Handles an illegal round score by resetting the score, clearing checkout darts used and updating the remaining points for the player.
+     *
+     * @param roundScore {@link X01LegRoundScore} the round score object to reset
+     * @param leg        {@link X01Leg} the leg containing the round
+     * @param playerId   {@link ObjectId} the ID of the player whose remaining points are being updated
+     * @param x01        int the starting score for the leg
+     */
+    private void handleIllegalRound(X01LegRoundScore roundScore, X01Leg leg, ObjectId playerId, int x01) {
+        roundScore.setScore(0);
+        leg.setCheckoutDartsUsed(null);
+        legResultService.updateRemaining(leg, playerId, x01);
+    }
 }

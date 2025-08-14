@@ -9,9 +9,8 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.x01leground.IX01LegRoundService
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class X01LegResultServiceImpl implements IX01LegResultService {
@@ -38,9 +37,11 @@ public class X01LegResultServiceImpl implements IX01LegResultService {
             return;
         }
 
+        // Update the remaining fields.
+        updateRemaining(leg, x01);
+
         // Find the winner of the leg by getting the first player who reaches zero remaining points.
-        Optional<X01MatchPlayer> winner = players.stream()
-                .filter(matchPlayer -> calculateRemainingScore(leg, x01, matchPlayer.getPlayerId()) == 0).findFirst();
+        Optional<X01MatchPlayer> winner = findLegWinner(leg, players, x01);
 
         // If a winner is present, set the player ID, otherwise set the winner to null
         winner.ifPresentOrElse(
@@ -85,27 +86,87 @@ public class X01LegResultServiceImpl implements IX01LegResultService {
     }
 
     /**
-     * Calculates the remaining score for a player in a leg.
+     * Finds the winner of a leg based on the remaining score reaching zero.
      *
-     * @param leg      {@link X01Leg} the leg containing the player scores
-     * @param x01      int of the starting score
-     * @param playerId {@link ObjectId} the player for which the remaining score needs to be calculated
-     * @return int of the remaining score for a player
+     * @param leg     {@link X01Leg} the leg to evaluate
+     * @param players {@link List<X01MatchPlayer>} the list of match players
+     * @param x01     int the starting score for the leg
+     * @return {@link Optional<X01MatchPlayer>} the winner if one exists, otherwise empty
      */
     @Override
-    public int calculateRemainingScore(X01Leg leg, int x01, ObjectId playerId) {
-        // When no rounds exist, the player has no throws so his remaining score is the starting score
-        if (X01MatchUtils.isRoundsEmpty(leg) || playerId == null) return x01;
+    public Optional<X01MatchPlayer> findLegWinner(X01Leg leg, List<X01MatchPlayer> players, int x01) {
+        List<X01MatchPlayer> orderedPlayers = X01MatchUtils.getThrowingOrder(leg.getThrowsFirst(), players);
 
-        // For every round map the player score and sum these up.
-        int totalScored = leg.getRounds().values().stream()
-                .mapToInt(value -> {
-                    X01LegRoundScore playerScore = value.getScores().get(playerId);
-                    return (playerScore != null) ? playerScore.getScore() : 0;
-                }).sum();
+        for (X01MatchPlayer player : orderedPlayers) {
+            int remaining = getRemainingForPlayer(leg, player.getPlayerId(), x01);
+            if (remaining == 0) {
+                return Optional.of(player);
+            }
+        }
 
-        // Subtract the total scored points from the starting score (x01).
-        return x01 - totalScored;
+        return Optional.empty();
+    }
+
+    /**
+     * Gets the remaining score for a specific player in a leg by checking the latest round in which they threw.
+     *
+     * @param leg      {@link X01Leg} the leg to evaluate
+     * @param playerId {@link ObjectId} the player ID
+     * @param x01      int the starting score for the leg
+     * @return int the remaining score for the player
+     */
+    @Override
+    public int getRemainingForPlayer(X01Leg leg, ObjectId playerId, int x01) {
+        for (X01LegRound round : leg.getRounds().descendingMap().values()) {
+            X01LegRoundScore playerScore = round.getScores().get(playerId);
+            if (playerScore != null) {
+                return playerScore.getRemaining();
+            }
+        }
+
+        return x01;
+    }
+
+    /**
+     * Updates the remaining scores for a specific player across all rounds in a leg.
+     *
+     * @param leg      {@link X01Leg} the leg to update
+     * @param playerId {@link ObjectId} the ID of the player whose remaining scores should be updated
+     * @param x01      int the starting score for the leg
+     */
+    @Override
+    public void updateRemaining(X01Leg leg, ObjectId playerId, int x01) {
+        if (leg == null) return;
+
+        AtomicInteger previousRemaining = new AtomicInteger(x01);
+        leg.getRounds().values().forEach(round -> {
+            if (round.getScores().containsKey(playerId)) {
+                X01LegRoundScore roundScore = round.getScores().get(playerId);
+
+                roundScore.setRemaining(previousRemaining.get() - roundScore.getScore());
+                previousRemaining.set(roundScore.getRemaining());
+            }
+        });
+    }
+
+    /**
+     * Updates the remaining scores for all players across all rounds in a leg.
+     *
+     * @param leg {@link X01Leg} the leg to update
+     * @param x01 int the starting score for the leg
+     */
+    @Override
+    public void updateRemaining(X01Leg leg, int x01) {
+        if (leg == null) return;
+
+        Map<ObjectId, Integer> remainingMap = new HashMap<>();
+        leg.getRounds().values().forEach(round -> {
+            round.getScores().forEach((playerId, roundScore) -> {
+                int previousRemaining = remainingMap.getOrDefault(playerId, x01);
+                roundScore.setRemaining(previousRemaining - roundScore.getScore());
+                remainingMap.put(playerId, roundScore.getRemaining());
+            });
+        });
     }
 
     /**
@@ -136,4 +197,5 @@ public class X01LegResultServiceImpl implements IX01LegResultService {
                     return 3;
                 }).sum();
     }
+
 }

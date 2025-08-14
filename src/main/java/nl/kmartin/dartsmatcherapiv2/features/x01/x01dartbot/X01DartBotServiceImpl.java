@@ -107,7 +107,7 @@ public class X01DartBotServiceImpl implements IX01DartBotService {
         int x01 = match.getMatchSettings().getX01();
 
         // Calculate the score already score by the dart bot in the current leg
-        int legScored = x01 - legResultService.calculateRemainingScore(currentLeg, x01, dartBotPlayer.getPlayerId());
+        int legScored = x01 - legResultService.getRemainingForPlayer(currentLeg, dartBotPlayer.getPlayerId(), x01);
 
         // Calculate the number of darts used by the dart bot in the current leg
         int dartsUsed = legResultService.calculateDartsUsed(currentLeg, dartBotPlayer.getPlayerId());
@@ -123,7 +123,7 @@ public class X01DartBotServiceImpl implements IX01DartBotService {
                 dartsUsed,
                 createTargetNumOfDarts(match.getMatchSettings().getX01(), targetOneDartAvg),
                 targetOneDartAvg,
-                new X01LegRoundScore(0, 0)
+                new X01LegRoundScore(0, 0, x01 - legScored)
         );
     }
 
@@ -168,7 +168,7 @@ public class X01DartBotServiceImpl implements IX01DartBotService {
             // Simulate dart throws and update the leg state for each throw.
             List<DartThrow> dartThrows = dartBotThrowSimulatorService.getNextDartThrows(dartBotLegState);
             dartThrows.forEach(dartThrow -> {
-                updateRoundScore(dartBotLegState.getLegRoundScore(), dartThrow, trackDoubles);
+                updateRoundScore(dartBotLegState, dartThrow, trackDoubles);
                 dartBotLegState.setDartsUsedInRound(dartBotLegState.getDartsUsedInRound() + 1);
             });
 
@@ -186,11 +186,13 @@ public class X01DartBotServiceImpl implements IX01DartBotService {
      * This method updates the score and the number of darts used for the given round. It also checks if the dart
      * throw missed the intended double section and updates the count of missed doubles if applicable.
      *
-     * @param roundScore {@link X01LegRoundScore} the current round score to update
+     * @param dartBotLegState {@link X01DartBotLegState} representing the dart bot's current state in the leg.
      * @param dartThrow  {@link DartThrow} the dart throw that contains the result to be added to the score
      */
-    private void updateRoundScore(X01LegRoundScore roundScore, DartThrow dartThrow, boolean trackDoubles) {
+    private void updateRoundScore(X01DartBotLegState dartBotLegState, DartThrow dartThrow, boolean trackDoubles) {
+        X01LegRoundScore roundScore = dartBotLegState.getLegRoundScore();
         roundScore.setScore(roundScore.getScore() + dartThrow.getResult().getScore());
+        roundScore.setRemaining(dartBotLegState.getRemainingPoints());
 
         // Check for double missed
         if (trackDoubles) {

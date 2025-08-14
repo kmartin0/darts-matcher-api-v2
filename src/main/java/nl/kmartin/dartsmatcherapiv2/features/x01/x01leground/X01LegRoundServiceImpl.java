@@ -6,7 +6,6 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01MatchPlayer;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -33,7 +32,7 @@ public class X01LegRoundServiceImpl implements IX01LegRoundService {
         if (playersToThrow.isEmpty()) return null;
 
         // Find the index of the player who stars the round.
-        List<X01MatchPlayer> orderedPlayers = getLegRoundThrowingOrder(throwsFirstInLeg, players);
+        List<X01MatchPlayer> orderedPlayers = X01MatchUtils.getThrowingOrder(throwsFirstInLeg, players);
         if (orderedPlayers == null) return null;
 
         // Find the first player in the order who hasn't scored yet.
@@ -59,32 +58,6 @@ public class X01LegRoundServiceImpl implements IX01LegRoundService {
         return players.stream()
                 .filter(player -> !legRound.getScores().containsKey(player.getPlayerId()))
                 .toList();
-    }
-
-    /**
-     * Orders a player list to the playing order for a round.
-     *
-     * @param throwsFirst {@link ObjectId} the player starting the round
-     * @param players     {@link List<X01MatchPlayer>} list of all match players.
-     * @return {@link List<X01MatchPlayer>} players ordered in the playing order of the round.
-     */
-    @Override
-    public List<X01MatchPlayer> getLegRoundThrowingOrder(ObjectId throwsFirst, List<X01MatchPlayer> players) {
-        if (players == null) return null;
-
-        // Find the index of the player that starts the round.
-        int throwsFirstIndex = players.indexOf(players.stream()
-                .filter(player -> player.getPlayerId().equals(throwsFirst))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Player not found")));
-
-        // Order the players in the throwing order of the round.
-        List<X01MatchPlayer> orderedPlayers = new ArrayList<>();
-        orderedPlayers.addAll(players.subList(throwsFirstIndex, players.size()));
-        orderedPlayers.addAll(players.subList(0, throwsFirstIndex));
-
-        // Return the ordered list.
-        return orderedPlayers;
     }
 
     /**

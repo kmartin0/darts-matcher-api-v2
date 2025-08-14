@@ -93,10 +93,14 @@ public class X01DartBotTests {
             }
             match.getMatchProgress().setCurrentRound(round);
             X01Turn x01Turn = dartBotService.createDartBotTurn(match);
-            X01LegRoundScore roundScore = new X01LegRoundScore(x01Turn.getDoublesMissed(), x01Turn.getScore());
+            X01LegRoundScore roundScore = new X01LegRoundScore(
+                    x01Turn.getDoublesMissed(),
+                    x01Turn.getScore(),
+                    remaining - x01Turn.getScore()
+            );
 
             currentLeg.getRounds().put(round++, new X01LegRound(new LinkedHashMap<>(Map.of(dartBotId, roundScore))));
-            remaining -= x01Turn.getScore();
+            remaining = roundScore.getRemaining();
             round++;
             dartsUsed = dartsUsed + (x01Turn.getCheckoutDartsUsed() == null ? 3 : x01Turn.getCheckoutDartsUsed());
         }

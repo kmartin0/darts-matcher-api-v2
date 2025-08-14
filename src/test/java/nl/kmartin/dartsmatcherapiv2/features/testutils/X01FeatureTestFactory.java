@@ -18,6 +18,8 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.api.IX01MatchRepositor
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service.*;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01matchsetup.IX01MatchSetupService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01matchsetup.X01MatchSetupServiceImpl;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01resultstatistics.IX01ResultStatisticsService;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01resultstatistics.X01ResultStatisticsServiceImpl;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01scorestatistics.IX01ScoreStatisticsService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01scorestatistics.X01ScoreStatisticsServiceImpl;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01set.*;
@@ -114,11 +116,16 @@ public class X01FeatureTestFactory {
 
     public IX01StatisticsService createStatisticsService() {
         return new X01StatisticsServiceImpl(
+                createResultStatisticsService(),
                 createScoreStatisticsService(),
                 createCheckoutStatisticsService(),
                 createAverageStatisticsService(),
                 createLegService()
         );
+    }
+
+    public IX01ResultStatisticsService createResultStatisticsService() {
+        return new X01ResultStatisticsServiceImpl();
     }
 
     public IX01CheckoutStatisticsService createCheckoutStatisticsService() {
