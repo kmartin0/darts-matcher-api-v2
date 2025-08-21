@@ -20,6 +20,8 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.x01matchsetup.IX01MatchSetupSer
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01matchsetup.X01MatchSetupServiceImpl;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01resultstatistics.IX01ResultStatisticsService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01resultstatistics.X01ResultStatisticsServiceImpl;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01rules.IX01RulesService;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01rules.X01RulesServiceImpl;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01scorestatistics.IX01ScoreStatisticsService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01scorestatistics.X01ScoreStatisticsServiceImpl;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01set.*;
@@ -68,7 +70,7 @@ public class X01FeatureTestFactory {
                 createSetProgressService(),
                 createLegProgressService(),
                 createLegRoundService(),
-                createStandingsService()
+                createRulesService()
         );
     }
 
@@ -81,7 +83,7 @@ public class X01FeatureTestFactory {
     }
 
     public IX01SetProgressService createSetProgressService() {
-        return new X01SetProgressServiceImpl(createLegService(), createLegProgressService(), createStandingsService());
+        return new X01SetProgressServiceImpl(createLegService(), createLegProgressService(), createRulesService());
     }
 
     public IX01LegService createLegService() {
@@ -179,6 +181,13 @@ public class X01FeatureTestFactory {
     }
 
     public IX01StandingsService createStandingsService() {
-        return new X01StandingsServiceImpl();
+        return new X01StandingsServiceImpl(
+                createMatchProgressService(),
+                createRulesService()
+        );
+    }
+
+    public IX01RulesService createRulesService() {
+        return new X01RulesServiceImpl();
     }
 }

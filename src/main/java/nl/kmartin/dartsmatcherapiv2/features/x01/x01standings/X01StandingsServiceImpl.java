@@ -1,6 +1,9 @@
 package nl.kmartin.dartsmatcherapiv2.features.x01.x01standings;
 
-import nl.kmartin.dartsmatcherapiv2.features.x01.model.X01ClearByTwoRule;
+import nl.kmartin.dartsmatcherapiv2.features.basematch.model.ResultType;
+import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01match.service.IX01MatchProgressService;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01rules.IX01RulesService;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -10,6 +13,47 @@ import java.util.stream.Collectors;
 
 @Service
 public class X01StandingsServiceImpl implements IX01StandingsService {
+
+    private final IX01MatchProgressService matchProgressService;
+    private final IX01RulesService rulesService;
+
+    public X01StandingsServiceImpl(IX01MatchProgressService matchProgressService, IX01RulesService rulesService) {
+        this.matchProgressService = matchProgressService;
+        this.rulesService = rulesService;
+    }
+
+    /**
+     * Updates the match standings for a match.
+     *
+     * @param match {@link X01Match} The match for which the standings need to be updated.
+     */
+    @Override
+    public void updateMatchStandings(X01Match match) {
+        if (match == null) return;
+
+        // Get the current set or the last set if the match is concluded.
+        Optional<X01SetEntry> currentSet = matchProgressService.getCurrentSet(match)
+                .or(() -> Optional.ofNullable(match.getSets().lastEntry())
+                        .map(X01SetEntry::new));
+
+        // Create the initial standings map with a value for each player set to 0 wins.
+        LinkedHashMap<ObjectId, X01StandingsEntry> matchStandings = createInitialStandings(match.getPlayers());
+
+        // Iterate through the sets and update the legsWonInSet and setsWon counts for the set/leg winners.
+        match.getSets().entrySet().stream().map(X01SetEntry::new).forEach(setEntry -> {
+            // For the current set update the legsWonInSet counts.
+            currentSet.ifPresent(currentSetEntry -> {
+                if (currentSetEntry.setNumber() == setEntry.setNumber())
+                    updateStandingsWithLegWinners(currentSetEntry, matchStandings);
+            });
+
+            // Update the setsWon counts
+            updateStandingsWithSetWinners(setEntry, matchStandings);
+        });
+
+        // Replace the match standings with the newly created standings.
+        match.setStandings(matchStandings);
+    }
 
     /**
      * Determines the winners from the current standings based on the number of legs/sets played,
@@ -33,13 +77,13 @@ public class X01StandingsServiceImpl implements IX01StandingsService {
         int bestOfRemaining = bestOf - played;
 
         // Step 3: For single player match continue until no remaining
-        if (isSinglePlayerMatch(standings, leaderScore, runnerUpScore)) {
+        if (rulesService.isSinglePlayerMatch(standings, leaderScore, runnerUpScore)) {
             if (bestOfRemaining == 0) return new ArrayList<>(standings.get(leaderScore));
             else return Collections.emptyList();
         }
 
         // Step 4: If leaderScore cannot be caught up by the remaining best of then everyone in the leaderScore group is a winner.
-        if (isWinnerConfirmed(diff, bestOfRemaining, played, bestOf, clearByTwoRule)) {
+        if (rulesService.isWinnerConfirmed(diff, bestOfRemaining, played, bestOf, clearByTwoRule)) {
             return new ArrayList<>(standings.get(leaderScore));
         }
 
@@ -48,17 +92,52 @@ public class X01StandingsServiceImpl implements IX01StandingsService {
     }
 
     /**
-     * Get the maximum number to play:
-     * - When clear by two is enabled; sum of bestOf and clear by two limit.
-     * - When clear by two is disabled; sum of bestOf.
+     * Creates a standings map with an entry for each player with 0 sets/leg wins.
      *
-     * @param bestOf         the best of setting.
-     * @param clearByTwoRule the clear by two rule.
-     * @return the maximum number to play.
+     * @param players The players that should be in the standings
+     * @return A linked hashmap keyed by player id and with a value of an empty {@link X01StandingsEntry}
      */
-    @Override
-    public int getMaxToPlay(int bestOf, X01ClearByTwoRule clearByTwoRule) {
-        return clearByTwoRule.isEnabled() ? bestOf + clearByTwoRule.getLimit() : bestOf;
+    private LinkedHashMap<ObjectId, X01StandingsEntry> createInitialStandings(List<X01MatchPlayer> players) {
+        return players.stream()
+                .collect(Collectors.toMap(
+                        X01MatchPlayer::getPlayerId,
+                        player -> new X01StandingsEntry(0, 0),
+                        (oldVal, newVal) -> oldVal,
+                        LinkedHashMap::new
+                ));
+    }
+
+    /**
+     * Updates the standings for all players that have won legs in a set.
+     *
+     * @param currentSetEntry The set containing the legs to update the standings with.
+     * @param matchStandings  The standings that need to be updated.
+     */
+    private void updateStandingsWithLegWinners(X01SetEntry currentSetEntry, LinkedHashMap<ObjectId, X01StandingsEntry> matchStandings) {
+        currentSetEntry.set().getLegs().entrySet().stream().map(X01LegEntry::new).forEach(legEntry -> {
+            ObjectId legWinner = legEntry.leg().getWinner();
+            if (legWinner != null && matchStandings.containsKey(legWinner)) {
+                X01StandingsEntry playerStandings = matchStandings.get(legWinner);
+                playerStandings.setLegsWonInCurrentSet(playerStandings.getLegsWonInCurrentSet() + 1);
+            }
+        });
+    }
+
+    /**
+     * Updates the standings for all players that have won or drawn a set.
+     *
+     * @param setEntry       The set containing the result to update the standings with.
+     * @param matchStandings The standings that need to be updated.
+     */
+    private void updateStandingsWithSetWinners(X01SetEntry setEntry, LinkedHashMap<ObjectId, X01StandingsEntry> matchStandings) {
+        if (!CollectionUtils.isEmpty(setEntry.set().getResult())) {
+            setEntry.set().getResult().entrySet().stream().filter(resultEntry ->
+                    (resultEntry.getValue().equals(ResultType.WIN) || resultEntry.getValue().equals(ResultType.DRAW) &&
+                            matchStandings.containsKey(resultEntry.getKey()))).forEach(resultEntry -> {
+                X01StandingsEntry playerStandings = matchStandings.get(resultEntry.getKey());
+                playerStandings.setSetsWon(playerStandings.getSetsWon() + 1);
+            });
+        }
     }
 
     /**
@@ -77,72 +156,6 @@ public class X01StandingsServiceImpl implements IX01StandingsService {
                         TreeMap::new, // supplier: group into a sorted TreeMap
                         Collectors.mapping(Map.Entry::getKey, Collectors.toList()) // downstream: map entries to player IDs list
                 ));
-    }
-
-    /**
-     * Checks if the match has only one player.
-     *
-     * @param standings     The current standings map.
-     * @param leaderScore   The highest score.
-     * @param runnerUpScore The second-highest score, or null if none (all players same score).
-     * @return true if there is exactly one player, false otherwise.
-     */
-    private boolean isSinglePlayerMatch(TreeMap<Integer, List<ObjectId>> standings, int leaderScore, Integer runnerUpScore) {
-        // A match has only one player if there is exactly 1 leader and there are no runner-ups.
-        return runnerUpScore == null && standings.get(leaderScore).size() == 1;
-    }
-
-    /**
-     * Determines if the winner is confirmed. First checks if the winner cannot be caught by the standard best of rules.
-     * Then checks if the clear by two rule is satisfied.
-     *
-     * @param diff            The difference in score won between the leader and runner-up.
-     * @param bestOfRemaining The number remaining to be played.
-     * @param played          The number already played.
-     * @param bestOf          the best of setting.
-     * @param clearByTwoRule  The clear-by-two rule settings.
-     * @return true if the winner can be confirmed, false otherwise.
-     */
-    private boolean isWinnerConfirmed(int diff, int bestOfRemaining, int played, int bestOf, X01ClearByTwoRule clearByTwoRule) {
-        return winnerCannotBeCaught(diff, bestOfRemaining) &&
-                isClearByTwoSatisfied(diff, played, bestOf, clearByTwoRule);
-    }
-
-    /**
-     * Determines if the leader cannot be caught by the runner-up given the remaining number to be played.
-     *
-     * @param diff            The difference score between the leader and runner-up.
-     * @param bestOfRemaining The number remaining to be played.
-     * @return true if the leader's lead is greater than the remaining number to be played, or if there is none remaining.
-     */
-    private boolean winnerCannotBeCaught(int diff, int bestOfRemaining) {
-        return bestOfRemaining == 0 || diff > bestOfRemaining;
-    }
-
-    /**
-     * Checks if the clear-by-two rule is satisfied. it is satisfied when:
-     * - The rule is disabled
-     * - Difference between winner and runner-up is two
-     * - The match has reached the best of limit + clear by two limit.
-     *
-     * @param diff           The difference between the leader and runner-up.
-     * @param played         The number for already played.
-     * @param bestOf         the best of setting.
-     * @param clearByTwoRule The clear-by-two rule settings.
-     * @return true if the clear-by-two condition is met or the match should end due to limit, false otherwise.
-     */
-    private boolean isClearByTwoSatisfied(int diff, int played, int bestOf, X01ClearByTwoRule clearByTwoRule) {
-        // Clear by two is disabled, so it is always satisfied.
-        if (!clearByTwoRule.isEnabled()) return true;
-
-        // Difference is 2 or more so clear by two is satisfied.
-        if (diff >= 2) return true;
-
-        // Calculate the maximum number that can be played.
-        int maxToPlay = getMaxToPlay(bestOf, clearByTwoRule);
-
-        // Match ends if played equals or exceeds max.
-        return played >= maxToPlay;
     }
 
 }

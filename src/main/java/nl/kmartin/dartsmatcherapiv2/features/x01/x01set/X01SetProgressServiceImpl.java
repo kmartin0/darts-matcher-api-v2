@@ -5,7 +5,7 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.common.X01MatchUtils;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegProgressService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegService;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01standings.IX01StandingsService;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01rules.IX01RulesService;
 import nl.kmartin.dartsmatcherapiv2.utils.NumberUtils;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
@@ -17,12 +17,12 @@ public class X01SetProgressServiceImpl implements IX01SetProgressService {
 
     private final IX01LegService legService;
     private final IX01LegProgressService legProgressService;
-    private final IX01StandingsService standingsService;
+    private final IX01RulesService rulesService;
 
-    public X01SetProgressServiceImpl(IX01LegService legService, IX01LegProgressService legProgressService, IX01StandingsService standingsService) {
+    public X01SetProgressServiceImpl(IX01LegService legService, IX01LegProgressService legProgressService, IX01RulesService rulesService) {
         this.legService = legService;
         this.legProgressService = legProgressService;
-        this.standingsService = standingsService;
+        this.rulesService = rulesService;
     }
 
     /**
@@ -83,7 +83,7 @@ public class X01SetProgressServiceImpl implements IX01SetProgressService {
         Set<Integer> existingLetNumbers = getLegNumbers(setEntry.set());
 
         // Find the next available leg number (ensure it doesn't exceed the best of legs)
-        int maxLegs = standingsService.getMaxToPlay(bestOf.getLegs(), bestOf.getClearByTwoLegsRuleForSet(setEntry.setNumber()));
+        int maxLegs = rulesService.getMaxToPlay(bestOf.getLegs(), bestOf.getClearByTwoLegsRuleForSet(setEntry.setNumber()));
         int nextLegNumber = NumberUtils.findNextNumber(existingLetNumbers, maxLegs);
         if (nextLegNumber == -1) return Optional.empty();
 

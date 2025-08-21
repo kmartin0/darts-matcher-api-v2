@@ -57,6 +57,9 @@ public class X01MatchResultServiceImpl implements IX01MatchResultService {
 
         // Update the match state.
         updateMatchState(match, matchWinners);
+
+        // update the standings.
+        standingsService.updateMatchStandings(match);
     }
 
     /**

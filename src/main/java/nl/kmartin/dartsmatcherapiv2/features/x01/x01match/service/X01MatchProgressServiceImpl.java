@@ -5,9 +5,9 @@ import nl.kmartin.dartsmatcherapiv2.features.x01.common.X01MatchUtils;
 import nl.kmartin.dartsmatcherapiv2.features.x01.model.*;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leg.IX01LegProgressService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01leground.IX01LegRoundService;
+import nl.kmartin.dartsmatcherapiv2.features.x01.x01rules.IX01RulesService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01set.IX01SetProgressService;
 import nl.kmartin.dartsmatcherapiv2.features.x01.x01set.IX01SetService;
-import nl.kmartin.dartsmatcherapiv2.features.x01.x01standings.IX01StandingsService;
 import nl.kmartin.dartsmatcherapiv2.utils.NumberUtils;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
@@ -24,15 +24,15 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
     private final IX01SetProgressService setProgressService;
     private final IX01LegProgressService legProgressService;
     private final IX01LegRoundService legRoundService;
-    private final IX01StandingsService standingsService;
+    private final IX01RulesService rulesService;
 
     public X01MatchProgressServiceImpl(IX01SetService setService, IX01SetProgressService setProgressService,
-                                       IX01LegProgressService legProgressService, IX01LegRoundService legRoundService, IX01StandingsService standingsService) {
+                                       IX01LegProgressService legProgressService, IX01LegRoundService legRoundService, IX01RulesService rulesService) {
         this.setService = setService;
         this.setProgressService = setProgressService;
         this.legProgressService = legProgressService;
         this.legRoundService = legRoundService;
-        this.standingsService = standingsService;
+        this.rulesService = rulesService;
     }
 
     /**
@@ -91,7 +91,7 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
 
         // Find the next available set number (ensure it doesn't exceed the best of sets)
         X01BestOf bestOf = match.getMatchSettings().getBestOf();
-        int maxSets = standingsService.getMaxToPlay(bestOf.getSets(), bestOf.getClearByTwoSetsRule());
+        int maxSets = rulesService.getMaxToPlay(bestOf.getSets(), bestOf.getClearByTwoSetsRule());
         int nextSetNumber = NumberUtils.findNextNumber(existingSetNumbers, maxSets);
         if (nextSetNumber == -1) return Optional.empty();
 
@@ -139,7 +139,7 @@ public class X01MatchProgressServiceImpl implements IX01MatchProgressService {
      * Finds the current leg in play inside a set. If the leg is not created yet. A new leg will be made and
      * added to the current set.
      *
-     * @param match      {@link X01Match}  the match for which the current leg needs to be determined
+     * @param match           {@link X01Match}  the match for which the current leg needs to be determined
      * @param currentSetEntry {@link X01SetEntry} the current set in play.
      * @return {@link Optional<X01LegEntry>} the current leg in play.
      */
