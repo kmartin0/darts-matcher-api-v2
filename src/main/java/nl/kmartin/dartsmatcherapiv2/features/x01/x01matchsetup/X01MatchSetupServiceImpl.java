@@ -39,7 +39,8 @@ public class X01MatchSetupServiceImpl implements IX01MatchSetupService {
     private void setupMatchPlayers(X01Match match) {
         // Generate a unique id for each player and set their statistics.
         match.getPlayers().forEach(player -> {
-            player.setPlayerId(new ObjectId());
+            // Don't generate a new player id if the player already has one
+            if (player.getPlayerId() == null) player.setPlayerId(new ObjectId());
             player.setResultType(null);
             player.setStatistics(new X01Statistics());
         });

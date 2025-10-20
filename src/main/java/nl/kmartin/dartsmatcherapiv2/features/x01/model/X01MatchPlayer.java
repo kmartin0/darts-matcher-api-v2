@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.MatchPlayer;
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.PlayerType;
 import nl.kmartin.dartsmatcherapiv2.features.basematch.model.ResultType;
@@ -13,6 +14,7 @@ import org.bson.types.ObjectId;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 @ValidX01DartBotSettings
 public class X01MatchPlayer extends MatchPlayer {
     public X01MatchPlayer(ObjectId playerId, String playerName, PlayerType playerType, ResultType resultType,
